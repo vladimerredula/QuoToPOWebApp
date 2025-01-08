@@ -1,0 +1,237 @@
+﻿@{
+    ViewData["Title"] = "Process";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="container">
+    <div class="row g-3 mb-4">
+        <div class="col-md">
+            <label for="pdfFile" class="form-label">Upload a Quotation file</label>
+            <input class="form-control" type="file" name="pdfFile" id="pdfFile" accept=".pdf" onchange="uploadPdf()">
+        </div>
+        <div class="col-md-auto col-lg-3">
+            <label for="pdfType" class="form-label">Select PDF type</label>
+            <select class="form-select" aria-label="PDF type" id="pdfType">
+                <option selected disabled>Choose..</option>
+                <option value="1">Native</option>
+                <option value="2">Scanned</option>
+            </select>
+        </div>
+        <div class="col-lg-auto">
+            <button class="mt-4 btn btn-lg btn-info">Run OCR</button>
+        </div>
+    </div>
+    <div class="row g-5 mb-3">
+        <div class="col-md-6 px-3">
+            <h4>Preview</h4>
+            <div class="row">
+                <div class="col-8">
+                    <img id="pdfPreview" class="border rounded-2" src="" filename="" alt="PDF Preview" style="width:100%;"/>
+                    <div class="mt-2 row justify-content-between">
+                        <div class="col-auto">
+                            <a class="btn btn-sm btn-outline-secondary" id="prev" onclick="prevPage()">Previous</a>
+                        </div>
+                        <div class="col-auto">
+                            Page <span id="currentPage">0</span> of <span id="totalPage">0</span>
+                        </div>
+                        <div class="col-auto">
+                            <a class="btn btn-sm btn-outline-secondary" id="next" onclick="nextPage()">Next</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* <div>
+                <img src="@Model" alt="PDF Thumbnail" style="width: 400px; height: auto; border: 1px solid #ccc;" />
+            </div>
+
+            <div style="margin-top: 20px;">
+                @{
+                    int pageIndex = ViewBag.PageIndex != null ? (int)ViewBag.PageIndex : 0;
+                }
+                <form method="get" action="/Process/Preview" style="display: inline;">
+                    <input type="hidden" name="filePath" value="@ViewBag.FilePath" />
+                    <input type="hidden" name="pageIndex" value="@(Math.Max(pageIndex - 1, 0))" />
+                    <button class="btn btn-sm btn-outline-secondary" type="submit" @(pageIndex == 0 ? "disabled" : "")>Previous</button>
+                </form>
+
+                <span style="margin: 0 20px;">
+                    Page @(pageIndex != null ? pageIndex + 1 : 1) of @(ViewBag.TotalPages ?? 1)
+                </span>
+
+                <form method="get" action="/Process/Preview" style="display: inline;">
+                    <input type="hidden" name="filePath" value="@ViewBag.FilePath" />
+                    <input type="hidden" name="pageIndex" value="@(Math.Min(pageIndex + 1, (int)ViewBag.TotalPages - 1))" />
+                    <button class="btn btn-sm btn-outline-secondary" type="submit" @(pageIndex == ViewBag.TotalPages - 1 ? "disabled" : "")>Next</button>
+                </form>
+            </div> *@
+        </div>
+        <div class="col-md-6">
+            @* <h4>Details</h4>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="quoteDate" class="form-label">Quotation date</label>
+                    <input type="date" class="form-control" id="quoteDate">
+                </div>
+                <div class="col-md-6">
+                    <label for="quoteNumber" class="form-label">Quotation number</label>
+                    <input type="text" class="form-control" id="quoteNumber">
+                </div>
+                <div class="col-md-6">
+                    <label for="supplier" class="form-label text-nowrap">Payment terms</label>
+                    <select class="form-select" aria-label="PDF type" id="pdfType">
+                        <option selected disabled>Choose..</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="supplier" class="form-label text-nowrap">Delivery terms</label>
+                    <select class="form-select" aria-label="PDF type" id="pdfType">
+                        <option selected disabled>Choose..</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-12">
+                    <div class="row">
+                        <label for="supplier" class="form-label">Supplier</label>
+                        <div class="col col-md-6">
+                            <select class="form-select" aria-label="PDF type" id="pdfType">
+                                <option selected disabled>Choose..</option>
+                                <option value="1">Supplier 1</option>
+                                <option value="2">Supplier 2</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-secondary">Custom</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <textarea type="text" class="form-control" id="supplier" placeholder="1234 Main St"></textarea>
+                </div>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-12">
+                    <div class="row">
+                        <label for="supplier" class="form-label">Delivery Address</label>
+                        <div class="col col-md-6">
+                            <select class="form-select" aria-label="PDF type" id="pdfType">
+                                <option selected disabled>Choose..</option>
+                                <option value="1">FFJ Zama</option>
+                                <option value="2">FFJ Hachioji</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-secondary text-nowrap">Custom</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <textarea type="text" class="form-control" id="supplier" placeholder="1234 Main St"></textarea>
+                </div>
+            </div> *@
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        async function uploadPdf() {
+            const fileInput = document.getElementById('pdfFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                return;
+            }
+            const formData = new FormData();
+            formData.append('pdfFile', file);
+
+            try {
+                // Perform the AJAX request using fetch
+                const response = await fetch('/Process/UploadPdf', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                renderPreview(data);
+            } catch (error) {
+                console.error('Upload error:', error);
+            }
+        }
+
+        async function nextPage() {
+            const preview = $('#pdfPreview');
+            const filePath = preview.attr("filename");
+
+            if (!filePath) {
+                return;
+            }
+            console.log("yes");
+
+            const currentPage = parseInt($("#currentPage").text());
+            const formData = new FormData();
+            formData.append('filePath', filePath);
+            formData.append('pageIndex', currentPage);
+
+            try {
+                // Perform the AJAX request using fetch
+                const response = await fetch('/Process/GenerateThumbnail', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                renderPreview(data);
+            } catch (error) {
+                console.error('Upload error:', error);
+            }
+        }
+
+        async function prevPage() {
+            const preview = $('#pdfPreview');
+            const filePath = preview.attr("filename");
+
+            if (!filePath) {
+                return;
+            }
+
+            const currentPage = parseInt($("#currentPage").text()) - 2;
+            const formData = new FormData();
+            formData.append('filePath', filePath);
+            formData.append('pageIndex', currentPage);
+
+            try {
+                // Perform the AJAX request using fetch
+                const response = await fetch('/Process/GenerateThumbnail', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                renderPreview(data);
+            } catch (error) {
+                console.error('Upload error:', error);
+            }
+        }
+
+        function renderPreview(data) {
+            console.log(data);
+            if (data.image) {
+                $('#pdfPreview').attr("src", data.image);
+                $('#pdfPreview').attr("filename", data.filePath);
+
+                $("#currentPage").text(data.pageIndex + 1);
+                $("#totalPage").text(data.totalPages);
+
+                $("#prev").toggleClass("disabled", data.pageIndex == 0);
+                $("#next").toggleClass("disabled", data.totalPages - data.pageIndex == 1);
+            }
+
+            return;
+        }
+    </script>
+}
