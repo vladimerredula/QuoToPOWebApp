@@ -1,17 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PdfiumViewer;
 using QouToPOWebApp.Services;
-using System.Drawing.Imaging;
 
 namespace QouToPOWebApp.Controllers
 {
     public class ProcessController : Controller
     {
-        private readonly IPdfViewerService _pdf;
+        private readonly PdfiumViewerService _pdf;
 
-        public ProcessController(IPdfViewerService pdfViewerService)
+        public ProcessController()
         {
-            _pdf = pdfViewerService;
+            _pdf = new PdfiumViewerService();
         }
 
         public IActionResult Index()

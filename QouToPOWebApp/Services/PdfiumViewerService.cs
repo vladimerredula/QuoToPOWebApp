@@ -3,13 +3,7 @@ using System.Drawing.Imaging;
 
 namespace QouToPOWebApp.Services
 {
-
-    public interface IPdfViewerService
-    {
-        List<byte[]> GenerateThumbnails(string filePath);
-    }
-
-    public class PdfiumViewerService : IPdfViewerService
+    public class PdfiumViewerService
     {
         public List<byte[]> GenerateThumbnails(string filePath)
         {
