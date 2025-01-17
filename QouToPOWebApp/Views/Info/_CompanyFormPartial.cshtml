@@ -1,0 +1,39 @@
+﻿@model Company
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<input type="hidden" asp-for="Company_ID" />
+<div class="form-group mb-3">
+    <label asp-for="Company_name" class="control-label"></label>
+    <input asp-for="Company_name" class="form-control" />
+    <span asp-validation-for="Company_name" class="text-danger"></span>
+</div>
+<div class="form-group mb-3">
+    <label asp-for="Company_name_jpn" class="control-label"></label>
+    <input asp-for="Company_name_jpn" class="form-control" />
+    <span asp-validation-for="Company_name_jpn" class="text-danger"></span>
+</div>
+<div class="form-group mb-3">
+    <label asp-for="Address" class="control-label"></label>
+    <input asp-for="Address" class="form-control" />
+    <span asp-validation-for="Address" class="text-danger"></span>
+</div>
+<div class="form-group mb-3">
+    <label asp-for="Address_jpn" class="control-label"></label>
+    <input asp-for="Address_jpn" class="form-control" />
+    <span asp-validation-for="Address_jpn" class="text-danger"></span>
+</div>
+<div class="form-group mb-3">
+    <label asp-for="Postal_code" class="control-label"></label>
+    <input asp-for="Postal_code" class="form-control" />
+    <span asp-validation-for="Postal_code" class="text-danger"></span>
+</div>
+<div class="form-group mb-3">
+    <label asp-for="Telephone" class="control-label"></label>
+    <input asp-for="Telephone" class="form-control" />
+    <span asp-validation-for="Telephone" class="text-danger"></span>
+</div>
+<div class="form-group mb-3">
+    <label asp-for="Fax" class="control-label"></label>
+    <input asp-for="Fax" class="form-control" />
+    <span asp-validation-for="Fax" class="text-danger"></span>
+</div>
