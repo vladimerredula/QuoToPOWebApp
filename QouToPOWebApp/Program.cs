@@ -1,10 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using QouToPOWebApp;
+using QouToPOWebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<PdfiumViewerService>();
+builder.Services.AddScoped<PdfPigService>();
+builder.Services.AddScoped<TabulaService>();
 
 // Add DbContext with MySQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

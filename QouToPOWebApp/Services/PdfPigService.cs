@@ -8,7 +8,7 @@ namespace QouToPOWebApp.Services
         {
             var extractedText = new List<string>();
 
-            using (var document = PdfDocument.Open(pdfPath))
+            using (var document = Open(pdfPath))
             {
                 foreach (var page in document.GetPages())
                 {
@@ -17,6 +17,21 @@ namespace QouToPOWebApp.Services
             }
 
             return extractedText;
+        }
+
+        public PdfDocument Open(byte[] fileBytes, ParsingOptions? options = null)
+        {
+            return PdfDocument.Open(fileBytes, options);
+        }
+
+        public PdfDocument Open(string pdfPath, ParsingOptions? options = null)
+        {
+            return PdfDocument.Open(pdfPath, options);
+        }
+
+        public PdfDocument Open(Stream stream, ParsingOptions? options = null)
+        {
+            return PdfDocument.Open(stream, options);
         }
     }
 }

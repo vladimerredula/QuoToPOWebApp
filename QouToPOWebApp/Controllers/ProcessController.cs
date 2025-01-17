@@ -5,11 +5,13 @@ namespace QouToPOWebApp.Controllers
 {
     public class ProcessController : Controller
     {
-        private readonly PdfiumViewerService _pdf;
+        private readonly ApplicationDbContext _db;
+        private readonly TabulaService _tabula;
 
-        public ProcessController()
+        public ProcessController(ApplicationDbContext dbContext, TabulaService tabula)
         {
-            _pdf = new PdfiumViewerService();
+            _db = dbContext;
+            _tabula = tabula;
         }
 
         public IActionResult Index()
