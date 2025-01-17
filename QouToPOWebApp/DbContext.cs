@@ -9,7 +9,7 @@ namespace QouToPOWebApp
         {
         }
 
-        public DbSet<Company> Companys { get; set; }
+        public DbSet<Company> Companies { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<Quotation> Quotations { get; set; }
         public DbSet<Quotation_item> quotation_items { get; set; }
