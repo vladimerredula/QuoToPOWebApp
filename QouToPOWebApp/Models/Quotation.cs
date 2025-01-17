@@ -8,17 +8,28 @@ namespace QouToPOWebApp.Models
         public int Quotation_ID { get; set; }
         public string? Quotation_number { get; set; }
 
-        [Display(Name = "Quotation Number")]
-        public string Quotation_number { get; set; }
+        private DateTime? _quotationDate;
+        public DateTime? Quotation_date 
+        {
+            get => _quotationDate; 
+            set => _quotationDate = value; 
+        }
 
-        [Display(Name = "Quotation Date")]
-        public DateOnly Quotation_date { get; set; }
-
-        [Display(Name = "Supplier")]
-        public int Supplier_ID { get; set; }
-
-        [Display(Name = "Payment Terms")]
-        public int Payment_term_ID { get; set; }
+        public string? Quotation_date_string
+        {
+            get => _quotationDate.HasValue ? _quotationDate.Value.ToString("yyyy-MM-dd") : string.Empty;
+            set
+            {
+                if (DateTime.TryParse(value, out var parsedDate))
+                {
+                    _quotationDate = parsedDate;
+                } 
+                else
+                {
+                    _quotationDate = null;
+                }
+            }
+        }
 
         public int? Supplier_ID { get; set; }
         public int? Payment_term_ID { get; set; }
