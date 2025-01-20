@@ -1,7 +1,7 @@
-﻿@model IEnumerable<QouToPOWebApp.Models.Delivery_term>
+﻿@model IEnumerable<Company>
 
 @{
-    ViewData["Title"] = "Delivery Term";
+    ViewData["Title"] = "Company";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -13,10 +13,25 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Delivery_term_name)
+                @Html.DisplayNameFor(model => model.Company_name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Delivery_term_name_jpn)
+                @Html.DisplayNameFor(model => model.Company_name_jpn)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Address)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Address_jpn)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Postal_code)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Telephone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Fax)
             </th>
             <th></th>
         </tr>
@@ -25,15 +40,30 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Delivery_term_name)
+                @Html.DisplayFor(modelItem => item.Company_name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Delivery_term_name_jpn)
+                @Html.DisplayFor(modelItem => item.Company_name_jpn)
             </td>
             <td>
-                <a class="editBtn" href="#" data-id="@item.Delivery_term_ID">Edit</a> |
-                <a class="detailsBtn" href="#" data-id="@item.Delivery_term_ID">Details</a> |
-                <a class="deleteBtn" href="#" data-id="@item.Delivery_term_ID">Delete</a>
+                @Html.DisplayFor(modelItem => item.Address)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Address_jpn)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Postal_code)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Telephone)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Fax)
+            </td>
+            <td>
+                <a class="editBtn" href="#" data-id="@item.Company_ID">Edit</a> |
+                <a class="detailsBtn" href="#" data-id="@item.Company_ID">Details</a> |
+                <a class="deleteBtn" href="#" data-id="@item.Company_ID">Delete</a>
             </td>
         </tr>
 }
@@ -47,7 +77,7 @@
                 <h5 class="modal-title" id="createModalLabel">Create New Entry</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="createForm" asp-controller="Info" asp-action="CreateDeliveryTerm" method="post">
+            <form id="createForm" asp-controller="Info" asp-action="CreateCompany" method="post">
                 <div class="modal-body">
                     <div id="createEntry">
                         <!-- Content loaded via AJAX -->
@@ -70,7 +100,7 @@
                 <h5 class="modal-title" id="editModalLabel">Edit Entry</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editForm" asp-controller="Info" asp-action="EditDeliveryTerm" method="post">
+            <form id="editForm" asp-controller="Info" asp-action="EditCompany" method="post">
                 <input type="hidden" name="id" id="editID" />
                 <div class="modal-body">
                     <div id="editEntry"></div> <!-- Content loaded via AJAX -->
@@ -86,7 +116,7 @@
 </div>
 
 <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="detailsModalLabel">Details</h5>
@@ -115,7 +145,7 @@
                 <div id="deleteEntry"></div> <!-- Content loaded via AJAX -->
             </div>
             <div class="modal-footer">
-                <form asp-action="DeleteDeliveryTerm">
+                <form asp-action="DeleteCompany">
                     <input type="hidden" name="id" id="deleteID" />
                     <input type="submit" value="Delete" class="btn btn-danger" />
                 </form>
@@ -132,11 +162,11 @@
         $(document).ready(function () {
             // Load the partial view content into the modal
             $('#createModal').on('show.bs.modal', function () {
-                $('#createEntry').load('/Info/CreateDeliveryTerm');
+                $('#createEntry').load('/Info/CreateCompany');
             });
 
             $('#editModal').on('show.bs.modal', function () {
-                loadEditForm()
+                loadEditForm();
             });
         });
 
@@ -151,19 +181,20 @@
             const id = $(this).data('id');
             $('#editID').val(id);
             $('#detailsModal').modal('show');
-            $('#detailsEntry').load(`/Info/DetailsDeliveryTerm/${id}`);
+            $('#detailsEntry').load(`/Info/DetailsCompany/${id}`);
         });
 
         $(".deleteBtn").on("click", function () {
             const id = $(this).data('id');
             $('#deleteModal').modal('show');
-            $('#deleteEntry').load(`/Info/DeleteDeliveryTerm/${id}`);
+            $('#deleteEntry').load(`/Info/DeleteCompany/${id}`);
             $('#deleteID').val(id);
         });
 
         function loadEditForm() {
             const id = $('#editID').val();
-            $('#editEntry').load(`/Info/EditDeliveryTerm/${id}`);
+            console.log(id);
+            $('#editEntry').load(`/Info/EditCompany/${id}`);
         }
     </script>
 }

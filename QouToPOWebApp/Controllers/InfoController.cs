@@ -17,7 +17,7 @@ namespace QouToPOWebApp.Controllers
         // GET: Company
         public async Task<IActionResult> Company()
         {
-            return View(await _context.Companies.ToListAsync());
+            return View("Company/Index", await _context.Companies.ToListAsync());
         }
 
         // GET: Info/DetailsCompany/5
@@ -35,13 +35,13 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            return PartialView("_CompanyDisplayPartial", company);
+            return PartialView("Company/_DisplayPartial", company);
         }
 
         // GET: Info/Create
         public IActionResult CreateCompany()
         {
-            return PartialView("_CompanyFormPartial");
+            return PartialView("Company/_FormPartial");
         }
 
         // POST: Info/CreateCompany
@@ -58,7 +58,7 @@ namespace QouToPOWebApp.Controllers
                 return RedirectToAction(nameof(Company));
             }
 
-            return View(nameof(Company), company);
+            return View("Company/Index", company);
         }
 
         // GET: Info/EditCompany/5
@@ -75,7 +75,7 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            return PartialView("_CompanyFormPartial", company);
+            return PartialView("Company/_FormPartial", company);
         }
 
         // POST: Info/EditCompany/5
@@ -109,7 +109,7 @@ namespace QouToPOWebApp.Controllers
                 }
                 return RedirectToAction(nameof(Company));
             }
-            return View(nameof(Company), company);
+            return View("Company/Index", company);
         }
 
         // GET: Info/DeleteCompany/5
@@ -127,7 +127,7 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            return PartialView("_CompanyDisplayPartial", company);
+            return PartialView("Company/_DisplayPartial", company);
         }
 
         // POST: Info/DeleteCompany/5
@@ -156,7 +156,7 @@ namespace QouToPOWebApp.Controllers
         // GET: DeliveryTerm
         public async Task<IActionResult> DeliveryTerm()
         {
-            return View(await _context.Delivery_terms.ToListAsync());
+            return View("DeliveryTerm/Index", await _context.Delivery_terms.ToListAsync());
         }
 
         // GET: Info/DetailsDeliveryTerm/5
@@ -174,13 +174,13 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            return PartialView("_DeliveryTermDisplayPartial", deliveryTerm);
+            return PartialView("DeliveryTerm/_DisplayPartial", deliveryTerm);
         }
 
         // GET: Info/Create
         public IActionResult CreateDeliveryTerm()
         {
-            return PartialView("_DeliveryTermFormPartial");
+            return PartialView("DeliveryTerm/_FormPartial");
         }
 
         // POST: Info/CreateDeliveryTerm
@@ -197,7 +197,7 @@ namespace QouToPOWebApp.Controllers
                 return RedirectToAction(nameof(DeliveryTerm));
             }
 
-            return View(nameof(DeliveryTerm), deliveryTerm);
+            return View("DeliveryTerm/Index", deliveryTerm);
         }
 
         // GET: Info/EditDeliveryTerm/5
@@ -214,7 +214,7 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            return PartialView("_DeliveryTermFormPartial", deliveryTerm);
+            return PartialView("DeliveryTerm/_FormPartial", deliveryTerm);
         }
 
         // POST: Info/EditDeliveryTerm/5
@@ -248,7 +248,7 @@ namespace QouToPOWebApp.Controllers
                 }
                 return RedirectToAction(nameof(DeliveryTerm));
             }
-            return View(nameof(DeliveryTerm), deliveryTerm);
+            return View("DeliveryTerm/Index", deliveryTerm);
         }
 
         // GET: Info/DeleteDeliveryTerm/5
@@ -266,7 +266,7 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            return PartialView("_DeliveryTermDisplayPartial", deliveryTerm);
+            return PartialView("DeliveryTerm/_DisplayPartial", deliveryTerm);
         }
 
         // POST: Info/DeleteDeliveryTerm/5
