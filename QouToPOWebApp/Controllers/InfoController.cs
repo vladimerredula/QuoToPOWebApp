@@ -307,7 +307,7 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            return await GetDeliveryAddress(supplier.Supplier_ID);
+            return await GetDeliveryAddress((int)supplier.Company_ID);
         }
 
         [HttpPost]
@@ -320,7 +320,7 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            return Json(company.Address);
+            return Json(company.Address ?? company.Address_jpn);
         }
 
         #endregion
