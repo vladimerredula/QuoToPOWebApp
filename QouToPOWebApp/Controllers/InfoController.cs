@@ -289,5 +289,144 @@ namespace QouToPOWebApp.Controllers
             return _context.Delivery_terms.Any(e => e.Delivery_term_ID == id);
         }
         #endregion
+
+
+        #region Payment term Functions
+        // GET: PaymentTerm
+        public async Task<IActionResult> PaymentTerm()
+        {
+            return View("PaymentTerm/Index", await _context.Payment_terms.ToListAsync());
+        }
+
+        // GET: Info/DetailsPaymentTerm/5
+        public async Task<IActionResult> DetailsPaymentTerm(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var paymentTerm = await _context.Payment_terms
+                .FirstOrDefaultAsync(m => m.Payment_term_ID == id);
+            if (paymentTerm == null)
+            {
+                return NotFound();
+            }
+
+            return PartialView("PaymentTerm/_DisplayPartial", paymentTerm);
+        }
+
+        // GET: Info/Create
+        public IActionResult CreatePaymentTerm()
+        {
+            return PartialView("PaymentTerm/_FormPartial");
+        }
+
+        // POST: Info/CreatePaymentTerm
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreatePaymentTerm([Bind("Payment_term_name,Payment_term_name_jpn")] Payment_term paymentTerm)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(paymentTerm);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(PaymentTerm));
+            }
+
+            return View("PaymentTerm/Index", paymentTerm);
+        }
+
+        // GET: Info/EditPaymentTerm/5
+        public async Task<IActionResult> EditPaymentTerm(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var paymentTerm = await _context.Payment_terms.FindAsync(id);
+            if (paymentTerm == null)
+            {
+                return NotFound();
+            }
+
+            return PartialView("PaymentTerm/_FormPartial", paymentTerm);
+        }
+
+        // POST: Info/EditPaymentTerm/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditPaymentTerm(int id, [Bind("Payment_term_ID,Payment_term_name,Payment_term_name_jpn")] Payment_term paymentTerm)
+        {
+            if (id != paymentTerm.Payment_term_ID)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(paymentTerm);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!PaymentTermExists(paymentTerm.Payment_term_ID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(PaymentTerm));
+            }
+            return View("PaymentTerm/Index", paymentTerm);
+        }
+
+        // GET: Info/DeletePaymentTerm/5
+        public async Task<IActionResult> DeletePaymentTerm(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var paymentTerm = await _context.Payment_terms
+                .FirstOrDefaultAsync(m => m.Payment_term_ID == id);
+            if (paymentTerm == null)
+            {
+                return NotFound();
+            }
+
+            return PartialView("PaymentTerm/_DisplayPartial", paymentTerm);
+        }
+
+        // POST: Info/DeletePaymentTerm/5
+        [HttpPost, ActionName("DeletePaymentTerm")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeletePaymentTermConfirmed(int id)
+        {
+            var paymentTerm = await _context.Payment_terms.FindAsync(id);
+            if (paymentTerm != null)
+            {
+                _context.Payment_terms.Remove(paymentTerm);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(PaymentTerm));
+        }
+
+        private bool PaymentTermExists(int id)
+        {
+            return _context.Payment_terms.Any(e => e.Payment_term_ID == id);
+        }
+        #endregion
     }
 }
