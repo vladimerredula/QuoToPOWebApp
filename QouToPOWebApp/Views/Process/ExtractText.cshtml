@@ -12,7 +12,7 @@
             <div class="col-md">
                 <label asp="pdfFile" class="form-label">Upload a Quotation file</label>
                 <input class="form-control" type="file" id="pdfFile" accept=".pdf" onchange="uploadPdf(this)">
-                <input asp-for="File_path" type="text" value="" hidden />
+                <input asp-for="File_path" type="text" hidden />
                 <span asp-validation-for="File_path" class="text-danger"></span>
             </div>
             <div class="col-md-auto col-lg-3">
@@ -29,9 +29,9 @@
         <div class="row g-5 mb-3">
             <div class="col-md-5 px-3">
                 <h4>Preview</h4>
-                <div class="row justify-content-center visually-hidden" id="preview">
+                <div class="row justify-content-center" id="preview">
                     <div class="col-12 bg-secondary-subtle p-0 rounded-2" style="max-width:340px">
-                        <img id="pdfPreview" class="border rounded-2" src="" filename="" alt="PDF Preview" style="width:100%;" />
+                        <img id="pdfPreview" class="border rounded-2" src="" filename="@Model.File_path" alt="PDF Preview" style="width:100%;" />
                     </div>
                     <div class="mt-2 row p-0 justify-content-between" style="max-width:337px;">
                         <div class="col-auto">
@@ -50,9 +50,9 @@
                 <h4>Details</h4>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label asp-for="Quotation_date_string" class="form-label"></label>
-                        <input asp-for="Quotation_date_string" type="date" class="form-control" />
-                        <span asp-validation-for="Quotation_date_string" class="text-danger"></span>
+                        <label asp-for="Quotation_date" class="form-label"></label>
+                        <input asp-for="Quotation_date" type="date" class="form-control" />
+                        <span asp-validation-for="Quotation_date" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
                         <label asp-for="Quotation_number" class="form-label"></label>
@@ -81,8 +81,6 @@
                             <div class="col col-md-6">
                                 <select asp-for="Supplier_ID" class="form-select" asp-items="ViewBag.supplierList">
                                     <option selected disabled>Choose..</option>
-                                    <option value="1">Supplier 1</option>
-                                    <option value="2">Supplier 2</option>
                                 </select>
                             </div>
                             <div class="col-auto">
@@ -92,7 +90,7 @@
                         </div>
                     </div>
                     <div class="col-12">
-                        <textarea type="text" class="form-control" id="supplier" placeholder="Supplier address"></textarea>
+                        <textarea type="text" class="form-control" id="supplierAddress" placeholder="Supplier address"></textarea>
                     </div>
                 </div>
                 <div class="row g-3 mb-3">
@@ -100,7 +98,7 @@
                         <div class="row">
                             <label for="delivery" class="form-label">Delivery Address</label>
                             <div class="col col-md-6">
-                                <select class="form-select">
+                                <select class="form-select" id="deliveryID">
                                     <option selected disabled>Choose..</option>
                                     <option value="1">FFJ Zama</option>
                                     <option value="2">FFJ Hachioji</option>
@@ -112,7 +110,7 @@
                         </div>
                     </div>
                     <div class="col-12">
-                        <textarea type="text" class="form-control" id="supplier" placeholder="Delivery address"></textarea>
+                        <textarea type="text" class="form-control" id="deliveryAddress" placeholder="Delivery address"></textarea>
                     </div>
                 </div>
             </div>
@@ -124,106 +122,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script>
-        function submitForm() {
-            $("#quoForm").submit();
-        }
 
-        async function uploadPdf(fileInput) {
-            const file = fileInput.files[0];
-
-            if (!file) {
-                return;
-            }
-            const formData = new FormData();
-            formData.append('pdfFile', file);
-
-            try {
-                // Perform the AJAX request using fetch
-                const response = await fetch('/Pdf/UploadPdf', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                renderPreview(data);
-            } catch (error) {
-                console.error('Upload error:', error);
-            }
-        }
-
-        async function nextPage() {
-            const preview = $('#pdfPreview');
-            const filePath = preview.attr("filename");
-
-            if (!filePath) {
-                return;
-            }
-
-            const currentPage = parseInt($("#currentPage").text());
-            const formData = new FormData();
-            formData.append('filePath', filePath);
-            formData.append('pageIndex', currentPage);
-
-            try {
-                // Perform the AJAX request using fetch
-                const response = await fetch('/Pdf/GenerateThumbnail', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                renderPreview(data);
-            } catch (error) {
-                console.error('Upload error:', error);
-            }
-        }
-
-        async function prevPage() {
-            const preview = $('#pdfPreview');
-            const filePath = preview.attr("filename");
-
-            if (!filePath) {
-                return;
-            }
-
-            const currentPage = parseInt($("#currentPage").text()) - 2;
-            const formData = new FormData();
-            formData.append('filePath', filePath);
-            formData.append('pageIndex', currentPage);
-
-            try {
-                // Perform the AJAX request using fetch
-                const response = await fetch('/Pdf/GenerateThumbnail', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                renderPreview(data);
-            } catch (error) {
-                console.error('Upload error:', error);
-            }
-        }
-
-        function renderPreview(data) {
-            if (data.image) {
-                $('#pdfPreview').attr("src", data.image);
-                $('#pdfPreview').attr("filename", data.filePath);
-                $('#File_path').val(data.filePath);
-                $('#preview').removeClass("visually-hidden");
-
-                $("#currentPage").text(data.pageIndex + 1);
-                $("#totalPage").text(data.totalPages);
-
-                $("#prev").toggleClass("disabled", data.pageIndex == 0);
-                $("#next").toggleClass("disabled", data.totalPages - data.pageIndex == 1);
-            }
-
-            return;
-        }
-    </script>
+    <script src="/js/extractText.js"></script>
 }

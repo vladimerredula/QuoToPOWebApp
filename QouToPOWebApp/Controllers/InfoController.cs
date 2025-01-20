@@ -296,6 +296,33 @@ namespace QouToPOWebApp.Controllers
         {
             return _db.Suppliers.Any(e => e.Supplier_ID == id);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> GetSupplierAddress(int id)
+        {
+            var supplier = await _db.Suppliers.FindAsync(id);
+
+            if (supplier == null)
+            {
+                return NotFound();
+            }
+
+            return await GetDeliveryAddress(supplier.Supplier_ID);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetDeliveryAddress(int id)
+        {
+            var company = await _db.Companies.FindAsync(id);
+
+            if (company == null)
+            {
+                return NotFound();
+            }
+
+            return Json(company.Address);
+        }
+
         #endregion
 
 
