@@ -55,7 +55,7 @@ namespace QouToPOWebApp.Controllers
             {
                 _context.Add(company);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Company));
             }
 
             return View(nameof(Company), company);

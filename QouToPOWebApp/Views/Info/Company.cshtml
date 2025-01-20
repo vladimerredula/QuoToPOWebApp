@@ -4,7 +4,7 @@
     ViewData["Title"] = "Company";
 }
 
-<h1>ViewData["Title"]</h1>
+<h1>@ViewData["Title"]</h1>
 
 <p>
     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createModal">Create New</button>
@@ -127,7 +127,7 @@
             </div>
             <div class="modal-footer">
                 <div class="form-group">
-                    <a href="#" class="btn btn-warning editBtn" id="detailsEditBtn" data-id="">Update</a>
+                    <button class="btn btn-warning" data-bs-target="#editModal" data-bs-toggle="modal">Update</button>
                 </div>
             </div>
         </div>
@@ -164,20 +164,24 @@
             $('#createModal').on('show.bs.modal', function () {
                 $('#createEntry').load('/Info/CreateCompany');
             });
+
+            $('#editModal').on('show.bs.modal', function () {
+                loadEditForm()
+            });
         });
 
         $(".editBtn").on("click", function () {
             const id = $(this).data('id');
-            $('#editModal').modal('show');
-            $('#editEntry').load(`/Info/EditCompany/${id}`);
             $('#editID').val(id);
+            $('#editModal').modal('show');
+            loadEditForm();
         });
 
         $(".detailsBtn").on("click", function () {
             const id = $(this).data('id');
+            $('#editID').val(id);
             $('#detailsModal').modal('show');
             $('#detailsEntry').load(`/Info/DetailsCompany/${id}`);
-            $('#detailsEditBtn').attr('data-id', id);
         });
 
         $(".deleteBtn").on("click", function () {
@@ -186,5 +190,11 @@
             $('#deleteEntry').load(`/Info/DeleteCompany/${id}`);
             $('#deleteID').val(id);
         });
+
+        function loadEditForm() {
+            const id = $('#editID').val();
+            console.log(id);
+            $('#editEntry').load(`/Info/EditCompany/${id}`);
+        }
     </script>
 }
