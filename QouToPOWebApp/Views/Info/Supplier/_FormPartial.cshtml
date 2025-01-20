@@ -1,0 +1,26 @@
+﻿@model Supplier
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<input type="hidden" asp-for="Supplier_ID" />
+<div class="form-group mb-3">
+    <label asp-for="Company_ID" class="form-label"></label>
+    <select class="form-select" asp-for="Company_ID" asp-items="ViewBag.CompanyList">
+        <option selected disabled>Choose..</option>
+    </select>
+    <span asp-validation-for="Company_ID" class="text-danger"></span>
+</div>
+<div class="form-group mb-3">
+    <label asp-for="Contact_person" class="control-label"></label>
+    <input asp-for="Contact_person" class="form-control" />
+    <span asp-validation-for="Contact_person" class="text-danger"></span>
+</div>
+<div class="form-group mb-3">
+    <label asp-for="Contact_person_jpn" class="control-label"></label>
+    <input asp-for="Contact_person_jpn" class="form-control" />
+    <span asp-validation-for="Contact_person_jpn" class="text-danger"></span>
+</div>
+<div class="form-group mb-3">
+    <label asp-for="Key_words" class="control-label"></label>
+    <input asp-for="Key_words" class="form-control" />
+    <span asp-validation-for="Key_words" class="text-danger"></span>
+</div>

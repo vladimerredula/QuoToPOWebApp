@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QouToPOWebApp.Models;
 
@@ -147,7 +148,153 @@ namespace QouToPOWebApp.Controllers
 
         private bool CompanyExists(int id)
         {
-            return _context.Companies.Any(e => e.Company_ID == id);
+            return _db.Companies.Any(e => e.Company_ID == id);
+        }
+        #endregion
+
+
+        #region Supplier Functions
+        // GET: Supplier
+        public async Task<IActionResult> Supplier()
+        {
+            return View("Supplier/Index", await _db.Suppliers.Include(s => s.Company).ToListAsync());
+        }
+
+        // GET: Info/DetailsSupplier/5
+        public async Task<IActionResult> DetailsSupplier(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var supplier = await _db.Suppliers
+                .Include(s => s.Company)
+                .FirstOrDefaultAsync(m => m.Supplier_ID == id);
+
+            if (supplier == null)
+            {
+                return NotFound();
+            }
+
+            return PartialView("Supplier/_DisplayPartial", supplier);
+        }
+
+        // GET: Info/Create
+        public IActionResult CreateSupplier()
+        {
+            ViewBag.CompanyList = new SelectList(_db.Companies.ToList(), "Company_ID", "Company_name");
+
+            return PartialView("Supplier/_FormPartial");
+        }
+
+        // POST: Info/CreateSupplier
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateSupplier([Bind("Company_ID,Contact_person,Contact_person_jpn,Key_words")] Supplier supplier)
+        {
+            if (ModelState.IsValid)
+            {
+                _db.Add(supplier);
+                await _db.SaveChangesAsync();
+                return RedirectToAction(nameof(Supplier));
+            }
+
+            return View("Supplier/Index", supplier);
+        }
+
+        // GET: Info/EditSupplier/5
+        public async Task<IActionResult> EditSupplier(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var supplier = await _db.Suppliers.FindAsync(id);
+            if (supplier == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.CompanyList = new SelectList(_db.Companies.ToList(), "Company_ID", "Company_name", supplier.Company_ID);
+
+            return PartialView("Supplier/_FormPartial", supplier);
+        }
+
+        // POST: Info/EditSupplier/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditSupplier(int id, [Bind("Contact_person,Contact_person_jpn,Company_ID,Key_words")] Supplier supplier)
+        {
+            if (id != supplier.Supplier_ID)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _db.Update(supplier);
+                    await _db.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!SupplierExists(supplier.Supplier_ID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Supplier));
+            }
+            return View("Supplier/Index", supplier);
+        }
+
+        // GET: Info/DeleteSupplier/5
+        public async Task<IActionResult> DeleteSupplier(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var supplier = await _db.Suppliers
+                .Include(s => s.Company)
+                .FirstOrDefaultAsync(m => m.Supplier_ID == id);
+            if (supplier == null)
+            {
+                return NotFound();
+            }
+
+            return PartialView("Supplier/_DisplayPartial", supplier);
+        }
+
+        // POST: Info/DeleteSupplier/5
+        [HttpPost, ActionName("DeleteSupplier")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteSupplierConfirmed(int id)
+        {
+            var supplier = await _db.Suppliers.FindAsync(id);
+            if (supplier != null)
+            {
+                _db.Suppliers.Remove(supplier);
+            }
+
+            await _db.SaveChangesAsync();
+            return RedirectToAction(nameof(Supplier));
+        }
+
+        private bool SupplierExists(int id)
+        {
+            return _db.Suppliers.Any(e => e.Supplier_ID == id);
         }
         #endregion
 

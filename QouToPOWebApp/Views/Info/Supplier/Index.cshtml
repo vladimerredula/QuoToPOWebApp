@@ -1,0 +1,176 @@
+﻿@model IEnumerable<Supplier>
+
+@{
+    ViewData["Title"] = "Supplier";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createModal">Create New</button>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Company.Company_name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Contact_person)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Key_words)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Company.Company_name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Contact_person)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Key_words)
+            </td>
+            <td>
+                <a class="editBtn" href="#" data-id="@item.Supplier_ID">Edit</a> |
+                <a class="detailsBtn" href="#" data-id="@item.Supplier_ID">Details</a> |
+                <a class="deleteBtn" href="#" data-id="@item.Supplier_ID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createModalLabel">Create New Entry</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="createForm" asp-controller="Info" asp-action="CreateSupplier" method="post">
+                <div class="modal-body">
+                    <div id="createEntry">
+                        <!-- Content loaded via AJAX -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="form-group">
+                        <input type="submit" value="Create" class="btn btn-primary" />
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Entry</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editForm" asp-controller="Info" asp-action="EditSupplier" method="post">
+                <input type="hidden" name="id" id="editID" />
+                <div class="modal-body">
+                    <div id="editEntry"></div> <!-- Content loaded via AJAX -->
+                </div>
+                <div class="modal-footer">
+                    <div class="form-group">
+                        <input type="submit" value="Save" class="btn btn-warning" />
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="detailsEntry"></div> <!-- Content loaded via AJAX -->
+            </div>
+            <div class="modal-footer">
+                <div class="form-group">
+                    <button class="btn btn-warning" data-bs-target="#editModal" data-bs-toggle="modal">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Entry</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="deleteEntry"></div> <!-- Content loaded via AJAX -->
+            </div>
+            <div class="modal-footer">
+                <form asp-action="DeleteSupplier">
+                    <input type="hidden" name="id" id="deleteID" />
+                    <input type="submit" value="Delete" class="btn btn-danger" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            // Load the partial view content into the modal
+            $('#createModal').on('show.bs.modal', function () {
+                $('#createEntry').load('/Info/CreateSupplier');
+            });
+
+            $('#editModal').on('show.bs.modal', function () {
+                loadEditForm();
+            });
+        });
+
+        $(".editBtn").on("click", function () {
+            const id = $(this).data('id');
+            $('#editID').val(id);
+            $('#editModal').modal('show');
+            loadEditForm();
+        });
+
+        $(".detailsBtn").on("click", function () {
+            const id = $(this).data('id');
+            $('#editID').val(id);
+            $('#detailsModal').modal('show');
+            $('#detailsEntry').load(`/Info/DetailsSupplier/${id}`);
+        });
+
+        $(".deleteBtn").on("click", function () {
+            const id = $(this).data('id');
+            $('#deleteModal').modal('show');
+            $('#deleteEntry').load(`/Info/DeleteSupplier/${id}`);
+            $('#deleteID').val(id);
+        });
+
+        function loadEditForm() {
+            const id = $('#editID').val();
+            console.log(id);
+            $('#editEntry').load(`/Info/EditSupplier/${id}`);
+        }
+    </script>
+}
