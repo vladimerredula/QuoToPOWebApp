@@ -6,18 +6,18 @@ namespace QouToPOWebApp.Controllers
 {
     public class InfoController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _db;
 
         public InfoController(ApplicationDbContext context)
         {
-            _context = context;
+            _db = context;
         }
 
         #region Company Functions
         // GET: Company
         public async Task<IActionResult> Company()
         {
-            return View("Company/Index", await _context.Companies.ToListAsync());
+            return View("Company/Index", await _db.Companies.ToListAsync());
         }
 
         // GET: Info/DetailsCompany/5
@@ -28,7 +28,7 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            var company = await _context.Companies
+            var company = await _db.Companies
                 .FirstOrDefaultAsync(m => m.Company_ID == id);
             if (company == null)
             {
@@ -53,8 +53,8 @@ namespace QouToPOWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(company);
-                await _context.SaveChangesAsync();
+                _db.Add(company);
+                await _db.SaveChangesAsync();
                 return RedirectToAction(nameof(Company));
             }
 
@@ -69,7 +69,7 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            var company = await _context.Companies.FindAsync(id);
+            var company = await _db.Companies.FindAsync(id);
             if (company == null)
             {
                 return NotFound();
@@ -93,8 +93,8 @@ namespace QouToPOWebApp.Controllers
             {
                 try
                 {
-                    _context.Update(company);
-                    await _context.SaveChangesAsync();
+                    _db.Update(company);
+                    await _db.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -120,7 +120,7 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            var company = await _context.Companies
+            var company = await _db.Companies
                 .FirstOrDefaultAsync(m => m.Company_ID == id);
             if (company == null)
             {
@@ -135,13 +135,13 @@ namespace QouToPOWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCompanyConfirmed(int id)
         {
-            var company = await _context.Companies.FindAsync(id);
+            var company = await _db.Companies.FindAsync(id);
             if (company != null)
             {
-                _context.Companies.Remove(company);
+                _db.Companies.Remove(company);
             }
 
-            await _context.SaveChangesAsync();
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Company));
         }
 
@@ -156,7 +156,7 @@ namespace QouToPOWebApp.Controllers
         // GET: DeliveryTerm
         public async Task<IActionResult> DeliveryTerm()
         {
-            return View("DeliveryTerm/Index", await _context.Delivery_terms.ToListAsync());
+            return View("DeliveryTerm/Index", await _db.Delivery_terms.ToListAsync());
         }
 
         // GET: Info/DetailsDeliveryTerm/5
@@ -167,7 +167,7 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            var deliveryTerm = await _context.Delivery_terms
+            var deliveryTerm = await _db.Delivery_terms
                 .FirstOrDefaultAsync(m => m.Delivery_term_ID == id);
             if (deliveryTerm == null)
             {
@@ -192,8 +192,8 @@ namespace QouToPOWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(deliveryTerm);
-                await _context.SaveChangesAsync();
+                _db.Add(deliveryTerm);
+                await _db.SaveChangesAsync();
                 return RedirectToAction(nameof(DeliveryTerm));
             }
 
@@ -208,7 +208,7 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            var deliveryTerm = await _context.Delivery_terms.FindAsync(id);
+            var deliveryTerm = await _db.Delivery_terms.FindAsync(id);
             if (deliveryTerm == null)
             {
                 return NotFound();
@@ -232,8 +232,8 @@ namespace QouToPOWebApp.Controllers
             {
                 try
                 {
-                    _context.Update(deliveryTerm);
-                    await _context.SaveChangesAsync();
+                    _db.Update(deliveryTerm);
+                    await _db.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -259,7 +259,7 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            var deliveryTerm = await _context.Delivery_terms
+            var deliveryTerm = await _db.Delivery_terms
                 .FirstOrDefaultAsync(m => m.Delivery_term_ID == id);
             if (deliveryTerm == null)
             {
@@ -274,19 +274,19 @@ namespace QouToPOWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteDeliveryTermConfirmed(int id)
         {
-            var deliveryTerm = await _context.Delivery_terms.FindAsync(id);
+            var deliveryTerm = await _db.Delivery_terms.FindAsync(id);
             if (deliveryTerm != null)
             {
-                _context.Delivery_terms.Remove(deliveryTerm);
+                _db.Delivery_terms.Remove(deliveryTerm);
             }
 
-            await _context.SaveChangesAsync();
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof(DeliveryTerm));
         }
 
         private bool DeliveryTermExists(int id)
         {
-            return _context.Delivery_terms.Any(e => e.Delivery_term_ID == id);
+            return _db.Delivery_terms.Any(e => e.Delivery_term_ID == id);
         }
         #endregion
 
@@ -295,7 +295,7 @@ namespace QouToPOWebApp.Controllers
         // GET: PaymentTerm
         public async Task<IActionResult> PaymentTerm()
         {
-            return View("PaymentTerm/Index", await _context.Payment_terms.ToListAsync());
+            return View("PaymentTerm/Index", await _db.Payment_terms.ToListAsync());
         }
 
         // GET: Info/DetailsPaymentTerm/5
@@ -306,7 +306,7 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            var paymentTerm = await _context.Payment_terms
+            var paymentTerm = await _db.Payment_terms
                 .FirstOrDefaultAsync(m => m.Payment_term_ID == id);
             if (paymentTerm == null)
             {
@@ -331,8 +331,8 @@ namespace QouToPOWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(paymentTerm);
-                await _context.SaveChangesAsync();
+                _db.Add(paymentTerm);
+                await _db.SaveChangesAsync();
                 return RedirectToAction(nameof(PaymentTerm));
             }
 
@@ -347,7 +347,7 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            var paymentTerm = await _context.Payment_terms.FindAsync(id);
+            var paymentTerm = await _db.Payment_terms.FindAsync(id);
             if (paymentTerm == null)
             {
                 return NotFound();
@@ -371,8 +371,8 @@ namespace QouToPOWebApp.Controllers
             {
                 try
                 {
-                    _context.Update(paymentTerm);
-                    await _context.SaveChangesAsync();
+                    _db.Update(paymentTerm);
+                    await _db.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -398,7 +398,7 @@ namespace QouToPOWebApp.Controllers
                 return NotFound();
             }
 
-            var paymentTerm = await _context.Payment_terms
+            var paymentTerm = await _db.Payment_terms
                 .FirstOrDefaultAsync(m => m.Payment_term_ID == id);
             if (paymentTerm == null)
             {
@@ -413,19 +413,19 @@ namespace QouToPOWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePaymentTermConfirmed(int id)
         {
-            var paymentTerm = await _context.Payment_terms.FindAsync(id);
+            var paymentTerm = await _db.Payment_terms.FindAsync(id);
             if (paymentTerm != null)
             {
-                _context.Payment_terms.Remove(paymentTerm);
+                _db.Payment_terms.Remove(paymentTerm);
             }
 
-            await _context.SaveChangesAsync();
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof(PaymentTerm));
         }
 
         private bool PaymentTermExists(int id)
         {
-            return _context.Payment_terms.Any(e => e.Payment_term_ID == id);
+            return _db.Payment_terms.Any(e => e.Payment_term_ID == id);
         }
         #endregion
     }
