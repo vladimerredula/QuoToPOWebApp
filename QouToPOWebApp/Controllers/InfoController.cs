@@ -335,7 +335,7 @@ namespace QouToPOWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateDeliveryTerm([Bind("Delivery_term_name,Delivery_term_name_jpn")] Delivery_term deliveryTerm)
+        public async Task<IActionResult> CreateDeliveryTerm([Bind("Delivery_term_name,Delivery_term_name_jpn,Key_words")] Delivery_term deliveryTerm)
         {
             if (ModelState.IsValid)
             {
@@ -368,7 +368,7 @@ namespace QouToPOWebApp.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditDeliveryTerm(int id, [Bind("Delivery_term_ID,Delivery_term_name,Delivery_term_name_jpn")] Delivery_term deliveryTerm)
+        public async Task<IActionResult> EditDeliveryTerm(int id, [Bind("Delivery_term_ID,Delivery_term_name,Delivery_term_name_jpn,Key_words")] Delivery_term deliveryTerm)
         {
             if (id != deliveryTerm.Delivery_term_ID)
             {
@@ -474,7 +474,7 @@ namespace QouToPOWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreatePaymentTerm([Bind("Payment_term_name,Payment_term_name_jpn")] Payment_term paymentTerm)
+        public async Task<IActionResult> CreatePaymentTerm([Bind("Payment_term_name,Payment_term_name_jpn,Key_words")] Payment_term paymentTerm)
         {
             if (ModelState.IsValid)
             {
@@ -507,7 +507,7 @@ namespace QouToPOWebApp.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPaymentTerm(int id, [Bind("Payment_term_ID,Payment_term_name,Payment_term_name_jpn")] Payment_term paymentTerm)
+        public async Task<IActionResult> EditPaymentTerm(int id, [Bind("Payment_term_ID,Payment_term_name,Payment_term_name_jpn,Key_words")] Payment_term paymentTerm)
         {
             if (id != paymentTerm.Payment_term_ID)
             {

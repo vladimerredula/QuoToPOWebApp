@@ -18,6 +18,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Delivery_term_name_jpn)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Key_words)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -29,6 +32,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Delivery_term_name_jpn)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Key_words)
             </td>
             <td>
                 <a class="editBtn" href="#" data-id="@item.Delivery_term_ID">Edit</a> |
