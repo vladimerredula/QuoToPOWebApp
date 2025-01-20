@@ -35,12 +35,13 @@ namespace QouToPOWebApp.Controllers
             //var extractedText = ListToString(extractedTables);
             List<string> extractedTables = _pdfPig.ExtractText(model.File_path);
             var extractedText = ListToString(extractedTables);
+            var cleanedText = extractedText.Replace("_", "").Replace(" ", "");
 
-            model.Quotation_date = GetQuotationDate(extractedText);
-            model.Supplier_ID = GetSupplier(extractedText);
+            model.Quotation_date = GetQuotationDate(cleanedText);
+            model.Supplier_ID = GetSupplier(cleanedText);
             model.File_name = Path.GetFileName(model.File_path);
-            model.Payment_term_ID = GetPaymentTerms(extractedText);
-            model.Delivery_term_ID = GetDeliveryTerms(extractedText);
+            model.Payment_term_ID = GetPaymentTerms(cleanedText);
+            model.Delivery_term_ID = GetDeliveryTerms(cleanedText);
 
             ViewBag.pdfTypeList = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name");
             ViewBag.paymentTermList = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Payment_term_ID);
@@ -120,7 +121,7 @@ namespace QouToPOWebApp.Controllers
 
                 foreach (var keyword in keywords)
                 {
-                    if (text.Contains(keyword))
+                    if (text.Contains(keyword.Replace(" ", "")))
                     {
                         return supplier.Supplier_ID;
                     }
