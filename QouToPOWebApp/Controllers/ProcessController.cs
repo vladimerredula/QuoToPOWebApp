@@ -11,12 +11,14 @@ namespace QouToPOWebApp.Controllers
         private readonly ApplicationDbContext _db;
         private readonly TabulaService _tabula;
         private readonly PdfPigService _pdfPig;
+        private readonly TabulaJarService _tabulaJar;
 
         public ProcessController(ApplicationDbContext dbContext, TabulaService tabula, PdfPigService pdfPig)
         {
             _db = dbContext;
             _tabula = tabula;
             _pdfPig = pdfPig;
+            _tabulaJar = new TabulaJarService();
         }
 
         public IActionResult Index()
