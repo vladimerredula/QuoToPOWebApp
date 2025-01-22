@@ -24,6 +24,7 @@ namespace QouToPOWebApp.Controllers
             ViewBag.pdfTypeList = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name");
             ViewBag.paymentTermList = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name");
             ViewBag.deliveryTermList = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name");
+            ViewBag.deliveryAddressList = new SelectList(GetDeliveryAddressList(), "Company_ID", "Company_name");
             ViewBag.supplierList = GetSupplierList(null);
 
             return View();
@@ -46,6 +47,7 @@ namespace QouToPOWebApp.Controllers
             ViewBag.pdfTypeList = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name");
             ViewBag.paymentTermList = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Payment_term_ID);
             ViewBag.deliveryTermList = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Delivery_term_ID);
+            ViewBag.deliveryAddressList = new SelectList(GetDeliveryAddressList(), "Company_ID", "Company_name");
             ViewBag.supplierList = GetSupplierList(model.Supplier_ID);
 
             return View(model);
@@ -190,6 +192,18 @@ namespace QouToPOWebApp.Controllers
             }
 
             return null;
+        }
+
+        public List<Company> GetDeliveryAddressList()
+        {
+            var list = _db.Companies.Where(c => c.Company_ID < 5).ToList();
+
+            return list;
+        }
+
+        public string CleanText(string text)
+        {
+            return text.Replace("_", "").Replace(" ", "");
         }
     }
 }

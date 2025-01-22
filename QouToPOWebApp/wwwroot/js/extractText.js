@@ -3,14 +3,18 @@ $(document).ready(function () {
     getThumbnail();
 
     var supplierId = $("#Supplier_ID").val();
-    console.log(supplierId);
+
     getSupplierAddress(supplierId);
 });
 
 $("#Supplier_ID").change(function () {
     const id = $(this).val();
-    console.log(id);
     getSupplierAddress(id);
+});
+
+$("#deliveryID").change(function () {
+    const id = $(this).val();
+    getDeliveryAddress(id);
 });
 
 function submitForm() {
@@ -94,33 +98,37 @@ function renderPreview(data) {
 }
 
 function getSupplierAddress(id) {
-    $.ajax({
-        url: '/Info/GetSupplierAddress',
-        type: 'POST',
-        data: {
-            id: id
-        },
-        success: function (response) {
-            $("#supplierAddress").val(response);
-        },
-        error: function (response) {
-            console.log(response);
-        }
-    });
+    if (id != null) {
+        $.ajax({
+            url: '/Info/GetSupplierAddress',
+            type: 'POST',
+            data: {
+                id: id
+            },
+            success: function (response) {
+                $("#supplierAddress").val(response);
+            },
+            error: function (response) {
+                console.log(response);
+            }
+        });
+    }
 }
 
 function getDeliveryAddress(id) {
-    $.ajax({
-        url: '/Info/GetDeliveryAddress',
-        type: 'POST',
-        data: {
-            id: id
-        },
-        success: function (response) {
-            $("#deliveryAddress").val(response);
-        },
-        error: function (response) {
-            console.log(response);
-        }
-    });
+    if (id != null) {
+        $.ajax({
+            url: '/Info/GetDeliveryAddress',
+            type: 'POST',
+            data: {
+                id: id
+            },
+            success: function (response) {
+                $("#deliveryAddress").val(response);
+            },
+            error: function (response) {
+                console.log(response);
+            }
+        });
+    }
 }

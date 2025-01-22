@@ -26,7 +26,7 @@
                 <a class="mt-4 btn btn-lg btn-info" onclick="submitForm()">Run OCR</a>
             </div>
         </div>
-        <div class="row g-5 mb-3">
+        <div class="row g-5 mb-4">
             <div class="col-md-5 px-3">
                 <h4>Preview</h4>
                 <div class="row justify-content-center" id="preview">
@@ -98,10 +98,8 @@
                         <div class="row">
                             <label for="delivery" class="form-label">Delivery Address</label>
                             <div class="col col-md-6">
-                                <select class="form-select" id="deliveryID">
+                                <select class="form-select" id="deliveryID" asp-items="ViewBag.deliveryAddressList">
                                     <option selected disabled>Choose..</option>
-                                    <option value="1">FFJ Zama</option>
-                                    <option value="2">FFJ Hachioji</option>
                                 </select>
                             </div>
                             <div class="col-auto">
@@ -113,6 +111,19 @@
                         <textarea type="text" class="form-control" id="deliveryAddress" placeholder="Delivery address"></textarea>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="row g-5 mb-3">
+            <div class="col-md">
+                <h4>Items</h4>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total Amount</th>
+                    </tr>
+                </table>
             </div>
         </div>
     </form>
