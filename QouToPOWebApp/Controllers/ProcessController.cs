@@ -34,17 +34,65 @@ namespace QouToPOWebApp.Controllers
 
         public IActionResult ExtractText([Bind("File_path")] Quotation model)
         {
-            //List<string> extractedTables = _tabula.LatticeModeExtraction(model.File_path);
-            //var extractedText = ListToString(extractedTables);
-            List<string> extractedTables = _pdfPig.ExtractText(model.File_path);
-            var extractedText = ListToString(extractedTables);
-            var cleanedText = extractedText.Replace("_", "").Replace(" ", "");
+            var extractedTables = ExtractTables(model.File_path);
 
-            model.Quotation_date = GetQuotationDate(cleanedText);
-            model.Supplier_ID = GetSupplier(cleanedText);
+            var quoNumber = string.Empty;
+            var quoDate = DateTime.MinValue;
+            int? supplierID = null;
+            int? paymentTerm = null;
+            int? deliveryTerm = null;
+
+            foreach (var tables in extractedTables)
+            {
+                var extractedText = ListToString(tables);
+                var cleanedText = extractedText.Replace("_", "").Replace(" ", "");
+
+                if (string.IsNullOrEmpty(quoNumber))
+                {
+                    quoNumber = GetQuotationNumber(extractedText);
+                }
+
+                if (quoDate == DateTime.MinValue)
+                {
+                    quoDate = ParseQuotationDate(cleanedText);
+                }
+
+                if (!supplierID.HasValue)
+                {
+                    supplierID = GetSupplier(cleanedText);
+                }
+
+                if (!paymentTerm.HasValue)
+                {
+                    paymentTerm = GetPaymentTerms(cleanedText);
+                }
+
+                if (!deliveryTerm.HasValue)
+                {
+                    deliveryTerm = GetDeliveryTerms(cleanedText);
+                }
+            }
+
+            if (string.IsNullOrEmpty(quoNumber))
+            {
+                var text = _tabulaJar.ExtractTables(model.File_path);
+                quoNumber = GetQuotationNumber(text);
+            }
+
+            if (string.IsNullOrEmpty(quoNumber))
+            {
+                var text = _tabulaJar.ExtractTables(model.File_path);
+                quoNumber = GetQuotationNumber(text);
+            }
+
+            model.Quotation_number = quoNumber;
+            model.Quotation_date = quoDate;
+            model.Supplier_ID = supplierID;
+            model.Payment_term_ID = paymentTerm;
+            model.Delivery_term_ID = deliveryTerm;
             model.File_name = Path.GetFileName(model.File_path);
-            model.Payment_term_ID = GetPaymentTerms(cleanedText);
-            model.Delivery_term_ID = GetDeliveryTerms(cleanedText);
+
+            GetQuotationItems(model.File_path);
 
             ViewBag.pdfTypeList = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name");
             ViewBag.paymentTermList = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Payment_term_ID);
@@ -53,6 +101,83 @@ namespace QouToPOWebApp.Controllers
             ViewBag.supplierList = GetSupplierList(model.Supplier_ID);
 
             return View(model);
+        }
+
+        public List<Quotation_item> GetQuotationItems(string filePath)
+        {
+            string extractedTables = _tabulaJar.ExtractTables(filePath);
+
+            var quotationItems = new List<Quotation_item>();
+            var rows = extractedTables.Split("\n");
+
+            var headerKeyWords = new List<string> {
+                "商品名",
+                "数量",
+                "単価"
+            };
+
+            foreach (var row in rows)
+            {
+                if (headerKeyWords.Any(keyword => row.Replace(" ","").Contains(keyword)))
+                {
+
+                }
+
+            }
+
+            //foreach (var table in extractedTables3)
+            //{
+            //    foreach (var row in table.Split("\n"))
+            //    {
+
+            //    }
+            //}
+            return quotationItems;
+        }
+
+        public string GetQuotationNumber(string text)
+        {
+            text = CleanText(text);
+            var quoNumber = string.Empty;
+
+            List<string> keyWords = new List<string> {
+                "見積書番号",
+                "伝票番号:",
+                "Purchase Order:"
+            };
+
+            foreach (var keyWord in keyWords)
+            {
+                int startIndex = text.IndexOf(keyWord);
+
+                if (startIndex != -1)
+                {
+
+                    // Adjust start index to be after the search string
+                    startIndex += keyWord.Length;
+
+                    int endIndex = text.IndexOf("\n", startIndex);
+                    if (endIndex != -1)
+                    {
+                        quoNumber = text.Substring(startIndex, endIndex - startIndex).Trim();
+                        quoNumber.Replace("\"", "").Replace(",", "");
+                    }
+                }
+            }
+
+            return quoNumber;
+        }
+
+        public List<string> StringToTable(string text)
+        {
+            List<string> table = new List<string>();
+
+            foreach (var row in text.Split("\n"))
+            {
+                table.Add(row);
+            }
+
+            return table;
         }
 
         public string ListToString(List<string> extractedTables)
@@ -67,8 +192,44 @@ namespace QouToPOWebApp.Controllers
             return analyzedText;
         }
 
-        public DateTime GetQuotationDate(string text)
+        private List<List<string>> ExtractTables(string filePath)
         {
+            return new List<List<string>>
+            {
+                _tabula.StreamModeExtraction(filePath),
+                _tabula.LatticeModeExtraction(filePath),
+                _pdfPig.ExtractText(filePath)
+            };
+        }
+
+        public DateTime ExtractQuotationDate(string filePath)
+        {
+            var extractors = new Func<string, List<string>>[]
+            {
+                _tabula.LatticeModeExtraction,
+                _tabula.StreamModeExtraction,
+                _pdfPig.ExtractText,
+            };
+
+
+            foreach (var extractor in extractors)
+            {
+                var extractedText = ListToString(extractor(filePath));
+                var date = ParseQuotationDate(extractedText);
+
+                if (date != DateTime.MinValue)
+                {
+                    return date;
+                }
+            }
+
+            return DateTime.MinValue;
+        }
+
+        public DateTime ParseQuotationDate(string text)
+        {
+            var cleanedText = text.Replace("_", "").Replace(" ", "");
+
             // Regex pattern to find dates in yyyy.MM.dd format
             string pattern = @"(?<jpnFormat1>\b\d{4}年\d{1,2}月\d{1,2}日\b)"
                     + @"|(?<jpnFormat2>(\d{4})年\s*(\d{1,2})月\s*(\d{1,2})日)"
@@ -83,7 +244,7 @@ namespace QouToPOWebApp.Controllers
                     + @"|(?<engFormat3>\b\d{1,2}(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}\b)";
 
             // Match the pattern in the extracted text
-            MatchCollection matches = Regex.Matches(text, pattern);
+            MatchCollection matches = Regex.Matches(cleanedText, pattern);
 
             // Add each matched date to the list
             foreach (Match match in matches)
@@ -149,13 +310,6 @@ namespace QouToPOWebApp.Controllers
             return new SelectList(supplierList, "Supplier_ID", "Supplier_name", selected);
         }
 
-        public string GetQuotationNumber(string text)
-        {
-            var quoNumber = string.Empty;
-
-            return quoNumber;
-        }
-
         public int? GetPaymentTerms(string text)
         {
             var paymentTerms = _db.Payment_terms.ToList();
@@ -166,7 +320,7 @@ namespace QouToPOWebApp.Controllers
 
                 foreach (var keyword in keywords)
                 {
-                    if (text.Contains(keyword))
+                    if (text.Contains(CleanText(keyword)))
                     {
                         return paymentTerm.Payment_term_ID;
                     }
@@ -186,7 +340,7 @@ namespace QouToPOWebApp.Controllers
 
                 foreach (var keyword in keywords)
                 {
-                    if (text.Contains(keyword))
+                    if (text.Contains(CleanText(keyword)))
                     {
                         return deliveryTerm.Delivery_term_ID;
                     }
