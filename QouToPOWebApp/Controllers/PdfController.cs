@@ -6,10 +6,12 @@ namespace QouToPOWebApp.Controllers
     public class PdfController : Controller
     {
         private readonly PdfiumViewerService _pdfViewer;
+        private readonly PdfSharpService _pdf;
 
         public PdfController(PdfiumViewerService pdfViewer)
         {
             _pdfViewer = pdfViewer;
+            _pdf = new PdfSharpService();
         }
 
         public IActionResult Index()
@@ -68,6 +70,29 @@ namespace QouToPOWebApp.Controllers
                 pageIndex = pageIndex,
                 totalPages = totalPages
             });
+        }
+        public IActionResult GenerateTablePdf()
+        {
+            string[][] tableData = new string[][]
+            {
+            new string[] { "Header 1", "Header 2", "Header 3" },
+            new string[] { "Row 1 Col 1", "Row 1 Col 2", "Row 1 Col 3" },
+            new string[] { "Row 2 Col 1", "Row 2 Col 2", "Row 2 Col 3" },
+            };
+
+            byte[] pdfBytes = _pdf.CreatePdfWithTable("Table Example", tableData);
+
+            return File(pdfBytes, "application/pdf", "TableExample.pdf");
+        }
+        public IActionResult GeneratePdf()
+        {
+            string title = "Sample PDF Document";
+            string content = "This is a sample PDF generated using PDFsharp 6.1 in ASP.NET Core MVC.";
+            //byte[] pdfBytes = _pdf.CreatePdf(title, content);
+            byte[] pdfBytes = _pdf.CreatePo();
+
+            // Return the PDF file as a download
+            return File(pdfBytes, "application/pdf", "Sample.pdf");
         }
     }
 }
