@@ -28,13 +28,37 @@ namespace QouToPOWebApp.Services
                 for (int i = 1; i <= pdoc.NumberOfPages; i++)
                 {
                     var area = ObjectExtractor.Extract(pdoc, i);
-                    var page = da.Detect(area);
+                    var pages = da.Detect(area);
 
-                    List<Table> tables = (List<Table>)ea.Extract(area.GetArea(page[0].BoundingBox)); // take first candidate area
+                    //List<Table> tables = (List<Table>)ea.Extract(area.GetArea(page[0].BoundingBox)); // take first candidate area
 
-                    foreach (var table in tables)
+                    //foreach (var table in tables)
+                    //{
+                    //    extractedText.Add(TableToString(table));
+                    //}
+
+                    if (pages.Count == 0) // No areas detected
                     {
-                        extractedText.Add(TableToString(table));
+                        Console.WriteLine($"No tables detected on page {i}");
+                        continue;
+                    }
+
+                    foreach (var detectedPage in pages)
+                    {
+                        // Extract tables within the bounding box of the detected area
+                        var tables = ea.Extract(area.GetArea(detectedPage.BoundingBox)) as List<Table>;
+
+                        if (tables != null && tables.Count > 0)
+                        {
+                            foreach (var table in tables)
+                            {
+                                extractedText.Add(TableToString(table));
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"No tables found in detected area on page {i}");
+                        }
                     }
                 }
 
@@ -65,8 +89,14 @@ namespace QouToPOWebApp.Services
 
                 var tables = tableExtractor.Extract(area);
 
-                // Convert table to text (you can customize formatting)
-                extractedText.Add(TableToString(tables[0]));
+                if (tables.Count != 0)
+                {
+                    foreach (var table in tables)
+                    {
+                        // Convert table to text (you can customize formatting)
+                        extractedText.Add(TableToString(table));
+                    }
+                }
             }
 
             return extractedText;

@@ -9,10 +9,10 @@ public class TabulaJarService
         _tabulaJarPath = Path.Combine(Directory.GetCurrentDirectory(), "AppData", "tabula-1.0.5-jar-with-dependencies.jar");
     }
 
-    public string ExtractTables(string pdfPath)
+    public string ExtractTables(string pdfPath, string extractMode = "lattice")
     {
         string output = string.Empty;
-        string arguments = $"-jar \"{_tabulaJarPath}\" --silent --lattice --pages all \"{pdfPath}\"";
+        string arguments = $"-jar \"{_tabulaJarPath}\" --silent --{extractMode} --pages all \"{pdfPath}\"";
 
         try
         {
