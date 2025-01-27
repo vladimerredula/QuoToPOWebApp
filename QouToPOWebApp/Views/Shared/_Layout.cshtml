@@ -19,11 +19,18 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Process" asp-action="Index">Process</a>
+                        <li class="nav-item dropdown">
+                            <button class="nav-link dropdown-toggle" id="poDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                POs
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="poDropdown">
+                                <li>
+                                    <a asp-controller="Po" asp-action="Index" class="dropdown-item">Create PO</a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Po" asp-action="Index" class="dropdown-item">Create from Quotation file</a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <button class="nav-link dropdown-toggle" id="infoDropdown" data-bs-toggle="dropdown" aria-expanded="false">

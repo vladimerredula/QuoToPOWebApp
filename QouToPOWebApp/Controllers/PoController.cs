@@ -2,18 +2,20 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using QouToPOWebApp.Models;
 using QouToPOWebApp.Services;
+using QouToPOWebApp.ViewModel;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace QouToPOWebApp.Controllers
 {
-    public class ProcessController : Controller
+    public class PoController : Controller
     {
         private readonly ApplicationDbContext _db;
         private readonly TabulaService _tabula;
         private readonly PdfPigService _pdfPig;
         private readonly TabulaJarService _tabulaJar;
 
-        public ProcessController(ApplicationDbContext dbContext, TabulaService tabula, PdfPigService pdfPig)
+        public PoController(ApplicationDbContext dbContext, TabulaService tabula, PdfPigService pdfPig)
         {
             _db = dbContext;
             _tabula = tabula;
@@ -23,18 +25,18 @@ namespace QouToPOWebApp.Controllers
 
         public IActionResult Index()
         {
-            ViewBag.pdfTypeList = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name");
-            ViewBag.paymentTermList = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name");
-            ViewBag.deliveryTermList = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name");
-            ViewBag.deliveryAddressList = new SelectList(GetDeliveryAddressList(), "Company_ID", "Company_name");
-            ViewBag.supplierList = GetSupplierList(null);
+            ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name");
+            ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name");
+            ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name");
+            ViewData["deliveryAddressList"] = new SelectList(GetDeliveryAddressList(), "Company_ID", "Company_name");
+            ViewData["supplierList"] = GetSupplierList(null);
 
             return View();
         }
 
-        public IActionResult ExtractText([Bind("File_path")] Quotation model)
+        public IActionResult ExtractText(QuotationViewModel model)
         {
-            var extractedTables = ExtractTables(model.File_path);
+            var extractedTables = ExtractTables(model.Quotation.File_path);
 
             var quoNumber = string.Empty;
             var quoDate = DateTime.MinValue;
@@ -75,30 +77,30 @@ namespace QouToPOWebApp.Controllers
 
             if (string.IsNullOrEmpty(quoNumber))
             {
-                var text = _tabulaJar.ExtractTables(model.File_path);
+                var text = _tabulaJar.ExtractTables(model.Quotation.File_path, "stream");
                 quoNumber = GetQuotationNumber(text);
             }
 
             if (string.IsNullOrEmpty(quoNumber))
             {
-                var text = _tabulaJar.ExtractTables(model.File_path);
+                var text = _tabulaJar.ExtractTables(model.Quotation.File_path);
                 quoNumber = GetQuotationNumber(text);
             }
 
-            model.Quotation_number = quoNumber;
-            model.Quotation_date = quoDate;
-            model.Supplier_ID = supplierID;
-            model.Payment_term_ID = paymentTerm;
-            model.Delivery_term_ID = deliveryTerm;
-            model.File_name = Path.GetFileName(model.File_path);
+            model.Quotation.Quotation_number = quoNumber;
+            model.Quotation.Quotation_date = quoDate;
+            model.Quotation.Supplier_ID = supplierID;
+            model.Quotation.Payment_term_ID = paymentTerm;
+            model.Quotation.Delivery_term_ID = deliveryTerm;
+            model.Quotation.File_name = Path.GetFileName(model.Quotation.File_path);
 
-            GetQuotationItems(model.File_path);
+            model.Items = GetQuotationItems(model.Quotation.File_path);
 
-            ViewBag.pdfTypeList = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name");
-            ViewBag.paymentTermList = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Payment_term_ID);
-            ViewBag.deliveryTermList = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Delivery_term_ID);
-            ViewBag.deliveryAddressList = new SelectList(GetDeliveryAddressList(), "Company_ID", "Company_name");
-            ViewBag.supplierList = GetSupplierList(model.Supplier_ID);
+            ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name", model.Quotation.Pdf_type_ID);
+            ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Quotation.Payment_term_ID);
+            ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Quotation.Delivery_term_ID);
+            ViewData["deliveryAddressList"] = new SelectList(GetDeliveryAddressList(), "Company_ID", "Company_name");
+            ViewData["supplierList"] = GetSupplierList(model.Quotation.Supplier_ID);
 
             return View(model);
         }
@@ -110,17 +112,84 @@ namespace QouToPOWebApp.Controllers
             var quotationItems = new List<Quotation_item>();
             var rows = extractedTables.Split("\n");
 
-            var headerKeyWords = new List<string> {
-                "商品名",
-                "数量",
-                "単価"
+            var headerKeyWords = new List<(List<string> headerNames, int itemIndex)> {
+                (new List<string> {"品名", "Discription", "Product", "Specification" }, 0),
+                (new List<string> {"数量", "Quantity", "QTY", "Qnt" }, 1),
+                (new List<string> {"単価", "Price" }, 2)
             };
 
+            var itemMarker = false;
             foreach (var row in rows)
             {
-                if (headerKeyWords.Any(keyword => row.Replace(" ","").Contains(keyword)))
+                if (headerKeyWords.Any(q => q.headerNames.Any(keyword => row.Replace(" ", "").Contains(keyword))))
                 {
+                    itemMarker = true;
 
+                    var headers = row.Split(",");
+
+                    for (int i = 0; i < headers.Count(); i++)
+                    {
+                        var keyWord = Regex.Replace(headers[i], @"[\r\n\t,""]", "").Replace(" ","");
+                        for (int j = 0; j < headerKeyWords.Count(); j++)
+                        {
+                            foreach (var keyword in headerKeyWords[j].headerNames)
+                            {
+                                if (keyWord.Contains(keyword))
+                                {
+                                    headerKeyWords[j] = (headerKeyWords[j].headerNames, i);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    continue;
+                }
+
+                var samp = Regex.Replace(row, @"[\r\n\t,""]", "");
+                if (Regex.Replace(row, @"[\r\n\t,""]", "") == "")
+                {
+                    itemMarker = false;
+                }
+
+                if (itemMarker)
+                {
+                    var quotationItem = new Quotation_item();
+
+                    var sample = Regex.Replace(row, @"[\r\n\t]", "");
+
+                    // Regular expression to split the string by commas, ignoring commas inside quotes
+                    string pattern = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+                    string[] result = Regex.Split(sample, pattern);
+
+                    // Trim any surrounding quotes from each part
+                    for (int i = 0; i < result.Length; i++)
+                    {
+                        result[i] = result[i].Trim('"');
+                    }
+
+                    var itemname = headerKeyWords.SingleOrDefault(q => q.headerNames.Contains("品名"));
+                    var itemquantity = headerKeyWords.SingleOrDefault(q => q.headerNames.Contains("数量"));
+                    var itemprice = headerKeyWords.SingleOrDefault(q => q.headerNames.Contains("単価"));
+
+                    if (result.Length > 2)
+                    {
+                        quotationItem.Item_name = result[itemname.itemIndex];
+
+                        int quantity;
+                        if (int.TryParse(Regex.Replace(result[itemquantity.itemIndex], @"[^0-9.]", ""), out quantity))
+                        {
+                            quotationItem.Item_quantity = quantity;
+                        }
+
+                        float price;
+                        if (float.TryParse(Regex.Replace(result[itemprice.itemIndex], @"[^0-9.]", ""), out price) && result.Length > 2)
+                        {
+                            quotationItem.Item_price = price;
+                        }
+                    }
+
+                    quotationItems.Add(quotationItem);
                 }
 
             }
@@ -141,9 +210,14 @@ namespace QouToPOWebApp.Controllers
             var quoNumber = string.Empty;
 
             List<string> keyWords = new List<string> {
+                "見積書番号:",
                 "見積書番号",
                 "伝票番号:",
-                "Purchase Order:"
+                "伝票番号",
+                "PurchaseOrder:",
+                "PurchaseOrder",
+                "Ref:",
+                "Ref"
             };
 
             foreach (var keyWord in keyWords)
@@ -160,7 +234,9 @@ namespace QouToPOWebApp.Controllers
                     if (endIndex != -1)
                     {
                         quoNumber = text.Substring(startIndex, endIndex - startIndex).Trim();
-                        quoNumber.Replace("\"", "").Replace(",", "");
+                        quoNumber.Replace("\"", "");
+                        quoNumber.Replace(",", "");
+                        break;
                     }
                 }
             }

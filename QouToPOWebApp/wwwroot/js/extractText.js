@@ -2,12 +2,12 @@
 $(document).ready(function () {
     getThumbnail();
 
-    var supplierId = $("#Supplier_ID").val();
+    var supplierId = $("#Quotation_Supplier_ID").val();
 
     getSupplierAddress(supplierId);
 });
 
-$("#Supplier_ID").change(function () {
+$("#Quotation_Supplier_ID").change(function () {
     const id = $(this).val();
     getSupplierAddress(id);
 });
@@ -86,7 +86,7 @@ function renderPreview(data) {
     if (data.image) {
         $('#pdfPreview').attr("src", data.image);
         $('#pdfPreview').attr("filename", data.filePath);
-        $('#File_path').val(data.filePath);
+        $('#Quotation_File_path').val(data.filePath);
         $('#preview').removeClass("visually-hidden");
 
         $("#currentPage").text(data.pageIndex + 1);
@@ -94,6 +94,7 @@ function renderPreview(data) {
 
         $("#prev").toggleClass("disabled", data.pageIndex == 0);
         $("#next").toggleClass("disabled", data.totalPages - data.pageIndex == 1);
+        console.log($('#Quotation_File_path').val());
     }
 }
 
