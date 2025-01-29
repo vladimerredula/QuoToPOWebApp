@@ -12,23 +12,17 @@
     <form asp-action="ExtractText" method="post" id="quoForm">
         <div class="row g-3 mb-4">
             <div class="col-md">
-                <label asp="pdfFile" class="form-label">Upload a Quotation file</label>
-                <input class="form-control" type="file" id="pdfFile" accept=".pdf" onchange="uploadPdf(this)">
+                <label class="form-label">Upload a Quotation file</label>
+                <input type="file" id="pdfFile" accept=".pdf" onchange="uploadPdf(this)" hidden>
                 <input asp-for="Quotation.File_path" type="text" value="" hidden />
                 <span asp-validation-for="Quotation.File_path" class="text-danger"></span>
-            </div>
-            <div class="col-md-auto col-lg-3">
-                <label asp-for="Quotation.Pdf_type_ID" class="form-label">Select PDF type</label>
-                <select class="form-select" aria-label="PDF type" asp-for="Quotation.Pdf_type_ID" asp-items="ViewBag.pdfTypeList">
-                    <option selected disabled>Choose..</option>
-                </select>
-                <span asp-validation-for="Quotation.Pdf_type_ID" class="text-danger"></span>
-            </div>
-            <div class="col-lg-auto">
-                <a class="mt-4 btn btn-lg btn-info" onclick="submitForm()">Run OCR</a>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="No file chosen" id="selectFileInput" readonly>
+                    <a href="#" class="btn btn-light border" type="button" id="selectFileBtn">Choose File</a>
+                </div>
             </div>
         </div>
-        <div class="row g-5 mb-3">
+        <div class="row g-5 mb-4">
             <div class="col-md-5 px-3">
                 <h4>Preview</h4>
                 <div class="row justify-content-center visually-hidden" id="preview">
@@ -48,69 +42,37 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <h4>Details</h4>
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label asp-for="Quotation.Quotation_date_string" class="form-label"></label>
-                        <input asp-for="Quotation.Quotation_date_string" type="date" class="form-control" />
-                        <span asp-validation-for="Quotation.Quotation_date_string" class="text-danger"></span>
-                    </div>
-                    <div class="col-md-6">
-                        <label asp-for="Quotation.Quotation_number" class="form-label"></label>
-                        <input asp-for="Quotation.Quotation_number" type="text" class="form-control" />
-                        <span asp-validation-for="Quotation.Quotation_number" class="text-danger"></span>
-                    </div>
-                    <div class="col-md-6">
-                        <label asp-for="Quotation.Payment_term_ID" class="form-label text-nowrap"></label>
-                        <select asp-for="Quotation.Payment_term_ID" class="form-select" asp-items="ViewBag.paymentTermList">
-                            <option selected disabled>Choose..</option>
-                        </select>
-                        <span asp-validation-for="Quotation.Payment_term_ID" class="text-danger"></span>
-                    </div>
-                    <div class="col-md-6">
-                        <label asp-for="Quotation.Delivery_term_ID" class="form-label text-nowrap"></label>
-                        <select asp-for="Quotation.Delivery_term_ID" class="form-select" asp-items="ViewBag.deliveryTermList">
-                            <option selected disabled>Choose..</option>
-                        </select>
-                        <span asp-validation-for="Quotation.File_path" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="row g-3 mb-3">
-                    <div class="col-12">
-                        <div class="row">
-                            <label asp-for="Quotation.Supplier_ID" class="form-label"></label>
-                            <div class="col col-md-6">
-                                <select asp-for="Quotation.Supplier_ID" class="form-select" asp-items="ViewBag.supplierList">
-                                    <option selected disabled>Choose..</option>
-                                </select>
+            <div class="col-md-7">
+                <h4>Extraction Settings</h4>
+                <div class="row g-3 mb-4">
+                    <div class="col-xl-8">
+                        <div class="row g-3">
+                            <div class="col-lg-6 col-xl-12">
+                                <div class="row align-items-center">
+                                    <label asp-for="Quotation.Pdf_type_ID" class="form-label col-xl-4">PDF type</label>
+                                    <div class="col-xl-8">
+                                        <select class="form-select col-xl-8" aria-label="PDF type" asp-for="Quotation.Pdf_type_ID" asp-items="ViewBag.pdfTypeList">
+                                            <option selected disabled>Choose..</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="Quotation.Pdf_type_ID" class="text-danger"></span>
+                                </div>
                             </div>
-                            <div class="col-auto">
-                                <a href="#" class="btn btn-secondary">Custom</a>
-                            </div>
-                            <span asp-validation-for="Quotation.Supplier_ID" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <textarea type="text" class="form-control" id="supplierAddress" placeholder="Supplier address"></textarea>
-                    </div>
-                </div>
-                <div class="row g-3 mb-3">
-                    <div class="col-12">
-                        <div class="row">
-                            <label for="delivery" class="form-label">Delivery Address</label>
-                            <div class="col col-md-6">
-                                <select class="form-select" id="deliveryID" asp-items="ViewBag.deliveryAddressList">
-                                    <option selected disabled>Choose..</option>
-                                </select>
-                            </div>
-                            <div class="col-auto">
-                                <a href="#" class="btn btn-secondary text-nowrap">Custom</a>
+                            <div class="col-lg-6 col-xl-12">
+                                <div class="row align-items-center">
+                                    <label asp-for="ExtractionMode" class="form-label col-xl-4">Extraction mode</label>
+                                    <div class="col-xl-8">
+                                        <select class="form-select" asp-for="ExtractionMode">
+                                            <option value="lattice">Lattice</option>
+                                            <option value="stream">Stream</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12">
-                        <textarea type="text" class="form-control" id="deliveryAddress" placeholder="Delivery address"></textarea>
+                    <div class="col-xl-4 d-grid gap-3 ps-xl-4 py-xl-3">
+                        <a class="btn btn-lg btn-info text-white align-content-center" onclick="submitForm()">Extract</a>
                     </div>
                 </div>
             </div>

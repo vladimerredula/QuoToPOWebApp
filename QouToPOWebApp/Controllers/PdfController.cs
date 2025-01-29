@@ -66,6 +66,7 @@ namespace QouToPOWebApp.Controllers
             return Json(new
             {
                 image = currentImage,
+                fileName = Path.GetFileName(filePath),
                 filePath = filePath,
                 pageIndex = pageIndex,
                 totalPages = totalPages

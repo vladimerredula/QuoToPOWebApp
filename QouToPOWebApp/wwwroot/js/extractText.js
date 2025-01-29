@@ -7,6 +7,10 @@ $(document).ready(function () {
     getSupplierAddress(supplierId);
 });
 
+$("#selectFileBtn").on("click", function () {
+    $("#pdfFile").click(); // Trigger the hidden file input
+});
+
 $("#Quotation_Supplier_ID").change(function () {
     const id = $(this).val();
     getSupplierAddress(id);
@@ -87,6 +91,7 @@ function renderPreview(data) {
         $('#pdfPreview').attr("src", data.image);
         $('#pdfPreview').attr("filename", data.filePath);
         $('#Quotation_File_path').val(data.filePath);
+        $('#selectFileInput').val(data.fileName);
         $('#preview').removeClass("visually-hidden");
 
         $("#currentPage").text(data.pageIndex + 1);
