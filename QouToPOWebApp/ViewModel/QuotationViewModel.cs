@@ -7,6 +7,7 @@ namespace QouToPOWebApp.ViewModel
     public class QuotationViewModel
     {
         public Quotation Quotation { get; set; }
+        public string? ExtractionMode { get; set; }
         public List<Quotation_item>? Items { get; set; }
     }
 }
