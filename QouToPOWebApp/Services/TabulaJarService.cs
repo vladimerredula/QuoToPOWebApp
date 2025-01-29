@@ -11,6 +11,11 @@ public class TabulaJarService
 
     public string ExtractTables(string pdfPath, string extractMode = "lattice")
     {
+        if (string.IsNullOrWhiteSpace(extractMode))
+        {
+            extractMode = "lattice";
+        }
+
         string output = string.Empty;
         string arguments = $"-jar \"{_tabulaJarPath}\" --silent --{extractMode} --pages all \"{pdfPath}\"";
 

@@ -107,7 +107,8 @@ namespace QouToPOWebApp.Controllers
 
         public List<Quotation_item> GetQuotationItems(string filePath)
         {
-            string extractedTables = _tabulaJar.ExtractTables(filePath);
+            var extractionMode = Request.Form["extractionMode"];
+            string extractedTables = _tabulaJar.ExtractTables(filePath, extractionMode);
 
             var quotationItems = new List<Quotation_item>();
             var rows = extractedTables.Split("\n");
