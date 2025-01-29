@@ -156,10 +156,17 @@ namespace QouToPOWebApp.Services
             var column4 = 90;
             var tableRowHeight = 26;
 
-            gfx.DrawRectangle(new XPen(ClayCreek, 0.75), new XSolidBrush(ClayCreek), 36, y, tableWitdh, 32);
+            //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), new XSolidBrush(ClayCreek), 36, y, tableWitdh, 32);
+            gfx.DrawRectangle(new XPen(ClayCreek, 0.75), new XSolidBrush(ClayCreek), 36, y, column1, 32);
             gfx.DrawString("商品名 ／ 品目", new XFont("Meiryo-bold", 12), XBrushes.White, new XRect(36, y, column1, 32), XStringFormats.Center);
+
+            gfx.DrawRectangle(new XPen(ClayCreek, 0.75), new XSolidBrush(ClayCreek), 36 + column1, y, column2, 32);
             gfx.DrawString("数　量", new XFont("Meiryo-bold", 12), XBrushes.White, new XRect(36 + column1, y, column2, 32), XStringFormats.Center);
+
+            gfx.DrawRectangle(new XPen(ClayCreek, 0.75), new XSolidBrush(ClayCreek), 36 + column1 + column2, y, column3, 32);
             gfx.DrawString("単　価", new XFont("Meiryo-bold", 12), XBrushes.White, new XRect(36 + column1 + column2, y, column3, 32), XStringFormats.Center);
+
+            gfx.DrawRectangle(new XPen(ClayCreek, 0.75), new XSolidBrush(ClayCreek), 36 + column1 + column2 + column3, y, column4, 32);
             gfx.DrawString("金　額", new XFont("Meiryo-bold", 12), XBrushes.White, new XRect(36 + column1 + column2 + column3, y, column4, 32), XStringFormats.Center);
 
             y += 32;
