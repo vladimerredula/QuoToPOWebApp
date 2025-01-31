@@ -95,5 +95,30 @@ namespace QouToPOWebApp.Controllers
             // Return the PDF file as a download
             return File(pdfBytes, "application/pdf", "Sample.pdf");
         }
+
+        public IActionResult Sample()
+        {
+            var file = "C:\\Users\\v.redula\\source\\repos\\QuoToPOWebApp\\QouToPOWebApp\\wwwroot\\uploads\\20240426 Q+PO AMS Korea MgO pellet.pdf";
+            var file2 = "C:\\Users\\v.redula\\source\\repos\\QuoToPOWebApp\\QouToPOWebApp\\wwwroot\\uploads\\20241010 Toshima Ag recycle Q No.24100926SO05.pdf";
+            var file3 = "C:\\Users\\v.redula\\source\\repos\\QuoToPOWebApp\\QouToPOWebApp\\wwwroot\\uploads\\NSK製 U-6904-H-20S8FDZZ GVSL 300個 2024-k056 (1).pdf";
+            var file4 = "C:\\Users\\v.redula\\source\\repos\\QuoToPOWebApp\\QouToPOWebApp\\wwwroot\\uploads\\20240422 PO ASE Net.pdf";
+            var file5 = "\\\\192.168.161.10\\Personal\\0062.Vladimer Redula\\Weekly reports\\2025\\Week4.pdf";
+            var pig = new PdfPigService();
+            byte[] pdfBytes = pig.SampleExtraction(file5, 1);
+
+            // Return the PDF file as a download
+            return File(pdfBytes, "application/pdf", "Sample.pdf");
+        }
+
+        public IActionResult samples()
+        {
+            var file = "C:\\Users\\v.redula\\source\\repos\\QuoToPOWebApp\\QouToPOWebApp\\wwwroot\\uploads\\1.pdf";
+
+            var pig = new TesseractService(new PdfiumViewerService());
+            byte[] pdfBytes = pig.sample(file);
+
+            // Return the PDF file as a download
+            return File(pdfBytes, "application/pdf", "Sample.png");
+        }
     }
 }
