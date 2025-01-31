@@ -23,18 +23,29 @@ namespace QouToPOWebApp.Controllers
             _tabulaJar = new TabulaJarService();
         }
 
-        public IActionResult Index()
+        public IActionResult CreatePoFromQuotation()
         {
             ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name");
             ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name");
             ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name");
-            ViewData["deliveryAddressList"] = new SelectList(GetDeliveryAddressList(), "Company_ID", "Company_name");
-            ViewData["supplierList"] = GetSupplierList(null);
+            ViewData["deliveryAddressList"] = GetDeliveryAddressList();
+            ViewData["supplierList"] = GetSupplierList();
 
             return View();
         }
 
-        public IActionResult ExtractText(QuotationViewModel model)
+        public IActionResult Extract(QuotationViewModel model)
+        {
+            switch (model.Quotation.Pdf_type_ID)
+            {
+                case 2:
+                    return ExtractScannedPdf(model);
+                default:
+                    return ExtractNativePdf(model);
+            }
+        }
+
+        public IActionResult ExtractNativePdf(QuotationViewModel model)
         {
             var extractedTables = ExtractTables(model.Quotation.File_path);
 
@@ -99,10 +110,67 @@ namespace QouToPOWebApp.Controllers
             ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name", model.Quotation.Pdf_type_ID);
             ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Quotation.Payment_term_ID);
             ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Quotation.Delivery_term_ID);
-            ViewData["deliveryAddressList"] = new SelectList(GetDeliveryAddressList(), "Company_ID", "Company_name");
+            ViewData["deliveryAddressList"] = GetDeliveryAddressList(model.Quotation.Delivery_term_ID);
             ViewData["supplierList"] = GetSupplierList(model.Quotation.Supplier_ID);
 
-            return View(model);
+            return View("ExtractText", model);
+        }
+
+        public IActionResult ExtractScannedPdf(QuotationViewModel model)
+        {
+            var tess = new TesseractService(new PdfiumViewerService());
+
+            var quoNumber = string.Empty;
+            var quoDate = DateTime.MinValue;
+            int? supplierID = null;
+            int? paymentTerm = null;
+            int? deliveryTerm = null;
+
+            var extractedText = tess.ExtractTextFromPdf(model.Quotation.File_path);
+            //var extractedText = tess.ExtractTextFromImage("C:\\Users\\v.redula\\OneDrive - Faraday Factory Japan\\Pictures\\Screenshots\\Screenshot 2025-01-29 173521.png");
+            var cleanedText = extractedText.Replace("_", "").Replace(" ", "");
+
+            if (string.IsNullOrEmpty(quoNumber))
+            {
+                quoNumber = GetQuotationNumber(extractedText);
+            }
+
+            if (quoDate == DateTime.MinValue)
+            {
+                quoDate = ParseQuotationDate(cleanedText);
+            }
+
+            if (!supplierID.HasValue)
+            {
+                supplierID = GetSupplier(cleanedText);
+            }
+
+            if (!paymentTerm.HasValue)
+            {
+                paymentTerm = GetPaymentTerms(cleanedText);
+            }
+
+            if (!deliveryTerm.HasValue)
+            {
+                deliveryTerm = GetDeliveryTerms(cleanedText);
+            }
+
+            model.Quotation.Quotation_number = quoNumber;
+            model.Quotation.Quotation_date = quoDate;
+            model.Quotation.Supplier_ID = supplierID;
+            model.Quotation.Payment_term_ID = paymentTerm;
+            model.Quotation.Delivery_term_ID = deliveryTerm;
+            model.Quotation.File_name = Path.GetFileName(model.Quotation.File_path);
+
+            model.Items = GetQuotationItems(model.Quotation.File_path);
+
+            ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name", model.Quotation.Pdf_type_ID);
+            ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Quotation.Payment_term_ID);
+            ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Quotation.Delivery_term_ID);
+            ViewData["deliveryAddressList"] = GetDeliveryAddressList(model.Quotation.Delivery_term_ID);
+            ViewData["supplierList"] = GetSupplierList(model.Quotation.Supplier_ID);
+
+            return View("ExtractText", model);
         }
 
         public List<Quotation_item> GetQuotationItems(string filePath)
@@ -195,13 +263,6 @@ namespace QouToPOWebApp.Controllers
 
             }
 
-            //foreach (var table in extractedTables3)
-            //{
-            //    foreach (var row in table.Split("\n"))
-            //    {
-
-            //    }
-            //}
             return quotationItems;
         }
 
@@ -279,30 +340,6 @@ namespace QouToPOWebApp.Controllers
             };
         }
 
-        public DateTime ExtractQuotationDate(string filePath)
-        {
-            var extractors = new Func<string, List<string>>[]
-            {
-                _tabula.LatticeModeExtraction,
-                _tabula.StreamModeExtraction,
-                _pdfPig.ExtractText,
-            };
-
-
-            foreach (var extractor in extractors)
-            {
-                var extractedText = ListToString(extractor(filePath));
-                var date = ParseQuotationDate(extractedText);
-
-                if (date != DateTime.MinValue)
-                {
-                    return date;
-                }
-            }
-
-            return DateTime.MinValue;
-        }
-
         public DateTime ParseQuotationDate(string text)
         {
             var cleanedText = text.Replace("_", "").Replace(" ", "");
@@ -373,7 +410,7 @@ namespace QouToPOWebApp.Controllers
             return null;
         }
 
-        public SelectList GetSupplierList(int? selected)
+        public SelectList GetSupplierList(int? selected = null)
         {
             var supplierList = _db.Suppliers
                 .Select(s => new
@@ -427,11 +464,16 @@ namespace QouToPOWebApp.Controllers
             return null;
         }
 
-        public List<Company> GetDeliveryAddressList()
+        public List<Company> GetDeliveryAddress()
         {
             var list = _db.Companies.Where(c => c.Company_ID < 5).ToList();
 
             return list;
+        }
+
+        public SelectList GetDeliveryAddressList(int? selected = null)
+        {
+            return new SelectList(GetDeliveryAddress(), "Company_ID", "Company_name", selected);
         }
 
         public string CleanText(string text)
