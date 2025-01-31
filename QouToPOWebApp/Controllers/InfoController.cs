@@ -150,6 +150,12 @@ namespace QouToPOWebApp.Controllers
         {
             return _db.Companies.Any(e => e.Company_ID == id);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> AddCustomSupplier(string Company_name, string Company_address, string Telephone, string Fax, string Contact_person)
+        {
+            return Json(null);
+        }
         #endregion
 
 

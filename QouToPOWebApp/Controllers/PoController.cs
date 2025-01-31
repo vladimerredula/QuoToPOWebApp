@@ -480,5 +480,13 @@ namespace QouToPOWebApp.Controllers
         {
             return text.Replace("_", "").Replace(" ", "");
         }
+
+        public IActionResult CreatePo()
+        {
+            ViewBag.deliveryAddressList = GetDeliveryAddressList();
+            ViewBag.supplierList = GetSupplierList();
+            ViewBag.paymentTerms = _db.Payment_terms.ToList();
+            return View();
+        }
     }
 }

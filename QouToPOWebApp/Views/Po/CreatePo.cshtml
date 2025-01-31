@@ -1,0 +1,333 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@using QouToPOWebApp.ViewModel
+
+@model PoViewModel
+
+@{
+    ViewData["Title"] = "Create PO";
+
+    var paymentTerms = ViewBag.paymentTerms as List<Payment_term>;
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+<div class="container">
+    <h4>Details</h4>
+    <div class="row mb-3">
+        <div class="col mb-2">
+            <label class="form-label">Date</label>
+            <input class="form-control" type="date" asp-for="Quotation_date" />
+        </div>
+        <div class="col mb-2">
+            <label class="form-label">Quotation no.</label>
+            <input class="form-control" type="text" asp-for="Quotation_number" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="row">
+                <label class="form-label">Supplier</label>
+                <div class="col col-md-6 mb-2">
+                    <select class="form-select" asp-for="Supplier_ID" asp-items="ViewBag.supplierList">
+                        <option selected disabled>Choose..</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <a href="#" class="btn btn-secondary" id="customSupplier">Custom</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <textarea type="text" class="form-control" id="supplierAddress" placeholder="Supplier address" readonly></textarea>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col mb-2">
+            <label class="form-label">Payment term</label>
+            <input class="form-control" type="text" list="paymentTermOptions" asp-for="Payment_term_ID"/>
+            <datalist id="paymentTermOptions">
+                @foreach (var paymentTerm in paymentTerms)
+                {
+                    <option value="@paymentTerm.Payment_term_ID">@paymentTerm.Payment_term_name</option>
+                }
+            </datalist>
+        </div>
+        <div class="col mb-2">
+            <label class="form-label">Delivery term</label>
+            <input class="form-control" type="text" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="row">
+                <label class="form-label">Deliver Address</label>
+                <div class="col col-md-6 mb-2">
+                    <select class="form-select" id="delivery_ID">
+                        <option selected disabled>Choose..</option>
+                        <option value="1">Zama</option>
+                        <option value="2">Hachioji</option>
+                        <option value="3">Hashimoto</option>
+                        <option value="4">SIC</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <textarea type="text" class="form-control" id="deliveryAddress" placeholder="Delivery address" readonly></textarea>
+        </div>
+    </div>
+    <br />
+    <p class="mb-1">
+        <span class="fs-3 fw-semibold">Items</span>&nbsp;
+        <a class="mb-2 btn btn-light border" href="#" id="addItem">Add</a>&nbsp;
+        <a class="mb-2 btn btn-light border disabled" href="#" id="editItem">Edit</a>&nbsp;
+        <a class="mb-2 btn btn-light border disabled" href="#" id="removeItem">Remove</a>
+    </p>
+    <div class="row">
+        <div class="col">
+            <table class="table datatable">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>No.</th>
+                        <th>Item name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Supplier Modal -->
+<div class="modal fade" id="supplierModal" tabindex="-1" aria-labelledby="supplierModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="supplierModalLabel">Custom supplier</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="supplierForm">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Supplier name</label>
+                            <input class="form-control" name="Company_name" />
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Supplier address</label>
+                            <textarea class="form-control" name="Company_address"></textarea>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Telephone</label>
+                            <input class="form-control" name="Telephone" />
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Fax</label>
+                            <input class="form-control" name="Fax" />
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Person in-charge</label>
+                            <input class="form-control" name="Contact_person" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" href="#" onclick="addCustomSupplier()">Save</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Item Modal -->
+<div class="modal fade" id="itemModal" tabindex="-1" aria-labelledby="itemModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="itemModalLabel">Add item</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Item name</label>
+                        <input class="form-control" id="itemName" />
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Price</label>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="yenSign">¥</span>
+                            <input class="form-control" id="price" aria-describedby="yenSign" />
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Quantity</label>
+                        <input class="form-control" type="number" id="quantity" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" href="#" id="submitItem">Add</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        var itemTable = $('table.datatable').DataTable({
+            responsive: true,
+            fixedHeader: true,
+            paging: false,
+            select: {
+                style: 'single',
+                info: false
+            },
+            filter: false,
+            columnDefs: [
+                {
+                    className: 'reorder',
+                    render: function () {
+                        return '≡';
+                    },
+                    targets: 0
+                },
+                {
+                    targets: [0,1],
+                    width: "50px"
+                },
+                { orderable: false, targets: '_all' }
+            ],
+            order: [[1, 'asc']],
+            rowReorder: {
+                cancelable: true,
+                dataSrc: 1
+            }
+        });
+
+        $("#submitItem").on("click", function () {
+            var itemname = $('#itemName').val();
+            var quantity = $('#quantity').val();
+            var price = $('#price').val();
+            var itemno = itemTable.rows().count() + 1;
+
+            $("#itemModal").modal("hide");
+
+            itemTable.row.add(["", itemno, itemname, quantity, price, quantity * price]).draw();
+        });
+
+        $("#customSupplier").on("click", function () {
+            $("#supplierModal").modal("show");
+        });
+
+        $("#addItem").on("click", function () {
+            $("#itemModal").modal("show");
+        });
+
+        // Enable button when a row is selected
+        itemTable.on('select.dt', function () {
+            $('#editItem').removeClass('disabled');
+            $('#removeItem').removeClass('disabled');
+        });
+
+        // Disable button when no row is selected
+        itemTable.on('deselect.dt', function () {
+            if (!itemTable.rows('.selected').any()) {
+                $('#editItem').addClass('disabled');
+                $('#removeItem').addClass('disabled');
+            }
+        });
+
+        $("#removeItem").on("click", function () {
+            itemTable.row(".selected").remove().draw(false);
+        });
+
+        function addCustomSupplier() {
+            var formData = new FormData();
+            formData.append('Company_name', $("#Company_name").val());
+            formData.append('Company_address', $("#Company_address").val());
+            formData.append('Telephone', $("#Telephone").val());
+            formData.append('Fax', $("#Fax").val());
+            formData.append('Contact_person', $("#Contact_person").val());
+
+            try {
+                $.ajax({
+                    url: '/Info/AddCustomSupplier',
+                    type: 'POST',
+                    data: {
+                        Company_name: $("input[name=Company_name]").val(),
+                        Company_address: $("input[name=Company_address]").val(),
+                        Telephone: $("input[name=Telephone]").val(),
+                        Fax: $("input[name=Fax]").val(),
+                        Contact_person: $("input[name=Contact_person]").val()
+                    },
+                    success: function (response) {
+                        console.log(response);
+                    },
+                    error: function (response) {
+                        console.log(response);
+                    }
+                });
+            } catch (error) {
+                console.error('Upload error:', error);
+            }
+        };
+
+        $("#Supplier_ID").change(function () {
+            const id = $(this).val();
+            getSupplierAddress(id);
+        });
+
+        function getSupplierAddress(id) {
+            if (id != null) {
+                $.ajax({
+                    url: '/Info/GetSupplierAddress',
+                    type: 'POST',
+                    data: {
+                        id: id
+                    },
+                    success: function (response) {
+                        $("#supplierAddress").val(response);
+                    },
+                    error: function (response) {
+                        console.log(response);
+                    }
+                });
+            }
+        }
+
+        $("#delivery_ID").change(function () {
+            const id = $(this).val();
+            getDeliveryAddress(id);
+        });
+
+        function getDeliveryAddress(id) {
+            if (id != null) {
+                $.ajax({
+                    url: '/Info/GetDeliveryAddress',
+                    type: 'POST',
+                    data: {
+                        id: id
+                    },
+                    success: function (response) {
+                        $("#deliveryAddress").val(response);
+                    },
+                    error: function (response) {
+                        console.log(response);
+                    }
+                });
+            }
+        }
+    </script>
+}
