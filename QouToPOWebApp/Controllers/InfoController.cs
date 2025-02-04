@@ -154,7 +154,41 @@ namespace QouToPOWebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> AddCustomSupplier(string Company_name, string Company_address, string Telephone, string Fax, string Contact_person)
         {
-            return Json(null);
+            try
+            {
+                var company = new Company
+                {
+                    Company_name = Company_name,
+                    Address = Company_address,
+                    Telephone = Telephone,
+                    Fax = Fax
+                };
+
+                await _db.Companies.AddAsync(company);
+                await _db.SaveChangesAsync();
+
+                var supplier = new Supplier
+                {
+                    Contact_person = Contact_person,
+                    Company_ID = company.Company_ID
+                };
+
+                await _db.Suppliers.AddAsync(supplier);
+                await _db.SaveChangesAsync();
+
+                return Ok( new
+                {
+                    supplerId = supplier.Supplier_ID,
+                    companyName = company.Company_name
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    message = "Failed to save custom supplier. Please try again"
+                });
+            }
         }
         #endregion
 
