@@ -46,7 +46,7 @@
     </tbody>
 </table>
 
-<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" >
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -69,7 +69,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" >
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -91,7 +91,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" >
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -110,7 +110,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" >
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -150,7 +150,6 @@
             const id = $(this).data('id');
             $('#editID').val(id);
             $('#editModal').modal('show');
-            loadEditForm();
         });
 
         $(".detailsBtn").on("click", function () {

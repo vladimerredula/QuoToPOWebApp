@@ -234,7 +234,7 @@ namespace QouToPOWebApp.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditSupplier(int id, [Bind("Contact_person,Contact_person_jpn,Company_ID,Key_words")] Supplier supplier)
+        public async Task<IActionResult> EditSupplier(int id, [Bind("Supplier_ID,Contact_person,Contact_person_jpn,Company_ID,Key_words")] Supplier supplier)
         {
             if (id != supplier.Supplier_ID)
             {
