@@ -1,6 +1,8 @@
 ﻿using PdfSharp.Drawing;
+using PdfSharp.Drawing.Layout;
 using PdfSharp.Fonts;
 using PdfSharp.Pdf;
+using QouToPOWebApp.ViewModel;
 using System.Globalization;
 
 namespace QouToPOWebApp.Services
@@ -29,7 +31,7 @@ namespace QouToPOWebApp.Services
             }
         }
 
-        public byte[] CreatePo()
+        public byte[] CreatePo(PoViewModel po)
         {
             var fontPaths = new Dictionary<string, string>
             {
@@ -42,11 +44,12 @@ namespace QouToPOWebApp.Services
 
             // Create a new PDF document
             var document = new PdfDocument();
-            document.Info.Title = "Blank Quotation";
+            document.Info.Title = "Po"; // update title according to supplier
 
             // Add a page
             PdfPage page = document.AddPage();
             XGraphics gfx = XGraphics.FromPdfPage(page);
+            XTextFormatter tf = new XTextFormatter(gfx);
 
             // Define table dimensions
             double x = 50; // Left margin
@@ -70,9 +73,9 @@ namespace QouToPOWebApp.Services
 
             // Quotation number
             //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 100, y, 100, rowHeight);
-            gfx.DrawString("12345678/FF", bodyFont, XBrushes.Black, new XRect(100, y, 100, rowHeight), XStringFormats.CenterLeft);
+            gfx.DrawString(po?.Quotation_number ?? "", bodyFont, XBrushes.Black, new XRect(100, y, 100, rowHeight), XStringFormats.CenterLeft);
 
-            // Load an image from file
+            // FFJ logo
             string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "AppData/Images", "FFJ_LOGO.jpg");
             XImage image = XImage.FromFile(imagePath);
             gfx.DrawImage(image, 384, y+1, 175, 62);
@@ -84,13 +87,14 @@ namespace QouToPOWebApp.Services
 
             // Quotation date
             //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 100, y, 100, rowHeight);
-            gfx.DrawString("2025年1月27日", bodyFont, XBrushes.Black, new XRect(100, y, 100, rowHeight), XStringFormats.CenterLeft);
+            gfx.DrawString(po?.Quotation_date?.ToString("yyyy年MM月dd日") ?? "", bodyFont, XBrushes.Black, new XRect(100, y, 100, rowHeight), XStringFormats.CenterLeft);
 
             y += 32;
 
             // Supplier Company name
             //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 36, y+3, 300, 20);
-            gfx.DrawString("株式会社サンプル　〇〇支社", new XFont("Meiryo", 14), XBrushes.Black, new XRect(36, y+3, 300, 20), XStringFormats.Center);
+            var supplierName = po?.Suppliers?.Company?.Company_name_jpn ?? po?.Suppliers?.Company?.Company_name ?? string.Empty;
+            gfx.DrawString(supplierName, new XFont("Meiryo", 14), XBrushes.Black, new XRect(36, y+3, 300, 20), XStringFormats.Center);
 
 
             gfx.DrawString("御 中", bodyFont2, XBrushes.Black, new XRect(340, y+8, 30, rowHeight), XStringFormats.Center);
@@ -103,7 +107,9 @@ namespace QouToPOWebApp.Services
 
             // Supplier Company address
             //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 36, 194, 300, 12);
-            gfx.DrawString("〒 123-1234　東京都世田谷区〇〇〇 1-2-3", new XFont("Meiryo", 9), XBrushes.Black, new XRect(36, 194, 300, 12), XStringFormats.Center);
+            var supplierAddress = po?.Suppliers?.Company?.Address_jpn ?? po?.Suppliers?.Company?.Address ?? string.Empty;
+            var postalCode = po?.Suppliers?.Company?.Postal_code ?? string.Empty;
+            gfx.DrawString($"〒 {postalCode}　{supplierAddress}", new XFont("Meiryo", 9), XBrushes.Black, new XRect(36, 194, 300, 12), XStringFormats.Center);
 
             gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 370, y, 184, 95);
             //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 385, y+10, 154, rowHeight);
@@ -125,7 +131,8 @@ namespace QouToPOWebApp.Services
             y += 12;
 
             // Supplier contact person name
-            gfx.DrawString("担当者：太郎 様", bodyFont2, XBrushes.Black, new XRect(36, y, 300, rowHeight), XStringFormats.Center);
+            var contactPerson = po?.Suppliers?.Contact_person_jpn ?? po?.Suppliers?.Contact_person ?? string.Empty;
+            gfx.DrawString($"担当者：{contactPerson} 様", bodyFont2, XBrushes.Black, new XRect(36, y, 300, rowHeight), XStringFormats.Center);
 
             y += rowHeight*2 + 3;
 
@@ -145,7 +152,7 @@ namespace QouToPOWebApp.Services
 
             // Tax included
             //gfx.DrawRectangle(new XPen(ClayCreek, 1), XBrushes.Transparent, 40, y-1, 75, rowHeight);
-            gfx.DrawString("(税込)", new XFont("Meiryo", 8), XBrushes.Black, new XRect(40, y-1, 75, rowHeight), XStringFormats.Center);
+            gfx.DrawString("(" + (po.Include_tax ? "税込" : "税抜") + ")", new XFont("Meiryo", 8), XBrushes.Black, new XRect(40, y-1, 75, rowHeight), XStringFormats.Center);
 
             y += 22;
 
@@ -180,11 +187,11 @@ namespace QouToPOWebApp.Services
                 ("□□□□○○○○素材　（　✖✖　を含む　）", 50, 5000)
             };
 
-            double totalAmount = 0;
+            float totalAmount = 0;
 
             var y1 = y;
 
-            foreach (var item in items)
+            /*foreach (var item in items)
             {
                 gfx.DrawString(item.itemName, new XFont("Meiryo", 10), XBrushes.Black, new XRect(42, y1, column1, tableRowHeight), XStringFormats.CenterLeft);
                 gfx.DrawString(item.quantity.ToString(), new XFont("Meiryo", 10), XBrushes.Black, new XRect(36 + column1, y1, column2, tableRowHeight), XStringFormats.Center);
@@ -196,10 +203,27 @@ namespace QouToPOWebApp.Services
                 totalAmount += totalprice;
 
                 y1 += tableRowHeight;
+            }*/
+
+            if (po?.Quotation_items?.Count() > 0)
+            {
+                foreach (var item in po?.Quotation_items)
+                {
+                    gfx.DrawString(item.Item_name, new XFont("Meiryo", 10), XBrushes.Black, new XRect(42, y1, column1, tableRowHeight), XStringFormats.CenterLeft);
+                    gfx.DrawString(item.Item_quantity?.ToString(), new XFont("Meiryo", 10), XBrushes.Black, new XRect(36 + column1, y1, column2, tableRowHeight), XStringFormats.Center);
+                    gfx.DrawString(item.Item_price?.ToString("N0", new CultureInfo("ja-JP")), new XFont("Meiryo", 10), XBrushes.Black, new XRect(32 + column1 + column2, y1, column3, tableRowHeight), XStringFormats.CenterRight);
+
+                    float totalprice = (float)(item.Item_price * item.Item_quantity);
+                    gfx.DrawString(totalprice.ToString("N0", new CultureInfo("ja-JP")), new XFont("Meiryo", 10), XBrushes.Black, new XRect(32 + column1 + column2 + column3, y1, column4, tableRowHeight), XStringFormats.CenterRight);
+
+                    totalAmount += totalprice;
+
+                    y1 += tableRowHeight;
+                }
             }
 
             // Draw table rows
-            for (int row = 1; row < 10; row++)
+            for (int row = 0; row < 10; row++)
             {
                 gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36, y, column1, tableRowHeight);
 
@@ -222,17 +246,20 @@ namespace QouToPOWebApp.Services
 
             y += 26;
 
-            var taxAmount = totalAmount * 0.1;
+            if (po.Include_tax)
+            {
+                float taxAmount = (float)(totalAmount * 0.1);
 
-            // Total tax
-            //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 35 + column1 + column2, y, 85, 26);
-            gfx.DrawString("消費税 (10%)", new XFont("Meiryo-bold", 12), XBrushes.Black, new XRect(33 + column1 + column2, y, 80, 26), XStringFormats.CenterRight);
-            //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 35 + column1 + column2 + column3, y, 87, 26);
-            gfx.DrawString(taxAmount.ToString("C0", new CultureInfo("ja-JP")), new XFont("Meiryo-bold", 11), XBrushes.Black, new XRect(33 + column1 + column2 + column3, y, 87, 26), XStringFormats.CenterRight);
+                // Total tax
+                //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 35 + column1 + column2, y, 85, 26);
+                gfx.DrawString("消費税 (10%)", new XFont("Meiryo-bold", 12), XBrushes.Black, new XRect(33 + column1 + column2, y, 80, 26), XStringFormats.CenterRight);
+                //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 35 + column1 + column2 + column3, y, 87, 26);
+                gfx.DrawString(taxAmount.ToString("C0", new CultureInfo("ja-JP")), new XFont("Meiryo-bold", 11), XBrushes.Black, new XRect(33 + column1 + column2 + column3, y, 87, 26), XStringFormats.CenterRight);
 
-            y += 26;
+                y += 26;
 
-            totalAmount += taxAmount;
+                totalAmount += taxAmount;
+            }
 
             // Total amount
             //gfx.DrawRectangle(new XPen(ClayCreek, 1), XBrushes.Transparent, 181, y-4, 150, 20);
@@ -240,7 +267,7 @@ namespace QouToPOWebApp.Services
 
             // Total amount
             //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 35 + column1 + column2, y, 85, 26);
-            gfx.DrawString("合　計 (税込)", new XFont("Meiryo-bold", 12), XBrushes.Black, new XRect(33 + column1 + column2, y, 80, 26), XStringFormats.CenterRight);
+            gfx.DrawString("合　計 (" + (po.Include_tax ? "税込" : "税抜") + ")", new XFont("Meiryo-bold", 12), XBrushes.Black, new XRect(33 + column1 + column2, y, 80, 26), XStringFormats.CenterRight);
             //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 35 + column1 + column2 + column3, y, 87, 26);
             gfx.DrawString(totalAmount.ToString("C0", new CultureInfo("ja-JP")), new XFont("Meiryo-bold", 11), XBrushes.Black, new XRect(33 + column1 + column2 + column3, y, 87, 26), XStringFormats.CenterRight);
 
@@ -250,18 +277,27 @@ namespace QouToPOWebApp.Services
 
             y += 20;
 
+            // Delivery term
             gfx.DrawString("納期：", new XFont("Meiryo-bold", 10), XBrushes.Black, new XRect(36, y, 50, rowHeight), XStringFormats.CenterLeft);
-            gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 86, y, 300, rowHeight);
+            //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 86, y, 300, rowHeight);
+            var deliveryTerm = po?.Delivery_terms?.Delivery_term_name_jpn ?? po?.Delivery_terms?.Delivery_term_name ?? string.Empty;
+            gfx.DrawString(deliveryTerm, new XFont("Meiryo-bold", 10), XBrushes.Black, new XRect(66, y, 300, rowHeight), XStringFormats.CenterLeft);
 
             y += 18;
 
+            // Payment term
             gfx.DrawString("決済条件：", new XFont("Meiryo-bold", 10), XBrushes.Black, new XRect(36, y, 50, rowHeight), XStringFormats.CenterLeft);
-            gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 86, y, 300, rowHeight);
+            //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 86, y, 300, rowHeight);
+            var paymentTerm = po?.Payment_terms?.Payment_term_name_jpn ?? po?.Payment_terms?.Payment_term_name ?? string.Empty;
+            gfx.DrawString(paymentTerm, new XFont("Meiryo-bold", 10), XBrushes.Black, new XRect(86, y, 300, rowHeight), XStringFormats.CenterLeft);
 
             y += 18;
 
+            // Delivery address
             gfx.DrawString("受渡場所：", new XFont("Meiryo-bold", 10), XBrushes.Black, new XRect(36, y, 50, rowHeight), XStringFormats.CenterLeft);
-            gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 86, y, 300, rowHeight);
+            //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 86, y, 300, rowHeight);
+            var deliveryAddress = po?.Companies?.Address_jpn ?? po?.Companies?.Address ?? string.Empty;
+            gfx.DrawString(deliveryAddress, new XFont("Meiryo-bold", 10), XBrushes.Black, new XRect(86, y, 300, rowHeight), XStringFormats.CenterLeft);
 
             y += rowHeight * 3;
 
