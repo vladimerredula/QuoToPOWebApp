@@ -232,12 +232,60 @@ function getFloatValue(string) {
     return parseFloat(string.replace(/,/g, ''))
 }
 
-$("#poForm").on("submit", function (e) {
-    e.preventDefault();
-    var paymentTerm = $('#Payment_term_ID');
-    paymentTerm.val(paymentTerm.data("value"));
-    var deliveryTerm = $('#Delivery_term_ID');
-    deliveryTerm.val(deliveryTerm.data("value"));
+$("#customPaymentTerm").on("click", function () {
+    $("#paymentTermAddModal").modal("show");
+});
 
-    this.submit();
-})
+function addPaymentTerm() {
+    if ($("#paymentTermForm").valid()) {
+        $.ajax({
+            url: '/Info/AddCustomPaymentTerm',
+            type: 'POST',
+            data: {
+                PaymentTermName: $("#payTermName").val(),
+                PaymentTermNameJpn: $("#payJpnName").val()
+            },
+            success: function (response) {
+                var paymentTerm = $("#Payment_term_ID");
+                paymentTerm.append(new Option(response.paymentTermName, response.paymentTermId));
+                paymentTerm.val(response.paymentTermId);
+                $("#paymentTermAddModal").modal("hide");
+            },
+            error: function (response) {
+                console.log(response);
+            }
+        });
+
+        $("#payTermName").val(null);
+        $("#payJpnName").val(null);
+    }
+}
+
+$("#customDeliveryTerm").on("click", function () {
+    $("#deliveryTermAddModal").modal("show");
+});
+
+function addDeliveryTerm() {
+    if ($("#deliveryTermForm").valid()) {
+        $.ajax({
+            url: '/Info/AddCustomDeliveryTerm',
+            type: 'POST',
+            data: {
+                DeliveryTermName: $("#delTermName").val(),
+                DeliveryTermNameJpn: $("#delJpnName").val()
+            },
+            success: function (response) {
+                var deliveryTerm = $("#Delivery_term_ID");
+                deliveryTerm.append(new Option(response.deliveryTermName, response.deliveryTermId));
+                deliveryTerm.val(response.deliveryTermId);
+                $("#deliveryTermAddModal").modal("hide");
+            },
+            error: function (response) {
+                console.log(response);
+            }
+        });
+
+        $("#delTermName").val(null);
+        $("#delJpnName").val(null);
+    }
+}

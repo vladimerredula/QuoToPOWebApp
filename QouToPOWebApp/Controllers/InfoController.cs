@@ -502,6 +502,35 @@ namespace QouToPOWebApp.Controllers
         {
             return _db.Delivery_terms.Any(e => e.Delivery_term_ID == id);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> AddCustomDeliveryTerm(string DeliveryTermName, string DeliveryTermNameJpn)
+        {
+            try
+            {
+                var deliveryTerm = new Delivery_term
+                {
+                    Delivery_term_name = DeliveryTermName,
+                    Delivery_term_name_jpn = DeliveryTermNameJpn
+                };
+
+                await _db.Delivery_terms.AddAsync(deliveryTerm);
+                await _db.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    deliveryTermId = deliveryTerm.Delivery_term_ID,
+                    deliveryTermName = deliveryTerm.Delivery_term_name
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    message = "Failed to save custom delivery term. Please try again"
+                });
+            }
+        }
         #endregion
 
 
@@ -640,6 +669,35 @@ namespace QouToPOWebApp.Controllers
         private bool PaymentTermExists(int id)
         {
             return _db.Payment_terms.Any(e => e.Payment_term_ID == id);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddCustomPaymentTerm(string PaymentTermName, string PaymentTermNameJpn)
+        {
+            try
+            {
+                var paymentTerm = new Payment_term
+                {
+                    Payment_term_name = PaymentTermName,
+                    Payment_term_name_jpn = PaymentTermNameJpn
+                };
+
+                await _db.Payment_terms.AddAsync(paymentTerm);
+                await _db.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    paymentTermId = paymentTerm.Payment_term_ID,
+                    paymentTermName = paymentTerm.Payment_term_name
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    message = "Failed to save custom payment term. Please try again"
+                });
+            }
         }
         #endregion
     }
