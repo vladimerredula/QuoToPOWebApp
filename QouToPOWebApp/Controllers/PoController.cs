@@ -433,7 +433,12 @@ namespace QouToPOWebApp.Controllers
 
             foreach (var paymentTerm in paymentTerms)
             {
-                var keywords = paymentTerm.Key_words.Split(",");
+                var keywords = new List<string>();
+
+                if (paymentTerm.Key_words != null)
+                {
+                    keywords = paymentTerm.Key_words.Split(",").ToList();
+                }
 
                 foreach (var keyword in keywords)
                 {
@@ -453,7 +458,12 @@ namespace QouToPOWebApp.Controllers
 
             foreach (var deliveryTerm in deliveryTerms)
             {
-                var keywords = deliveryTerm.Key_words.Split(",");
+                var keywords = new List<string>();
+
+                if (deliveryTerm.Key_words != null)
+                {
+                    keywords = deliveryTerm.Key_words.Split(",").ToList();
+                }
 
                 foreach (var keyword in keywords)
                 {
