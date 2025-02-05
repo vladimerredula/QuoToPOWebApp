@@ -26,7 +26,7 @@ namespace QouToPOWebApp.Controllers
             _pdf = new PdfSharpService();
         }
 
-        public IActionResult CreatePoFromQuotation()
+        public IActionResult FromQuotation()
         {
             ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name");
             ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name");
@@ -484,7 +484,7 @@ namespace QouToPOWebApp.Controllers
             return text.Replace("_", "").Replace(" ", "");
         }
 
-        public IActionResult CreatePo()
+        public IActionResult CreateNew()
         {
             ViewBag.deliveryAddressList = GetDeliveryAddressList();
             ViewBag.supplierList = GetSupplierList();
@@ -501,7 +501,7 @@ namespace QouToPOWebApp.Controllers
                 ViewBag.supplierList = GetSupplierList(po.Supplier_ID);
                 ViewBag.paymentTermList = new SelectList(_db.Payment_terms.ToList(), "Payment_term_ID", "Payment_term_name", po.Payment_term_ID);
                 ViewBag.deliveryTermList = new SelectList(_db.Delivery_terms.ToList(), "Delivery_term_ID", "Delivery_term_name", po.Delivery_term_ID);
-                return View("CreatePo", po);
+                return View("CreateNew", po);
             }
 
             po.Suppliers = _db.Suppliers
