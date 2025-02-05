@@ -127,6 +127,7 @@ $("#editItem").on("click", function () {
 });
 
 function addCustomSupplier() {
+    if ($("#supplierForm").valid()) {
     $.ajax({
         url: '/Info/AddCustomSupplier',
         type: 'POST',
@@ -147,6 +148,7 @@ function addCustomSupplier() {
             console.log(response);
         }
     });
+    }
 };
 
 $("#Supplier_ID").change(function () {

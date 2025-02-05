@@ -7,107 +7,164 @@
 @model PoViewModel
 
 @{
-    ViewData["Title"] = "Create PO";
+    ViewData["Title"] = "Create new";
 
     var paymentTerms = ViewBag.paymentTerms as List<Payment_term>;
+    var deliveryTerms = ViewBag.deliveryTerms as List<Delivery_term>;
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 <div class="container">
-    <h4>Details</h4>
-    <div class="row mb-3">
-        <div class="col mb-2">
-            <label class="form-label">Date</label>
-            <input class="form-control" type="date" asp-for="Quotation_date" />
-        </div>
-        <div class="col mb-2">
-            <label class="form-label">Quotation no.</label>
-            <input class="form-control" type="text" asp-for="Quotation_number" />
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="row">
-                <label class="form-label">Supplier</label>
-                <div class="col col-md-6 mb-2">
-                    <select class="form-select" asp-for="Supplier_ID" asp-items="ViewBag.supplierList">
-                        <option selected disabled>Choose..</option>
-                    </select>
-                </div>
-                <div class="col-auto">
-                    <a href="#" class="btn btn-secondary" id="customSupplier">Custom</a>
-                </div>
+    <form asp-action="GeneratePo" id="poForm">
+        <h4>Details</h4>
+        <div class="row mb-3">
+            <div class="col mb-2">
+                <label class="form-label" asp-for="Quotation_date"></label><span class="text-danger" title="Required">*</span>
+                <input class="form-control" type="date" asp-for="Quotation_date" />
+                <span asp-validation-for="Quotation_date" class="text-danger"></span>
+            </div>
+            <div class="col mb-2">
+                <label class="form-label" asp-for="Quotation_number"></label><span class="text-danger" title="Required">*</span>
+                <input class="form-control" type="text" asp-for="Quotation_number" />
+                <span asp-validation-for="Quotation_number" class="text-danger"></span>
             </div>
         </div>
-        <div class="col-12">
-            <textarea type="text" class="form-control" id="supplierAddress" placeholder="Supplier address" readonly></textarea>
+        <div class="row mb-3">
+            <div class="col-12">
+                <label class="form-label" asp-for="Supplier_ID"></label><span class="text-danger" title="Required">*</span>
+                <div class="row">
+                    <div class="col col-md-6 mb-2">
+                        <select class="form-select" asp-for="Supplier_ID" asp-items="ViewBag.supplierList">
+                            <option selected disabled>Choose..</option>
+                        </select>
+                    </div>
+                    <div class="col-auto ps-0">
+                        <a href="#" class="btn btn-outline-secondary" id="customSupplier">Custom supplier</a>
+                    </div>
+                </div>
+                <span asp-validation-for="Supplier_ID" class="text-danger"></span>
+            </div>
+            <div class="col-12">
+                <textarea type="text" class="form-control" id="supplierAddress" placeholder="Supplier address" readonly></textarea>
+            </div>
         </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col mb-2">
-            <label class="form-label">Payment term</label>
-            <input class="form-control" type="text" list="paymentTermOptions" asp-for="Payment_term_ID"/>
-            <datalist id="paymentTermOptions">
-                @foreach (var paymentTerm in paymentTerms)
-                {
-                    <option value="@paymentTerm.Payment_term_ID">@paymentTerm.Payment_term_name</option>
-                }
-            </datalist>
+        <div class="row mb-3">
+            <div class="col mb-2">
+                <label class="form-label" asp-for="Payment_term_ID"></label><span class="text-danger" title="Required">*</span>
+                <div class="row">
+                    <div class="col mb-2">
+                        <select class="form-select" asp-for="Payment_term_ID" asp-items="ViewBag.paymentTermList">
+                            <option selected disabled>Choose..</option>
+                        </select>
+                    </div>
+                    <div class="col-auto ps-0">
+                        <a href="#" class="btn btn-outline-secondary" id="customPaymentTerm">Add</a>
+                    </div>
+                </div>
+                <span asp-validation-for="Payment_term_ID" class="text-danger"></span>
+            </div>
+            <div class="col mb-2">
+                <label class="form-label" asp-for="Delivery_term_ID"></label><span class="text-danger" title="Required">*</span>
+                <div class="row">
+                    <div class="col mb-2">
+                        <select class="form-select" asp-for="Delivery_term_ID" asp-items="ViewBag.deliveryTermList">
+                            <option selected disabled>Choose..</option>
+                        </select>
+                    </div>
+                    <div class="col-auto ps-0">
+                        <a href="#" class="btn btn-outline-secondary" id="customDeliveryTerm">Add</a>
+                    </div>
+                </div>
+                <span asp-validation-for="Delivery_term_ID" class="text-danger"></span>
+            </div>
         </div>
-        <div class="col mb-2">
-            <label class="form-label">Delivery term</label>
-            <input class="form-control" type="text" />
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col-12">
+        <div class="row mb-3">
+            <div class="col-12">
                 <label class="form-label" asp-for="Delivery_address_ID">Deliver Address</label><span class="text-danger" title="Required">*</span>
-            <div class="row">
-                <div class="col col-md-6 mb-2">
+                <div class="row">
+                    <div class="col col-md-6 mb-2">
                         <select class="form-select" asp-for="Delivery_address_ID">
-                        <option selected disabled>Choose..</option>
+                            <option selected disabled>Choose..</option>
                             <option value="1">FFJ Zama</option>
                             <option value="2">FFJ Hachioji</option>
                             <option value="3">FFJ Hashimoto</option>
                             <option value="4">FFJ SIC</option>
-                    </select>
+                        </select>
+                    </div>
+                </div>
+                <span asp-validation-for="Delivery_address_ID" class="text-danger"></span>
+            </div>
+            <div class="col-12">
+                <textarea type="text" class="form-control" id="deliveryAddress" placeholder="Delivery address" readonly></textarea>
+            </div>
+        </div>
+        <br />
+
+        <div class="row justify-content-between">
+            <div class="col-auto">
+                <span class="fs-3 fw-semibold">Items</span>&nbsp;
+                <a class="mb-2 btn btn-light border" href="#" id="addItem">Add</a>&nbsp;
+                <a class="mb-2 btn btn-light border disabled" href="#" id="editItem">Edit</a>&nbsp;
+                <a class="mb-2 btn btn-light border disabled" href="#" id="removeItem">Remove</a>
+            </div>
+            <div class="col-auto align-self-end">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" asp-for="Include_tax">
+                    <label class="form-check-label" asp-for="Include_tax">Include 10% tax</label>
                 </div>
             </div>
-                <span asp-validation-for="Delivery_address_ID" class="text-danger"></span>
         </div>
-        <div class="col-12">
-            <textarea type="text" class="form-control" id="deliveryAddress" placeholder="Delivery address" readonly></textarea>
+        <div class="row">
+            <div class="col">
+                <table class="table table-hover datatable">
+                    <thead class="table-light">
+                        <tr>
+                            <th></th>
+                            <th>No.</th>
+                            <th>Item name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-    <br />
-    <p class="mb-1">
-        <span class="fs-3 fw-semibold">Items</span>&nbsp;
-        <a class="mb-2 btn btn-light border" href="#" id="addItem">Add</a>&nbsp;
-        <a class="mb-2 btn btn-light border disabled" href="#" id="editItem">Edit</a>&nbsp;
-        <a class="mb-2 btn btn-light border disabled" href="#" id="removeItem">Remove</a>
-    </p>
-    <div class="row">
-        <div class="col">
-            <table class="table datatable">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>No.</th>
-                        <th>Item name</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Total price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+        <div class="row mb-3 justify-content-end">
+            <div class="col-auto">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th class="text-end">Subtotal (Without tax): </th>
+                            <td class="text-end" id="subTotal" style="min-width:100px;">0</td>
+                        </tr>
+                        <tr id="tax">
+                            <th class="text-end">Consumption tax (10%): </th>
+                            <td class="text-end" id="taxValue">0</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end">Total (<span id="totalTax">Without</span> tax): </th>
+                            <td class="text-end" id="totalAmount">0</td>
+                        </tr>
+                    </tbody>
+                    <tfoot class="table-group-divider">
+                        <tr></tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
-    </div>
+        <div class="row justify-content-end">
+            <div class="col-auto">
+                <button class="btn btn-lg btn-info text-white" type="submit">Generate PO</button>
+            </div>
+        </div>
+    </form>
 </div>
 
 <!-- Supplier Modal -->
-<div class="modal fade" id="supplierModal" tabindex="-1" aria-labelledby="supplierModalLabel" aria-hidden="true">
+<div class="modal fade" id="supplierModal" tabindex="-1" aria-labelledby="supplierModalLabel">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -118,12 +175,12 @@
                 <form id="supplierForm">
                     <div class="row">
                         <div class="col-12 mb-3">
-                            <label class="form-label">Supplier name</label>
-                            <input class="form-control" name="Company_name" />
+                            <label class="form-label">Supplier name</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" name="Company_name" required/>
                         </div>
                         <div class="col-12 mb-3">
-                            <label class="form-label">Supplier address</label>
-                            <textarea class="form-control" name="Company_address"></textarea>
+                            <label class="form-label">Supplier address</label><span class="text-danger" title="Required">*</span>
+                            <textarea class="form-control" name="Company_address" required></textarea>
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label">Telephone</label>
@@ -134,8 +191,8 @@
                             <input class="form-control" name="Fax" />
                         </div>
                         <div class="col-12 mb-3">
-                            <label class="form-label">Person in-charge</label>
-                            <input class="form-control" name="Contact_person" />
+                            <label class="form-label">Person in-charge</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" name="Contact_person" required/>
                         </div>
                     </div>
                 </form>
@@ -148,7 +205,7 @@
 </div>
 
 <!-- Item Modal -->
-<div class="modal fade" id="itemModal" tabindex="-1" aria-labelledby="itemModalLabel" aria-hidden="true">
+<div class="modal fade" id="itemModal" tabindex="-1" aria-labelledby="itemModalLabel">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -156,26 +213,122 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-12 mb-3">
-                        <label class="form-label">Item name</label>
-                        <input class="form-control" id="itemName" />
-                    </div>
-                    <div class="col-6 mb-3">
-                        <label class="form-label">Price</label>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="yenSign">¥</span>
-                            <input class="form-control" id="price" aria-describedby="yenSign" />
+                <form id="itemForm">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Item name</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" id="itemName" required />
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Quantity</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" type="number" id="quantity" required />
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Price</label><span class="text-danger" title="Required">*</span>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="yenSign">¥</span>
+                                <input class="form-control" id="price" aria-describedby="yenSign"  required/>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-6 mb-3">
-                        <label class="form-label">Quantity</label>
-                        <input class="form-control" type="number" id="quantity" />
-                    </div>
-                </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <a class="btn btn-primary" href="#" id="submitItem">Add</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Item Modal -->
+<div class="modal fade" id="itemEditModal" tabindex="-1" aria-labelledby="itemEditModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="itemEditModalLabel">Edit item</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="itemEditForm">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Item name</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" id="itemEditName" required/>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Quantity</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" type="number" id="itemEditQuantity" required/>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Price</label><span class="text-danger" title="Required">*</span>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="yenSign">¥</span>
+                                <input class="form-control" id="itemEditPrice" aria-describedby="yenSign" required/>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-warning" href="#" id="saveItem">Save</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Payment Term Modal -->
+<div class="modal fade" id="paymentTermAddModal" tabindex="-1" aria-labelledby="paymentTermAddModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="paymentTermAddModalLabel">Add payment term</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="paymentTermForm">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Term name</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" id="payTermName" required/>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Japanese translation</label>
+                            <input class="form-control" id="payJpnName" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" href="#" id="savePayTerm" onclick="addPaymentTerm()">Save</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Delivery Term Modal -->
+<div class="modal fade" id="deliveryTermAddModal" tabindex="-1" aria-labelledby="deliveryTermAddModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="deliveryTermAddModalLabel">Add delivery term</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="deliveryTermForm">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Term name</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" id="delTermName" required/>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Japanese translation</label>
+                            <input class="form-control" id="delJpnName" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" href="#" id="saveDelTerm" onclick="addDeliveryTerm()">Save</a>
             </div>
         </div>
     </div>
