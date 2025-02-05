@@ -3,9 +3,10 @@ $(document).ready(function () {
     getThumbnail();
     taxSwitch();
 
-    var supplierId = $("#Quotation_Supplier_ID").val();
-
+    var supplierId = $("#Supplier_ID").val();
     getSupplierAddress(supplierId);
+    var companyId = $("#Delivery_address_ID").val();
+    getDeliveryAddress(companyId);
 });
 
 var itemTable = $('table.datatable').DataTable({
@@ -43,12 +44,12 @@ $("#selectFileBtn").on("click", function () {
     $("#pdfFile").click(); // Trigger the hidden file input
 });
 
-$("#Quotation_Supplier_ID").change(function () {
+$("#Supplier_ID").change(function () {
     const id = $(this).val();
     getSupplierAddress(id);
 });
 
-$("#deliveryID").change(function () {
+$("#Delivery_address_ID").change(function () {
     const id = $(this).val();
     getDeliveryAddress(id);
 });
@@ -122,7 +123,7 @@ function renderPreview(data) {
     if (data.image) {
         $('#pdfPreview').attr("src", data.image);
         $('#pdfPreview').attr("filename", data.filePath);
-        $('#Quotation_File_path').val(data.filePath);
+        $('#filePath').val(data.filePath);
         $('#selectFileInput').val(data.fileName);
         $('#preview').removeClass("visually-hidden");
 
@@ -131,7 +132,6 @@ function renderPreview(data) {
 
         $("#prev").toggleClass("disabled", data.pageIndex == 0);
         $("#next").toggleClass("disabled", data.totalPages - data.pageIndex == 1);
-        console.log($('#Quotation_File_path').val());
     }
 }
 
@@ -276,7 +276,7 @@ function addCustomSupplier() {
             Contact_person: $("input[name=Contact_person]").val()
         },
         success: function (response) {
-            var supplier = $("#Quotation_Supplier_ID");
+            var supplier = $("#Supplier_ID");
             supplier.append(new Option(response.companyName, response.supplerId));
             supplier.val(response.supplerId).trigger("change");
             $("#supplierModal").modal("hide");

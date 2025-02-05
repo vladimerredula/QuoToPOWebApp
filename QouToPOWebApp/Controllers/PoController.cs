@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using QouToPOWebApp.Models;
 using QouToPOWebApp.Services;
 using QouToPOWebApp.ViewModel;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace QouToPOWebApp.Controllers
@@ -28,7 +27,7 @@ namespace QouToPOWebApp.Controllers
 
         public IActionResult FromQuotation()
         {
-            ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name");
+            ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name", 1);
             ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name");
             ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name");
             ViewData["deliveryAddressList"] = GetDeliveryAddressList();
@@ -37,26 +36,27 @@ namespace QouToPOWebApp.Controllers
             return View();
         }
 
-        public IActionResult Extract(QuotationViewModel model)
+        public IActionResult Extract(int pdfType, string filePath)
         {
-            switch (model.Quotation.Pdf_type_ID)
+            switch (pdfType)
             {
                 case 2:
-                    return ExtractScannedPdf(model);
+                    return ExtractScannedPdf(filePath);
                 default:
-                    return ExtractNativePdf(model);
+                    return ExtractNativePdf(filePath);
             }
         }
 
-        public IActionResult ExtractNativePdf(QuotationViewModel model)
+        public IActionResult ExtractNativePdf(string filePath)
         {
-            var extractedTables = ExtractTables(model.Quotation.File_path);
+            var extractedTables = ExtractTables(filePath);
 
             var quoNumber = string.Empty;
             var quoDate = DateTime.MinValue;
             int? supplierID = null;
             int? paymentTerm = null;
             int? deliveryTerm = null;
+            bool isTaxable = false;
 
             foreach (var tables in extractedTables)
             {
@@ -87,39 +87,53 @@ namespace QouToPOWebApp.Controllers
                 {
                     deliveryTerm = GetDeliveryTerms(cleanedText);
                 }
+
+                if (!isTaxable)
+                {
+                    isTaxable = IsTaxable(cleanedText);
+                }
             }
 
             if (string.IsNullOrEmpty(quoNumber))
             {
-                var text = _tabulaJar.ExtractTables(model.Quotation.File_path, "stream");
+                var text = _tabulaJar.ExtractTables(filePath, "stream");
                 quoNumber = GetQuotationNumber(text);
             }
 
             if (string.IsNullOrEmpty(quoNumber))
             {
-                var text = _tabulaJar.ExtractTables(model.Quotation.File_path);
+                var text = _tabulaJar.ExtractTables(filePath);
                 quoNumber = GetQuotationNumber(text);
             }
 
-            model.Quotation.Quotation_number = quoNumber;
-            model.Quotation.Quotation_date = quoDate;
-            model.Quotation.Supplier_ID = supplierID;
-            model.Quotation.Payment_term_ID = paymentTerm;
-            model.Quotation.Delivery_term_ID = deliveryTerm;
-            model.Quotation.File_name = Path.GetFileName(model.Quotation.File_path);
+            var model = new QuotationViewModel()
+            {
+                Quotation_items = new List<Quotation_item>(),
+                ExtractMode = Request.Form["extractMode"]
+            };
 
-            model.Items = GetQuotationItems(model.Quotation.File_path);
+            model.Quotation_number = quoNumber;
+            model.Quotation_date = quoDate;
+            model.Supplier_ID = supplierID;
+            model.Payment_term_ID = paymentTerm;
+            model.Delivery_term_ID = deliveryTerm;
+            model.File_path = filePath;
+            model.File_name = Path.GetFileName(filePath);
+            model.Include_tax = isTaxable;
+            model.Pdf_type_ID = int.Parse(Request.Form["pdfType"]);
 
-            ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name", model.Quotation.Pdf_type_ID);
-            ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Quotation.Payment_term_ID);
-            ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Quotation.Delivery_term_ID);
-            ViewData["deliveryAddressList"] = GetDeliveryAddressList(model.Quotation.Delivery_term_ID);
-            ViewData["supplierList"] = GetSupplierList(model.Quotation.Supplier_ID);
+            model.Quotation_items = GetQuotationItems(filePath);
+
+            ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name", model.Pdf_type_ID);
+            ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Payment_term_ID);
+            ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Delivery_term_ID);
+            ViewData["deliveryAddressList"] = GetDeliveryAddressList(model.Delivery_term_ID);
+            ViewData["supplierList"] = GetSupplierList(model.Supplier_ID);
 
             return View("ExtractText", model);
         }
 
-        public IActionResult ExtractScannedPdf(QuotationViewModel model)
+        public IActionResult ExtractScannedPdf(string filePath)
         {
             var tess = new TesseractService(new PdfiumViewerService());
 
@@ -128,8 +142,9 @@ namespace QouToPOWebApp.Controllers
             int? supplierID = null;
             int? paymentTerm = null;
             int? deliveryTerm = null;
+            bool withTax = false;
 
-            var extractedText = tess.ExtractTextFromPdf(model.Quotation.File_path);
+            var extractedText = tess.ExtractTextFromPdf(filePath);
             //var extractedText = tess.ExtractTextFromImage("C:\\Users\\v.redula\\OneDrive - Faraday Factory Japan\\Pictures\\Screenshots\\Screenshot 2025-01-29 173521.png");
             var cleanedText = extractedText.Replace("_", "").Replace(" ", "");
 
@@ -158,27 +173,35 @@ namespace QouToPOWebApp.Controllers
                 deliveryTerm = GetDeliveryTerms(cleanedText);
             }
 
-            model.Quotation.Quotation_number = quoNumber;
-            model.Quotation.Quotation_date = quoDate;
-            model.Quotation.Supplier_ID = supplierID;
-            model.Quotation.Payment_term_ID = paymentTerm;
-            model.Quotation.Delivery_term_ID = deliveryTerm;
-            model.Quotation.File_name = Path.GetFileName(model.Quotation.File_path);
+            var model = new QuotationViewModel()
+            {
+                Quotation_items = new List<Quotation_item>(),
+                ExtractMode = Request.Form["extractMode"]
+            };
 
-            model.Items = GetQuotationItems(model.Quotation.File_path);
+            model.Quotation_number = quoNumber;
+            model.Quotation_date = quoDate;
+            model.Supplier_ID = supplierID;
+            model.Payment_term_ID = paymentTerm;
+            model.Delivery_term_ID = deliveryTerm;
+            model.File_path = filePath;
+            model.File_name = Path.GetFileName(filePath);
+            model.Include_tax = IsTaxable(cleanedText);
 
-            ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name", model.Quotation.Pdf_type_ID);
-            ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Quotation.Payment_term_ID);
-            ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Quotation.Delivery_term_ID);
-            ViewData["deliveryAddressList"] = GetDeliveryAddressList(model.Quotation.Delivery_term_ID);
-            ViewData["supplierList"] = GetSupplierList(model.Quotation.Supplier_ID);
+            model.Quotation_items = GetQuotationItems(filePath);
+
+            ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name", model.Pdf_type_ID);
+            ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Payment_term_ID);
+            ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Delivery_term_ID);
+            ViewData["deliveryAddressList"] = GetDeliveryAddressList(model.Delivery_term_ID);
+            ViewData["supplierList"] = GetSupplierList(model.Supplier_ID);
 
             return View("ExtractText", model);
         }
 
         public List<Quotation_item> GetQuotationItems(string filePath)
         {
-            var extractionMode = Request.Form["extractionMode"];
+            var extractionMode = Request.Form["extractMode"];
             string extractedTables = _tabulaJar.ExtractTables(filePath, extractionMode);
 
             var quotationItems = new List<Quotation_item>();
@@ -267,6 +290,28 @@ namespace QouToPOWebApp.Controllers
             }
 
             return quotationItems;
+        }
+
+        public bool IsTaxable(string text)
+        {
+            text = CleanText(text);
+
+            List<string> keyWords = new List<string> {
+                "消費税:",
+                "消費税",
+                "10%",
+                "税込"
+            };
+
+            foreach (var keyword in keyWords)
+            {
+                if (text.Contains(keyword.Replace(" ", "")))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public string GetQuotationNumber(string text)

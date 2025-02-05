@@ -2,10 +2,6 @@
     ViewData["Title"] = "Create from Quotation";
 }
 
-@using QouToPOWebApp.ViewModel
-
-@model QuotationViewModel;
-
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
 <div class="container">
@@ -14,8 +10,7 @@
             <div class="col-md">
                 <label class="form-label">Upload a Quotation file</label>
                 <input type="file" id="pdfFile" accept=".pdf" onchange="uploadPdf(this)" hidden>
-                <input asp-for="Quotation.File_path" type="text" value="" hidden />
-                <span asp-validation-for="Quotation.File_path" class="text-danger"></span>
+                <input name="filePath" id="filePath" type="text" value="" hidden />
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" placeholder="No file chosen" id="selectFileInput" readonly>
                     <a href="#" class="btn btn-light border" type="button" id="selectFileBtn">Choose File</a>
@@ -49,20 +44,19 @@
                         <div class="row g-3">
                             <div class="col-lg-6 col-xl-12">
                                 <div class="row align-items-center">
-                                    <label asp-for="Quotation.Pdf_type_ID" class="form-label col-xl-4">PDF type</label>
+                                    <label for="pdfType" class="form-label col-xl-4">PDF type</label>
                                     <div class="col-xl-8">
-                                        <select class="form-select col-xl-8" aria-label="PDF type" asp-for="Quotation.Pdf_type_ID" asp-items="ViewBag.pdfTypeList">
+                                        <select class="form-select col-xl-8" aria-label="PDF type" name="pdfType" id="pdfType" asp-items="ViewBag.pdfTypeList">
                                             <option selected disabled>Choose..</option>
                                         </select>
                                     </div>
-                                    <span asp-validation-for="Quotation.Pdf_type_ID" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-lg-6 col-xl-12">
                                 <div class="row align-items-center">
-                                    <label asp-for="ExtractionMode" class="form-label col-xl-4">Extraction mode</label>
+                                    <label for="extractMode" class="form-label col-xl-4">Extraction mode</label>
                                     <div class="col-xl-8">
-                                        <select class="form-select" asp-for="ExtractionMode">
+                                        <select class="form-select" name="extractMode" id="extractMode">
                                             <option value="lattice">Lattice</option>
                                             <option value="stream">Stream</option>
                                         </select>

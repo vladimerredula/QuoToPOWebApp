@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QouToPOWebApp.Services;
+using QouToPOWebApp.ViewModel;
 
 namespace QouToPOWebApp.Controllers
 {
@@ -90,7 +91,7 @@ namespace QouToPOWebApp.Controllers
             string title = "Sample PDF Document";
             string content = "This is a sample PDF generated using PDFsharp 6.1 in ASP.NET Core MVC.";
             //byte[] pdfBytes = _pdf.CreatePdf(title, content);
-            byte[] pdfBytes = _pdf.CreatePo();
+            byte[] pdfBytes = _pdf.CreatePo(new ViewModel.PoViewModel());
 
             // Return the PDF file as a download
             return File(pdfBytes, "application/pdf", "Sample.pdf");

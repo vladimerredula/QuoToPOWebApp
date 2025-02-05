@@ -15,8 +15,7 @@
             <div class="col-md">
                 <label class="form-label">Upload a Quotation file</label>
                 <input type="file" id="pdfFile" accept=".pdf" onchange="uploadPdf(this)" hidden>
-                <input asp-for="Quotation.File_path" type="text" value="" hidden />
-                <span asp-validation-for="Quotation.File_path" class="text-danger"></span>
+                <input name="filePath" id="filePath" type="text" value="" hidden />
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" placeholder="No file chosen" id="selectFileInput" readonly>
                     <a href="#" class="btn btn-light border" type="button" id="selectFileBtn">Choose File</a>
@@ -28,7 +27,7 @@
                 <h4>Preview</h4>
                 <div class="row justify-content-center" id="preview">
                     <div class="col-12 bg-secondary-subtle p-0 rounded-2 d-flex justify-content-center">
-                        <img id="pdfPreview" class="border" src="" filename="@Model.Quotation.File_path" alt="PDF Preview" style="max-width:340px;" />
+                        <img id="pdfPreview" class="border" src="" filename="@Model.File_path" alt="PDF Preview" style="max-width:340px;" />
                     </div>
                     <div class="mt-2 row p-0 justify-content-between" style="max-width:337px;">
                         <div class="col-auto">
@@ -50,20 +49,19 @@
                         <div class="row g-3">
                             <div class="col-lg-6 col-xl-12">
                                 <div class="row align-items-center">
-                                    <label asp-for="Quotation.Pdf_type_ID" class="form-label col-xl-4">PDF type</label>
+                                    <label for="pdftype" class="form-label col-xl-4">PDF type</label>
                                     <div class="col-xl-8">
-                                        <select class="form-select col-xl-8" aria-label="PDF type" asp-for="Quotation.Pdf_type_ID" asp-items="ViewBag.pdfTypeList">
+                                        <select class="form-select col-xl-8" aria-label="PDF type" name="pdfType" id="pdfType" asp-items="ViewBag.pdfTypeList">
                                             <option selected disabled>Choose..</option>
                                         </select>
                                     </div>
-                                    <span asp-validation-for="Quotation.Pdf_type_ID" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-lg-6 col-xl-12">
                                 <div class="row align-items-center">
-                                    <label asp-for="ExtractionMode" class="form-label col-xl-4">Extraction mode</label>
+                                    <label for="extractMode" class="form-label col-xl-4">Extraction mode</label>
                                     <div class="col-xl-8">
-                                        <select class="form-select" asp-for="ExtractionMode">
+                                        <select class="form-select" name="extractMode" id="extractMode">
                                             <option value="lattice">Lattice</option>
                                             <option value="stream">Stream</option>
                                         </select>
@@ -79,43 +77,43 @@
                 <h4>Details</h4>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label asp-for="Quotation.Quotation_date" class="form-label"></label>
-                        <input asp-for="Quotation.Quotation_date" type="date" class="form-control" value="@(Model.Quotation.Quotation_date_string)"/>
-                        <span asp-validation-for="Quotation.Quotation_date" class="text-danger"></span>
+                        <label asp-for="Quotation_date" class="form-label"></label>
+                        <input asp-for="Quotation_date" type="date" class="form-control" value="@(Model.Quotation_date)"/>
+                        <span asp-validation-for="Quotation_date" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="Quotation.Quotation_number" class="form-label"></label>
-                        <input asp-for="Quotation.Quotation_number" type="text" class="form-control" value="@(Model.Quotation.Quotation_number ?? string.Empty)"/>
-                        <span asp-validation-for="Quotation.Quotation_number" class="text-danger"></span>
+                        <label asp-for="Quotation_number" class="form-label"></label>
+                        <input asp-for="Quotation_number" type="text" class="form-control" value="@(Model.Quotation_number ?? string.Empty)"/>
+                        <span asp-validation-for="Quotation_number" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="Quotation.Payment_term_ID" class="form-label text-nowrap"></label>
-                        <select asp-for="Quotation.Payment_term_ID" class="form-select" asp-items="ViewBag.paymentTermList">
+                        <label asp-for="Payment_term_ID" class="form-label text-nowrap"></label>
+                        <select asp-for="Payment_term_ID" class="form-select" asp-items="ViewBag.paymentTermList">
                             <option selected disabled>Choose..</option>
                         </select>
-                        <span asp-validation-for="Quotation.Payment_term_ID" class="text-danger"></span>
+                        <span asp-validation-for="Payment_term_ID" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="Quotation.Delivery_term_ID" class="form-label text-nowrap"></label>
-                        <select asp-for="Quotation.Delivery_term_ID" class="form-select" asp-items="ViewBag.deliveryTermList">
+                        <label asp-for="Delivery_term_ID" class="form-label text-nowrap"></label>
+                        <select asp-for="Delivery_term_ID" class="form-select" asp-items="ViewBag.deliveryTermList">
                             <option selected disabled>Choose..</option>
                         </select>
-                        <span asp-validation-for="Quotation.File_path" class="text-danger"></span>
+                        <span asp-validation-for="Delivery_term_ID" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="row g-3 mb-3">
                     <div class="col-12">
                         <div class="row">
-                            <label asp-for="Quotation.Supplier_ID" class="form-label"></label>
+                            <label asp-for="Supplier_ID" class="form-label"></label>
                             <div class="col col-md-6">
-                                <select asp-for="Quotation.Supplier_ID" class="form-select" asp-items="ViewBag.supplierList">
+                                <select asp-for="Supplier_ID" class="form-select" asp-items="ViewBag.supplierList">
                                     <option selected disabled>Choose..</option>
                                 </select>
                             </div>
                             <div class="col-auto">
-                                <a href="#" class="btn btn-secondary">Custom</a>
+                                <a href="#" class="btn btn-secondary" id="customSupplier">Custom</a>
                             </div>
-                            <span asp-validation-for="Quotation.Supplier_ID" class="text-danger"></span>
+                            <span asp-validation-for="Supplier_ID" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="col-12">
@@ -127,12 +125,13 @@
                         <div class="row">
                             <label for="delivery" class="form-label">Delivery Address</label>
                             <div class="col col-md-6">
-                                <select class="form-select" id="deliveryID" asp-items="ViewBag.deliveryAddressList">
+                                <select class="form-select" asp-for="Delivery_address_ID">
                                     <option selected disabled>Choose..</option>
+                                    <option value="1">FFJ Zama</option>
+                                    <option value="2">FFJ Hachioji</option>
+                                    <option value="3">FFJ Hashimoto</option>
+                                    <option value="4">FFJ SIC</option>
                                 </select>
-                            </div>
-                            <div class="col-auto">
-                                <a href="#" class="btn btn-secondary text-nowrap">Custom</a>
                             </div>
                         </div>
                     </div>
@@ -142,36 +141,195 @@
                 </div>
             </div>
         </div>
+        <div class="row justify-content-between">
+            <div class="col-auto">
+                <span class="fs-4 fw-semibold">Items</span>&nbsp;
+                <a class="mb-2 btn btn-light border" href="#" id="addItem">Add</a>&nbsp;
+                <a class="mb-2 btn btn-light border disabled" href="#" id="editItem">Edit</a>&nbsp;
+                <a class="mb-2 btn btn-light border disabled" href="#" id="removeItem">Remove</a>
+            </div>
+            <div class="col-auto align-self-end">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" asp-for="Include_tax">
+                    <label class="form-check-label" asp-for="Include_tax">Include 10% tax</label>
+                </div>
+            </div>
+        </div>
         <div class="row g-5 mb-3">
             <div class="col-md">
-                <h4>Items</h4>
-                <table class="table table-bordered">
-                    <tr>
-                        <th>Name</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Amount</th>
-                        <th>Total Amount</th>
-                    </tr>
-                    @{
-                        var totalAmount = 0.0;
-                    }
-                    @foreach (var item in Model?.Items)
-                    {
-                        var price = (item.Item_quantity ?? 0) * (item.Item_price ?? 0);
-                        totalAmount += price;
+                <table class="table datatable table-hover">
+                    <thead>
                         <tr>
-                            <td>@item.Item_name</td>
-                            <td>@item.Item_quantity</td>
-                            <td>@item.Item_price?.ToString("N0")</td>
-                            <td>@price.ToString("N0")</td>
-                            <td>@totalAmount.ToString("N0")</td>
+                            <th></th>
+                            <th>No.</th>
+                            <th>Name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Amount</th>
                         </tr>
-                    }
+                    </thead>
+                    <tbody>
+                        @{
+                            var totalAmount = 0.0;
+                            var counter = 1;
+                        }
+                        @for (var i = 0; i < Model?.Quotation_items?.Count(); i++)
+                        {
+                            var price = (Model?.Quotation_items[i]?.Item_quantity ?? 0) * (Model?.Quotation_items[i]?.Item_price ?? 0);
+                            totalAmount += price;
+                            <tr>
+                                <td></td>
+                                <td>@(i + 1)</td>
+                                <td><span>@Model?.Quotation_items[i]?.Item_name</span><input hidden asp-for="Quotation_items[i].Item_name" value='@Model?.Quotation_items[i]?.Item_name'></td>
+                                <td><span>@Model?.Quotation_items[i]?.Item_quantity</span><input hidden asp-for="Quotation_items[i].Item_quantity" value='@Model?.Quotation_items[i]?.Item_quantity'></td>
+                                <td><span>@Model?.Quotation_items[i]?.Item_price?.ToString("N0")</span><input hidden asp-for="Quotation_items[i].Item_price" value='@Model?.Quotation_items[i]?.Item_price'></td>
+                                <td><span class='itemPrice'>@price.ToString("N0")</span></td>
+                            </tr>
+
+                            counter++;
+                        }
+                    </tbody>
                 </table>
             </div>
         </div>
+        <div class="row mb-3 justify-content-end">
+            <div class="col-auto">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th class="text-">Subtotal (Without tax): </th>
+                            <td class="text-end" id="subTotal" style="min-width:100px;">0</td>
+                        </tr>
+                        <tr id="tax">
+                            <th class="text-end">Consumption tax (10%): </th>
+                            <td class="text-end" id="taxValue">0</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end">Total (<span id="totalTax">Without</span> tax): </th>
+                            <td class="text-end" id="totalAmount">0</td>
+                        </tr>
+                    </tbody>
+                    <tfoot class="table-group-divider">
+                        <tr></tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="row justify-content-end">
+            <div class="col-auto">
+                <button class="btn btn-lg btn-info text-white" type="submit">Generate PO</button>
+            </div>
+        </div>
     </form>
+</div>
+
+<!-- Supplier Modal -->
+<div class="modal fade" id="supplierModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="supplierModalLabel">Custom supplier</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="supplierForm">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Supplier name</label>
+                            <input class="form-control" name="Company_name" />
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Supplier address</label>
+                            <textarea class="form-control" name="Company_address"></textarea>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Telephone</label>
+                            <input class="form-control" name="Telephone" />
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Fax</label>
+                            <input class="form-control" name="Fax" />
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Person in-charge</label>
+                            <input class="form-control" name="Contact_person" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" href="#" onclick="addCustomSupplier()">Save</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Item Modal -->
+<div class="modal fade" id="itemModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="itemModalLabel">Add item</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Item name</label>
+                        <input class="form-control" id="itemName" />
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Quantity</label>
+                        <input class="form-control" type="number" id="quantity" />
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Price</label>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="yenSign">¥</span>
+                            <input class="form-control" id="price" aria-describedby="yenSign" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" href="#" id="submitItem">Add</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Item Modal -->
+<div class="modal fade" id="itemEditModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="itemEditModalLabel">Add item</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></  >
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Item name</label>
+                        <input class="form-control" id="itemEditName" />
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Quantity</label>
+                        <input class="form-control" type="number" id="itemEditQuantity" />
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Price</label>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="yenSign">¥</span>
+                            <input class="form-control" id="itemEditPrice" aria-describedby="yenSign" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-warning" href="#" id="saveItem">Save</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -179,5 +337,5 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    <script src="/js/extractText.js"></script>
+    <script src="/js/po/extractText.js"></script>
 }
