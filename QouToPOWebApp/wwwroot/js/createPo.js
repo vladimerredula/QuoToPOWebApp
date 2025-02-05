@@ -108,6 +108,9 @@ itemTable.on('deselect.dt', function () {
 
 $("#removeItem").on("click", function () {
     itemTable.row(".selected").remove().draw(false);
+
+    itemTable.rows().deselect();
+
     calculateTotal();
 });
 
@@ -128,26 +131,26 @@ $("#editItem").on("click", function () {
 
 function addCustomSupplier() {
     if ($("#supplierForm").valid()) {
-    $.ajax({
-        url: '/Info/AddCustomSupplier',
-        type: 'POST',
-        data: {
-            Company_name: $("input[name=Company_name]").val(),
-            Company_address: $("textarea[name=Company_address]").val(),
-            Telephone: $("input[name=Telephone]").val(),
-            Fax: $("input[name=Fax]").val(),
-            Contact_person: $("input[name=Contact_person]").val()
-        },
-        success: function (response) {
-            var supplier = $("#Supplier_ID");
-            supplier.append(new Option(response.companyName, response.supplerId));
-            supplier.val(response.supplerId).trigger("change");
-            $("#supplierModal").modal("hide");
-        },
-        error: function (response) {
-            console.log(response);
-        }
-    });
+        $.ajax({
+            url: '/Info/AddCustomSupplier',
+            type: 'POST',
+            data: {
+                Company_name: $("input[name=Company_name]").val(),
+                Company_address: $("textarea[name=Company_address]").val(),
+                Telephone: $("input[name=Telephone]").val(),
+                Fax: $("input[name=Fax]").val(),
+                Contact_person: $("input[name=Contact_person]").val()
+            },
+            success: function (response) {
+                var supplier = $("#Supplier_ID");
+                supplier.append(new Option(response.companyName, response.supplerId));
+                supplier.val(response.supplerId).trigger("change");
+                $("#supplierModal").modal("hide");
+            },
+            error: function (response) {
+                console.log(response);
+            }
+        });
     }
 };
 

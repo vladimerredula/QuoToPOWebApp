@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using QouToPOWebApp.Models;
 using QouToPOWebApp.Services;
 using QouToPOWebApp.ViewModel;
@@ -14,6 +15,7 @@ namespace QouToPOWebApp.Controllers
         private readonly TabulaService _tabula;
         private readonly PdfPigService _pdfPig;
         private readonly TabulaJarService _tabulaJar;
+        private readonly PdfSharpService _pdf;
 
         public PoController(ApplicationDbContext dbContext, TabulaService tabula, PdfPigService pdfPig)
         {
@@ -21,6 +23,7 @@ namespace QouToPOWebApp.Controllers
             _tabula = tabula;
             _pdfPig = pdfPig;
             _tabulaJar = new TabulaJarService();
+            _pdf = new PdfSharpService();
         }
 
         public IActionResult CreatePoFromQuotation()
@@ -485,8 +488,34 @@ namespace QouToPOWebApp.Controllers
         {
             ViewBag.deliveryAddressList = GetDeliveryAddressList();
             ViewBag.supplierList = GetSupplierList();
-            ViewBag.paymentTerms = _db.Payment_terms.ToList();
+            ViewBag.paymentTermList = new SelectList(_db.Payment_terms.ToList(), "Payment_term_ID", "Payment_term_name");
+            ViewBag.deliveryTermList = new SelectList(_db.Delivery_terms.ToList(), "Delivery_term_ID", "Delivery_term_name");
             return View();
+        }
+
+        public IActionResult GeneratePo(PoViewModel po)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.deliveryAddressList = GetDeliveryAddressList(po.Delivery_address_ID);
+                ViewBag.supplierList = GetSupplierList(po.Supplier_ID);
+                ViewBag.paymentTermList = new SelectList(_db.Payment_terms.ToList(), "Payment_term_ID", "Payment_term_name", po.Payment_term_ID);
+                ViewBag.deliveryTermList = new SelectList(_db.Delivery_terms.ToList(), "Delivery_term_ID", "Delivery_term_name", po.Delivery_term_ID);
+                return View("CreatePo", po);
+            }
+
+            po.Suppliers = _db.Suppliers
+                .Include(s => s.Company)
+                .FirstOrDefault(s => s.Supplier_ID == po.Supplier_ID);
+
+            po.Payment_terms = _db.Payment_terms.FirstOrDefault(p => p.Payment_term_ID == po.Payment_term_ID);
+            po.Delivery_terms = _db.Delivery_terms.FirstOrDefault(d => d.Delivery_term_ID == po.Delivery_term_ID);
+            po.Companies = _db.Companies.FirstOrDefault(c => c.Company_ID == po.Delivery_address_ID);
+
+            byte[] pdfBytes = _pdf.CreatePo(po);
+
+            // Return the PDF file as a download
+            return File(pdfBytes, "application/pdf", "Sample.pdf");
         }
     }
 }
