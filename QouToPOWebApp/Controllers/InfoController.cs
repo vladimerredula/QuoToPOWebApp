@@ -338,22 +338,22 @@ namespace QouToPOWebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetSupplierAddress(int id)
+        public IActionResult GetSupplierAddress(int id)
         {
-            var supplier = await _db.Suppliers.FindAsync(id);
+            var supplier = _db.Suppliers.Find(id);
 
             if (supplier == null)
             {
                 return NotFound();
             }
 
-            return await GetDeliveryAddress((int)supplier.Company_ID);
+            return GetDeliveryAddress((int)supplier.Company_ID);
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetDeliveryAddress(int id)
+        public IActionResult GetDeliveryAddress(int id)
         {
-            var company = await _db.Companies.FindAsync(id);
+            var company = _db.Companies.Find(id);
 
             if (company == null)
             {

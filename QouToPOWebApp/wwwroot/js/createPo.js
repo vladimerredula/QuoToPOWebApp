@@ -172,7 +172,7 @@ function getSupplierAddress(id) {
     }
 }
 
-$("#delivery_ID").change(function () {
+$("#Delivery_address_ID").change(function () {
     const id = $(this).val();
     getDeliveryAddress(id);
 });

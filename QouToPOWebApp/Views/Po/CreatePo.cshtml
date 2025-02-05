@@ -61,18 +61,19 @@
     </div>
     <div class="row mb-3">
         <div class="col-12">
+                <label class="form-label" asp-for="Delivery_address_ID">Deliver Address</label><span class="text-danger" title="Required">*</span>
             <div class="row">
-                <label class="form-label">Deliver Address</label>
                 <div class="col col-md-6 mb-2">
-                    <select class="form-select" id="delivery_ID">
+                        <select class="form-select" asp-for="Delivery_address_ID">
                         <option selected disabled>Choose..</option>
-                        <option value="1">Zama</option>
-                        <option value="2">Hachioji</option>
-                        <option value="3">Hashimoto</option>
-                        <option value="4">SIC</option>
+                            <option value="1">FFJ Zama</option>
+                            <option value="2">FFJ Hachioji</option>
+                            <option value="3">FFJ Hashimoto</option>
+                            <option value="4">FFJ SIC</option>
                     </select>
                 </div>
             </div>
+                <span asp-validation-for="Delivery_address_ID" class="text-danger"></span>
         </div>
         <div class="col-12">
             <textarea type="text" class="form-control" id="deliveryAddress" placeholder="Delivery address" readonly></textarea>
