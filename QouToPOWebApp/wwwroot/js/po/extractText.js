@@ -182,20 +182,22 @@ $("#submitItem").on("click", function () {
     var itemno = itemTable.rows().count() + 1;
     var totalPrice = parseFloat(quantity * price).toLocaleString();
 
-    $("#itemModal").modal("hide");
-    $('#itemName').val(null);
-    $('#quantity').val(null);
-    $('#price').val(null);
+    if ($('#itemName').val().trim() != "" && $('#quantity').val() != "" && $('#price').val() != "") {
+        $("#itemModal").modal("hide");
+        $('#itemName').val(null);
+        $('#quantity').val(null);
+        $('#price').val(null);
 
-    itemTable.row.add([
-        "",
-        itemno,
-        `<span>${itemname}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_name' value='${itemname}'>`,
-        `<span>${quantity}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_quantity' value='${quantity}'>`,
-        `<span>${price.toLocaleString()}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_price' value='${price}'>`,
-        `<span class='itemPrice'>${totalPrice}</span>`
-    ]).draw();
-    calculateTotal();
+        itemTable.row.add([
+            "",
+            itemno,
+            `<span>${itemname}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_name' value='${itemname}'>`,
+            `<span>${quantity}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_quantity' value='${quantity}'>`,
+            `<span>${price.toLocaleString()}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_price' value='${price}'>`,
+            `<span class='itemPrice'>${totalPrice}</span>`
+        ]).draw();
+        calculateTotal();
+    }
 });
 
 $("#saveItem").on("click", function () {
@@ -204,22 +206,24 @@ $("#saveItem").on("click", function () {
     var price = parseFloat($('#itemEditPrice').val());
     var totalPrice = parseFloat(quantity * price).toLocaleString();
 
-    $("#itemEditModal").modal("hide");
-    $('#itemEditName').val(null);
-    $('#itemEditQuantity').val(null);
-    $('#itemEditPrice').val(null);
+    if ($('#itemEditName').val().trim() != "" && $('#itemEditQuantity').val() != "" && $('#itemEditPrice').val() != "") {
+        $("#itemEditModal").modal("hide");
+        $('#itemEditName').val(null);
+        $('#itemEditQuantity').val(null);
+        $('#itemEditPrice').val(null);
 
-    var row = itemTable.row(".selected");
-    var rowData = row.data();
+        var row = itemTable.row(".selected");
+        var rowData = row.data();
 
-    rowData[2] = `<span>${itemname}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_name' value='${itemname}'>`;
-    rowData[3] = `<span>${quantity}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_quantity' value='${quantity}'>`;
-    rowData[4] = `<span>${price.toLocaleString()}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_price' value='${price}'>`;
-    rowData[5] = `<span class='itemPrice'>${totalPrice}</span>`;
+        rowData[2] = `<span>${itemname}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_name' value='${itemname}'>`;
+        rowData[3] = `<span>${quantity}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_quantity' value='${quantity}'>`;
+        rowData[4] = `<span>${price.toLocaleString()}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_price' value='${price}'>`;
+        rowData[5] = `<span class='itemPrice'>${totalPrice}</span>`;
 
-    row.data(rowData).draw();
+        row.data(rowData).draw();
 
-    calculateTotal();
+        calculateTotal();
+    }
 });
 
 $("#customSupplier").on("click", function () {
@@ -265,26 +269,28 @@ $("#editItem").on("click", function () {
 });
 
 function addCustomSupplier() {
-    $.ajax({
-        url: '/Info/AddCustomSupplier',
-        type: 'POST',
-        data: {
-            Company_name: $("input[name=Company_name]").val(),
-            Company_address: $("textarea[name=Company_address]").val(),
-            Telephone: $("input[name=Telephone]").val(),
-            Fax: $("input[name=Fax]").val(),
-            Contact_person: $("input[name=Contact_person]").val()
-        },
-        success: function (response) {
-            var supplier = $("#Supplier_ID");
-            supplier.append(new Option(response.companyName, response.supplerId));
-            supplier.val(response.supplerId).trigger("change");
-            $("#supplierModal").modal("hide");
-        },
-        error: function (response) {
-            console.log(response);
-        }
-    });
+    if ($("#supplierForm").valid()) {
+        $.ajax({
+            url: '/Info/AddCustomSupplier',
+            type: 'POST',
+            data: {
+                Company_name: $("input[name=Company_name]").val(),
+                Company_address: $("textarea[name=Company_address]").val(),
+                Telephone: $("input[name=Telephone]").val(),
+                Fax: $("input[name=Fax]").val(),
+                Contact_person: $("input[name=Contact_person]").val()
+            },
+            success: function (response) {
+                var supplier = $("#Supplier_ID");
+                supplier.append(new Option(response.companyName, response.supplerId));
+                supplier.val(response.supplerId).trigger("change");
+                $("#supplierModal").modal("hide");
+            },
+            error: function (response) {
+                console.log(response);
+            }
+        });
+    }
 };
 
 function taxSwitch() {

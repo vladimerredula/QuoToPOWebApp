@@ -27,17 +27,18 @@ namespace QouToPOWebApp.Controllers
 
         public IActionResult FromQuotation()
         {
-            ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name", 1);
-            ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name");
-            ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name");
-            ViewData["deliveryAddressList"] = GetDeliveryAddressList();
-            ViewData["supplierList"] = GetSupplierList();
+            ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name");
 
             return View();
         }
 
         public IActionResult Extract(int pdfType, string filePath)
         {
+            if (filePath == null || filePath.Length == 0)
+            {
+                return RedirectToAction(nameof(FromQuotation));
+            }
+
             switch (pdfType)
             {
                 case 2:
@@ -117,6 +118,7 @@ namespace QouToPOWebApp.Controllers
             model.Supplier_ID = supplierID;
             model.Payment_term_ID = paymentTerm;
             model.Delivery_term_ID = deliveryTerm;
+            model.Delivery_address_ID = 1;
             model.File_path = filePath;
             model.File_name = Path.GetFileName(filePath);
             model.Include_tax = isTaxable;
@@ -127,7 +129,6 @@ namespace QouToPOWebApp.Controllers
             ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name", model.Pdf_type_ID);
             ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Payment_term_ID);
             ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Delivery_term_ID);
-            ViewData["deliveryAddressList"] = GetDeliveryAddressList(model.Delivery_term_ID);
             ViewData["supplierList"] = GetSupplierList(model.Supplier_ID);
 
             return View("ExtractText", model);
@@ -193,7 +194,7 @@ namespace QouToPOWebApp.Controllers
             ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name", model.Pdf_type_ID);
             ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Payment_term_ID);
             ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Delivery_term_ID);
-            ViewData["deliveryAddressList"] = GetDeliveryAddressList(model.Delivery_term_ID);
+            ViewData["deliveryAddressList"] = GetDeliveryAddressList(1);
             ViewData["supplierList"] = GetSupplierList(model.Supplier_ID);
 
             return View("ExtractText", model);
@@ -403,7 +404,8 @@ namespace QouToPOWebApp.Controllers
                     + @"|(?<dashSeparated>\b\d{4}-\d{1,2}-\d{1,2}\b)"
                     + @"|(?<engFormat1>\b(January|February|March|April|May|June|July|August|September|October|November|December) \d{1,2}, \d{4}\b)"
                     + @"|(?<engFormat2>\b\d{1,2} (January|February|March|April|May|June|July|August|September|October|November|December) \d{4}\b)"
-                    + @"|(?<engFormat3>\b\d{1,2}(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}\b)";
+                    + @"|(?<engFormat3>\b\d{1,2}(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\d{4}\b)"
+                    + @"|(?<engFormat4>\b\d{1,2}(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}\b)";
 
             // Match the pattern in the extracted text
             MatchCollection matches = Regex.Matches(cleanedText, pattern);
@@ -547,16 +549,16 @@ namespace QouToPOWebApp.Controllers
             return text.Replace("_", "").Replace(" ", "");
         }
 
-        public IActionResult CreateNew()
+        public IActionResult CreateNewPo()
         {
             ViewBag.deliveryAddressList = GetDeliveryAddressList();
             ViewBag.supplierList = GetSupplierList();
             ViewBag.paymentTermList = new SelectList(_db.Payment_terms.ToList(), "Payment_term_ID", "Payment_term_name");
             ViewBag.deliveryTermList = new SelectList(_db.Delivery_terms.ToList(), "Delivery_term_ID", "Delivery_term_name");
-            return View();
+            return View(nameof(CreateNew));
         }
 
-        public IActionResult GeneratePo(PoViewModel po)
+        public IActionResult CreateNew(PoViewModel po)
         {
             if (!ModelState.IsValid)
             {
@@ -564,9 +566,14 @@ namespace QouToPOWebApp.Controllers
                 ViewBag.supplierList = GetSupplierList(po.Supplier_ID);
                 ViewBag.paymentTermList = new SelectList(_db.Payment_terms.ToList(), "Payment_term_ID", "Payment_term_name", po.Payment_term_ID);
                 ViewBag.deliveryTermList = new SelectList(_db.Delivery_terms.ToList(), "Delivery_term_ID", "Delivery_term_name", po.Delivery_term_ID);
-                return View("CreateNew", po);
+                return View(po);
             }
 
+            return GeneratePo(po);
+        }
+
+        public IActionResult GeneratePo(PoViewModel po)
+        {
             po.Suppliers = _db.Suppliers
                 .Include(s => s.Company)
                 .FirstOrDefault(s => s.Supplier_ID == po.Supplier_ID);

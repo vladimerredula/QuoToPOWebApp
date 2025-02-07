@@ -10,20 +10,41 @@
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
 <div class="container">
-    <form asp-action="Extract" method="post" id="quoForm">
-        <div class="row g-3 mb-4">
-            <div class="col-md">
-                <label class="form-label">Upload a Quotation file</label>
-                <input type="file" id="pdfFile" accept=".pdf" onchange="uploadPdf(this)" hidden>
-                <input name="filePath" id="filePath" type="text" value="" hidden />
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="No file chosen" id="selectFileInput" readonly>
-                    <a href="#" class="btn btn-light border" type="button" id="selectFileBtn">Choose File</a>
-                </div>
+    <div class="row g-3 mb-3">
+        <div class="col-md">
+            <label class="form-label">Upload a Quotation file</label>
+            <input type="file" id="pdfFile" accept=".pdf" onchange="uploadPdf(this)" hidden>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="No file chosen" id="selectFileInput" readonly>
+                <a href="#" class="btn btn-light border" type="button" id="selectFileBtn">Choose File</a>
             </div>
         </div>
+    </div>
+    <form asp-action="Extract" method="post" id="quoForm">
+        <input name="filePath" id="filePath" type="text" value="" hidden />
+        <div class="row mb-3">
+            <h4>Extraction Settings</h4>
+            <div class="col-md-4 mb-2">
+                <label for="pdfType" class="form-label col-xl-4">PDF type</label>
+                <select class="form-select col-xl-8" aria-label="PDF type" name="pdfType" id="pdfType" asp-items="ViewBag.pdfTypeList">
+                    <option selected disabled>Choose..</option>
+                </select>
+            </div>
+            <div class="col-md-4 mb-2">
+                <label for="extractMode" class="form-label col-xl-4">Extraction mode</label>
+                <select class="form-select" name="extractMode" id="extractMode">
+                    <option value="lattice">Lattice</option>
+                    <option value="stream">Stream</option>
+                </select>
+            </div>
+            <div class="col-md-auto mb-2 align-content-end text-end">
+                <a class="btn btn-info text-white align-content-center" onclick="submitForm()">Extract</a>
+            </div>
+        </div>
+    </form>
+    <form asp-action="GeneratePo">
         <div class="row g-5 mb-4">
-            <div class="col-md-5 px-3">
+            <div class="col-md-5">
                 <h4>Preview</h4>
                 <div class="row justify-content-center" id="preview">
                     <div class="col-12 bg-secondary-subtle p-0 rounded-2 d-flex justify-content-center">
@@ -43,42 +64,11 @@
                 </div>
             </div>
             <div class="col-md-7">
-                <h4>Extraction Settings</h4>
-                <div class="row g-3 mb-4">
-                    <div class="col-xl-8">
-                        <div class="row g-3">
-                            <div class="col-lg-6 col-xl-12">
-                                <div class="row align-items-center">
-                                    <label for="pdftype" class="form-label col-xl-4">PDF type</label>
-                                    <div class="col-xl-8">
-                                        <select class="form-select col-xl-8" aria-label="PDF type" name="pdfType" id="pdfType" asp-items="ViewBag.pdfTypeList">
-                                            <option selected disabled>Choose..</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-xl-12">
-                                <div class="row align-items-center">
-                                    <label for="extractMode" class="form-label col-xl-4">Extraction mode</label>
-                                    <div class="col-xl-8">
-                                        <select class="form-select" name="extractMode" id="extractMode">
-                                            <option value="lattice">Lattice</option>
-                                            <option value="stream">Stream</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-4 d-grid gap-3 ps-xl-4 py-xl-3">
-                        <a class="btn btn-lg btn-info text-white align-content-center" onclick="submitForm()">Extract</a>
-                    </div>
-                </div>
                 <h4>Details</h4>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <label asp-for="Quotation_date" class="form-label"></label>
-                        <input asp-for="Quotation_date" type="date" class="form-control" value="@(Model.Quotation_date)"/>
+                        <input asp-for="Quotation_date" type="date" class="form-control" value="@(Model.Quotation_date.Value.ToString("yyyy-MM-dd"))"/>
                         <span asp-validation-for="Quotation_date" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
@@ -141,9 +131,9 @@
                 </div>
             </div>
         </div>
+        <span class="fs-4 fw-semibold">Items</span>&nbsp;
         <div class="row justify-content-between">
             <div class="col-auto">
-                <span class="fs-4 fw-semibold">Items</span>&nbsp;
                 <a class="mb-2 btn btn-light border" href="#" id="addItem">Add</a>&nbsp;
                 <a class="mb-2 btn btn-light border disabled" href="#" id="editItem">Edit</a>&nbsp;
                 <a class="mb-2 btn btn-light border disabled" href="#" id="removeItem">Remove</a>
@@ -197,7 +187,7 @@
                 <table class="table">
                     <tbody>
                         <tr>
-                            <th class="text-">Subtotal (Without tax): </th>
+                            <th class="text-end">Subtotal (Without tax): </th>
                             <td class="text-end" id="subTotal" style="min-width:100px;">0</td>
                         </tr>
                         <tr id="tax">
@@ -235,12 +225,12 @@
                 <form id="supplierForm">
                     <div class="row">
                         <div class="col-12 mb-3">
-                            <label class="form-label">Supplier name</label>
-                            <input class="form-control" name="Company_name" />
+                            <label class="form-label">Supplier name</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" name="Company_name" required/>
                         </div>
                         <div class="col-12 mb-3">
-                            <label class="form-label">Supplier address</label>
-                            <textarea class="form-control" name="Company_address"></textarea>
+                            <label class="form-label">Supplier address</label><span class="text-danger" title="Required">*</span>
+                            <textarea class="form-control" name="Company_address" required></textarea>
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label">Telephone</label>
@@ -251,8 +241,8 @@
                             <input class="form-control" name="Fax" />
                         </div>
                         <div class="col-12 mb-3">
-                            <label class="form-label">Person in-charge</label>
-                            <input class="form-control" name="Contact_person" />
+                            <label class="form-label">Person in-charge</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" name="Contact_person" required/>
                         </div>
                     </div>
                 </form>
@@ -286,7 +276,7 @@
                         <label class="form-label">Price</label>
                         <div class="input-group mb-3">
                             <span class="input-group-text" id="yenSign">¥</span>
-                            <input class="form-control" id="price" aria-describedby="yenSign" />
+                            <input class="form-control" type="number" id="price" aria-describedby="yenSign" />
                         </div>
                     </div>
                 </div>
@@ -320,7 +310,7 @@
                         <label class="form-label">Price</label>
                         <div class="input-group mb-3">
                             <span class="input-group-text" id="yenSign">¥</span>
-                            <input class="form-control" id="itemEditPrice" aria-describedby="yenSign" />
+                            <input class="form-control" type="number" id="itemEditPrice" aria-describedby="yenSign" />
                         </div>
                     </div>
                 </div>
