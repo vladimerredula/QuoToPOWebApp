@@ -440,11 +440,19 @@ namespace QouToPOWebApp.Controllers
 
         public int? GetSupplier(string text)
         {
-            var suppliers = _db.Suppliers.ToList();
+            var suppliers = _db.Suppliers.Include(s => s.Company).ToList();
 
             foreach (var supplier in suppliers)
             {
-                var keywords = supplier.Key_words.Split(",");
+                var keywords = new List<string>();
+
+                if (supplier.Key_words != null)
+                {
+                    keywords = supplier.Key_words.Split(",").ToList();
+                } else
+                {
+                    keywords.Add(supplier.Company.Company_name ?? supplier.Company.Company_name_jpn);
+                }
 
                 foreach (var keyword in keywords)
                 {
