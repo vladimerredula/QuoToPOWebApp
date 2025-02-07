@@ -35,13 +35,19 @@ namespace QouToPOWebApp.Services
         {
             // Resolve the font name (adjust this logic for your fonts)
             if (familyName == "Meiryo")
-            {
                 return new FontResolverInfo("Meiryo");
-            }
             if (familyName == "Meiryo-bold")
-            {
                 return new FontResolverInfo("Meiryo-bold");
-            }
+            if (familyName == "Calibri-regular")
+                return new FontResolverInfo("Calibri-regular");
+            if (familyName == "Calibri-bold")
+                return new FontResolverInfo("Calibri-bold");
+            if (familyName == "Calibri-italic")
+                return new FontResolverInfo("Calibri-italic");
+            if (familyName == "Times new roman-bold")
+                return new FontResolverInfo("Times new roman-bold");
+            if (familyName == "Arial")
+                return new FontResolverInfo("Arial");
 
             return null; // Fallback
         }
