@@ -8,6 +8,7 @@ namespace QouToPOWebApp.Models
         public int Delivery_term_ID { get; set; }
 
         [Display(Name = "Delivery Term Name")]
+        [Required]
         public string? Delivery_term_name { get; set; }
 
         [Display(Name = "Delivery Term Name (Japanese)")]

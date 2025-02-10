@@ -10,6 +10,7 @@ namespace QouToPOWebApp.Models
 
         [ForeignKey(nameof(Company))]
         [Display(Name = "Company")]
+        [Required]
         public int? Company_ID { get; set; }
 
         [Display(Name = "Contact Person")]

@@ -8,6 +8,7 @@ namespace QouToPOWebApp.Models
         public int Payment_term_ID { get; set; }
 
         [Display(Name = "Payment Term Name")]
+        [Required]
         public string? Payment_term_name { get; set; }
 
         [Display(Name = "Payment Term Name (Japanese)")]
