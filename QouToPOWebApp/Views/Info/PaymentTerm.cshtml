@@ -1,0 +1,206 @@
+﻿@model Payment_term
+
+@{
+    ViewData["Title"] = "Payment terms";
+
+    var paymentTerms = ViewData["paymentTerms"] as List<Payment_term>;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <button type="button" class="btn btn-success" onclick="addPaymentTerm()">Create New</button>
+</p>
+<table class="datatable table table-hover">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Payment_term_name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Payment_term_name_jpn)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Key_words)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in paymentTerms) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Payment_term_name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Payment_term_name_jpn)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Key_words)
+                </td>
+                <td>
+                    <a href="#" onclick="editPaymentTerm(@item.Payment_term_ID)">Edit</a> |
+                    <a href="#" onclick="deletePaymentTerm(@item.Payment_term_ID)">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="modal fade" id="paymentTermModal" tabindex="-1" aria-labelledby="createModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentTermModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="paymentTermForm" asp-controller="Info" asp-action="" method="post">
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Payment_term_ID" />
+                    <div class="form-group mb-3">
+                        <label asp-for="Payment_term_name" class="control-label"></label>
+                        <input asp-for="Payment_term_name" class="form-control" />
+                        <span asp-validation-for="Payment_term_name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Payment_term_name_jpn" class="control-label"></label>
+                        <input asp-for="Payment_term_name_jpn" class="form-control" />
+                        <span asp-validation-for="Payment_term_name_jpn" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Key_words" class="control-label"></label>
+                        <input asp-for="Key_words" class="form-control" />
+                        <span asp-validation-for="Key_words" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="form-group">
+                        <a href="#" class="btn btn-primary" id="modalButton"></a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Entry</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.Payment_term_name)
+                    </dt>
+                    <dd class="col-sm-8" id="payment_term_name">
+                    </dd>
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.Payment_term_name_jpn)
+                    </dt>
+                    <dd class="col-sm-8" id="payment_term_name_jpn">
+                    </dd>
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.Key_words)
+                    </dt>
+                    <dd class="col-sm-8" id="key_words">
+                    </dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <form asp-action="DeletePaymentTerm">
+                    <input type="hidden" name="id" id="deleteID" />
+                    <input type="submit" value="Delete" class="btn btn-danger" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            $("table.datatable").DataTable({
+                responsive: true,
+                fixedHeader: true
+            });
+        });
+
+        function addPaymentTerm() {
+            $(".modal-title").text("Add Payment Term");
+
+            $("#modalButton").text("Create");
+
+            $("#paymentTermForm").attr("action", "/Info/CreatePaymentTerm");
+
+            clearModal();
+
+            // Show the modal
+            $("#paymentTermModal").modal("show");
+        }
+
+        function editPaymentTerm(id) {
+            clearModal();
+
+            var postData = {
+                id: id
+                // __RequestVerificationToken: getToken()
+            };
+
+            $.post("/Info/GetPaymentTerm", postData, function (data) {
+                // Iterate over the properties of the data object and set the corresponding form field values
+                $.each(data, function (key, value) {
+                    var elementId = key.charAt(0).toUpperCase() + key.slice(1); // Capitalize the first letter
+                    $("#" + elementId).val(value);
+                });
+
+                // Set the action attribute of the form
+                $("#paymentTermForm").attr("action", "/Info/EditPaymentTerm/" + data["payment_term_ID"]);
+                $("#paymentTermModalLabel").text("Edit Payment Term");
+                $("#modalButton").text("Update");
+
+                // Show the modal
+                $("#paymentTermModal").modal("show");
+            });
+        };
+
+        function deletePaymentTerm(id) {
+            var postData = {
+                id: id
+                // __RequestVerificationToken: getToken()
+            };
+
+            $.post("/Info/GetPaymentTerm", postData, function (data) {
+                // Iterate over the properties of the data object and set the corresponding form field values
+                $.each(data, function (key, value) {
+                    var $element = $("#" + key);
+                    if ($element.length) {
+                        $element.text(value);
+                    }
+                });
+
+                $("#deleteID").val(data["payment_term_ID"]);
+
+                // Show the modal
+                $("#deleteModal").modal("show");
+            });
+        }
+
+        $("#modalButton").on("click", function() {
+            $("#paymentTermForm").submit();
+        });
+        
+        function clearModal() {
+            $('input[type="text"]').val('');
+            // $('select').prop('selectedIndex', "");
+
+            $(".field-validation-error").text("");
+        }
+    </script>
+}

@@ -18,31 +18,8 @@ namespace QouToPOWebApp.Controllers
         // GET: Company
         public async Task<IActionResult> Company()
         {
-            return View("Company/Index", await _db.Companies.ToListAsync());
-        }
-
-        // GET: Info/DetailsCompany/5
-        public async Task<IActionResult> DetailsCompany(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var company = await _db.Companies
-                .FirstOrDefaultAsync(m => m.Company_ID == id);
-            if (company == null)
-            {
-                return NotFound();
-            }
-
-            return PartialView("Company/_DisplayPartial", company);
-        }
-
-        // GET: Info/Create
-        public IActionResult CreateCompany()
-        {
-            return PartialView("Company/_FormPartial");
+            ViewData["companies"] = await _db.Companies.ToListAsync();
+            return View();
         }
 
         // POST: Info/CreateCompany
@@ -59,24 +36,7 @@ namespace QouToPOWebApp.Controllers
                 return RedirectToAction(nameof(Company));
             }
 
-            return View("Company/Index", company);
-        }
-
-        // GET: Info/EditCompany/5
-        public async Task<IActionResult> EditCompany(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var company = await _db.Companies.FindAsync(id);
-            if (company == null)
-            {
-                return NotFound();
-            }
-
-            return PartialView("Company/_FormPartial", company);
+            return View("Company/_FormPartial", company);
         }
 
         // POST: Info/EditCompany/5
@@ -113,24 +73,6 @@ namespace QouToPOWebApp.Controllers
             return View("Company/Index", company);
         }
 
-        // GET: Info/DeleteCompany/5
-        public async Task<IActionResult> DeleteCompany(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var company = await _db.Companies
-                .FirstOrDefaultAsync(m => m.Company_ID == id);
-            if (company == null)
-            {
-                return NotFound();
-            }
-
-            return PartialView("Company/_DisplayPartial", company);
-        }
-
         // POST: Info/DeleteCompany/5
         [HttpPost, ActionName("DeleteCompany")]
         [ValidateAntiForgeryToken]
@@ -144,6 +86,23 @@ namespace QouToPOWebApp.Controllers
 
             await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Company));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetCompany(int? id)
+        {
+            if (id == null || _db.Companies == null)
+            {
+                return RedirectToAction(nameof(Company));
+            }
+
+            var company = await _db.Companies.FindAsync(id);
+            if (company == null)
+            {
+                return RedirectToAction(nameof(company));
+            }
+
+            return Json(company);
         }
 
         private bool CompanyExists(int id)
@@ -197,35 +156,9 @@ namespace QouToPOWebApp.Controllers
         // GET: Supplier
         public async Task<IActionResult> Supplier()
         {
-            return View("Supplier/Index", await _db.Suppliers.Include(s => s.Company).ToListAsync());
-        }
-
-        // GET: Info/DetailsSupplier/5
-        public async Task<IActionResult> DetailsSupplier(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var supplier = await _db.Suppliers
-                .Include(s => s.Company)
-                .FirstOrDefaultAsync(m => m.Supplier_ID == id);
-
-            if (supplier == null)
-            {
-                return NotFound();
-            }
-
-            return PartialView("Supplier/_DisplayPartial", supplier);
-        }
-
-        // GET: Info/Create
-        public IActionResult CreateSupplier()
-        {
+            ViewData["suppliers"] = await _db.Suppliers.Include(s => s.Company).ToListAsync();
             ViewBag.CompanyList = new SelectList(_db.Companies.ToList(), "Company_ID", "Company_name");
-
-            return PartialView("Supplier/_FormPartial");
+            return View();
         }
 
         // POST: Info/CreateSupplier
@@ -242,26 +175,7 @@ namespace QouToPOWebApp.Controllers
                 return RedirectToAction(nameof(Supplier));
             }
 
-            return View("Supplier/Index", supplier);
-        }
-
-        // GET: Info/EditSupplier/5
-        public async Task<IActionResult> EditSupplier(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var supplier = await _db.Suppliers.FindAsync(id);
-            if (supplier == null)
-            {
-                return NotFound();
-            }
-
-            ViewBag.CompanyList = new SelectList(_db.Companies.ToList(), "Company_ID", "Company_name", supplier.Company_ID);
-
-            return PartialView("Supplier/_FormPartial", supplier);
+            return View(nameof(Supplier), supplier);
         }
 
         // POST: Info/EditSupplier/5
@@ -295,26 +209,7 @@ namespace QouToPOWebApp.Controllers
                 }
                 return RedirectToAction(nameof(Supplier));
             }
-            return View("Supplier/Index", supplier);
-        }
-
-        // GET: Info/DeleteSupplier/5
-        public async Task<IActionResult> DeleteSupplier(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var supplier = await _db.Suppliers
-                .Include(s => s.Company)
-                .FirstOrDefaultAsync(m => m.Supplier_ID == id);
-            if (supplier == null)
-            {
-                return NotFound();
-            }
-
-            return PartialView("Supplier/_DisplayPartial", supplier);
+            return View(nameof(Supplier), supplier);
         }
 
         // POST: Info/DeleteSupplier/5
@@ -330,6 +225,29 @@ namespace QouToPOWebApp.Controllers
 
             await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Supplier));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetSupplier(int? id)
+        {
+            if (id == null || _db.Suppliers == null)
+            {
+                return RedirectToAction(nameof(Supplier));
+            }
+
+            var supplier = await _db.Suppliers.Include(s => s.Company).FirstOrDefaultAsync(s => s.Supplier_ID == id);
+            if (supplier == null)
+            {
+                return RedirectToAction(nameof(Supplier));
+            }
+
+            return Json(new
+            {
+                company_name = supplier.Company.Company_name,
+                contact_person = supplier.Contact_person,
+                contact_person_jpn = supplier.Contact_person_jpn,
+                key_words = supplier.Key_words
+            });
         }
 
         private bool SupplierExists(int id)
@@ -370,31 +288,9 @@ namespace QouToPOWebApp.Controllers
         // GET: DeliveryTerm
         public async Task<IActionResult> DeliveryTerm()
         {
-            return View("DeliveryTerm/Index", await _db.Delivery_terms.ToListAsync());
-        }
+            ViewData["deliveryTerms"] = await _db.Delivery_terms.ToListAsync();
 
-        // GET: Info/DetailsDeliveryTerm/5
-        public async Task<IActionResult> DetailsDeliveryTerm(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var deliveryTerm = await _db.Delivery_terms
-                .FirstOrDefaultAsync(m => m.Delivery_term_ID == id);
-            if (deliveryTerm == null)
-            {
-                return NotFound();
-            }
-
-            return PartialView("DeliveryTerm/_DisplayPartial", deliveryTerm);
-        }
-
-        // GET: Info/Create
-        public IActionResult CreateDeliveryTerm()
-        {
-            return PartialView("DeliveryTerm/_FormPartial");
+            return View();
         }
 
         // POST: Info/CreateDeliveryTerm
@@ -411,24 +307,7 @@ namespace QouToPOWebApp.Controllers
                 return RedirectToAction(nameof(DeliveryTerm));
             }
 
-            return View("DeliveryTerm/Index", deliveryTerm);
-        }
-
-        // GET: Info/EditDeliveryTerm/5
-        public async Task<IActionResult> EditDeliveryTerm(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var deliveryTerm = await _db.Delivery_terms.FindAsync(id);
-            if (deliveryTerm == null)
-            {
-                return NotFound();
-            }
-
-            return PartialView("DeliveryTerm/_FormPartial", deliveryTerm);
+            return View(nameof(DeliveryTerm), deliveryTerm);
         }
 
         // POST: Info/EditDeliveryTerm/5
@@ -462,25 +341,7 @@ namespace QouToPOWebApp.Controllers
                 }
                 return RedirectToAction(nameof(DeliveryTerm));
             }
-            return View("DeliveryTerm/Index", deliveryTerm);
-        }
-
-        // GET: Info/DeleteDeliveryTerm/5
-        public async Task<IActionResult> DeleteDeliveryTerm(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var deliveryTerm = await _db.Delivery_terms
-                .FirstOrDefaultAsync(m => m.Delivery_term_ID == id);
-            if (deliveryTerm == null)
-            {
-                return NotFound();
-            }
-
-            return PartialView("DeliveryTerm/_DisplayPartial", deliveryTerm);
+            return View(nameof(DeliveryTerm), deliveryTerm);
         }
 
         // POST: Info/DeleteDeliveryTerm/5
@@ -496,6 +357,23 @@ namespace QouToPOWebApp.Controllers
 
             await _db.SaveChangesAsync();
             return RedirectToAction(nameof(DeliveryTerm));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetDeliveryTerm(int id)
+        {
+            if (id == null || _db.Delivery_terms == null)
+            {
+                return RedirectToAction(nameof(DeliveryTerm));
+            }
+
+            var deliveryTerm = await _db.Delivery_terms.FindAsync(id);
+            if (deliveryTerm == null)
+            {
+                return RedirectToAction(nameof(DeliveryTerm));
+            }
+
+            return Json(deliveryTerm);
         }
 
         private bool DeliveryTermExists(int id)
@@ -538,31 +416,9 @@ namespace QouToPOWebApp.Controllers
         // GET: PaymentTerm
         public async Task<IActionResult> PaymentTerm()
         {
-            return View("PaymentTerm/Index", await _db.Payment_terms.ToListAsync());
-        }
+            ViewData["paymentTerms"] = await _db.Payment_terms.ToListAsync();
 
-        // GET: Info/DetailsPaymentTerm/5
-        public async Task<IActionResult> DetailsPaymentTerm(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var paymentTerm = await _db.Payment_terms
-                .FirstOrDefaultAsync(m => m.Payment_term_ID == id);
-            if (paymentTerm == null)
-            {
-                return NotFound();
-            }
-
-            return PartialView("PaymentTerm/_DisplayPartial", paymentTerm);
-        }
-
-        // GET: Info/Create
-        public IActionResult CreatePaymentTerm()
-        {
-            return PartialView("PaymentTerm/_FormPartial");
+            return View();
         }
 
         // POST: Info/CreatePaymentTerm
@@ -579,24 +435,7 @@ namespace QouToPOWebApp.Controllers
                 return RedirectToAction(nameof(PaymentTerm));
             }
 
-            return View("PaymentTerm/Index", paymentTerm);
-        }
-
-        // GET: Info/EditPaymentTerm/5
-        public async Task<IActionResult> EditPaymentTerm(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var paymentTerm = await _db.Payment_terms.FindAsync(id);
-            if (paymentTerm == null)
-            {
-                return NotFound();
-            }
-
-            return PartialView("PaymentTerm/_FormPartial", paymentTerm);
+            return View(nameof(PaymentTerm), paymentTerm);
         }
 
         // POST: Info/EditPaymentTerm/5
@@ -630,25 +469,7 @@ namespace QouToPOWebApp.Controllers
                 }
                 return RedirectToAction(nameof(PaymentTerm));
             }
-            return View("PaymentTerm/Index", paymentTerm);
-        }
-
-        // GET: Info/DeletePaymentTerm/5
-        public async Task<IActionResult> DeletePaymentTerm(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var paymentTerm = await _db.Payment_terms
-                .FirstOrDefaultAsync(m => m.Payment_term_ID == id);
-            if (paymentTerm == null)
-            {
-                return NotFound();
-            }
-
-            return PartialView("PaymentTerm/_DisplayPartial", paymentTerm);
+            return View(nameof(PaymentTerm), paymentTerm);
         }
 
         // POST: Info/DeletePaymentTerm/5
@@ -664,6 +485,23 @@ namespace QouToPOWebApp.Controllers
 
             await _db.SaveChangesAsync();
             return RedirectToAction(nameof(PaymentTerm));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetPaymentTerm(int? id)
+        {
+            if (id == null || _db.Payment_terms == null)
+            {
+                return RedirectToAction(nameof(PaymentTerm));
+            }
+
+            var paymentTerm = await _db.Payment_terms.FindAsync(id);
+            if (paymentTerm == null)
+            {
+                return RedirectToAction(nameof(PaymentTerm));
+            }
+
+            return Json(paymentTerm);
         }
 
         private bool PaymentTermExists(int id)

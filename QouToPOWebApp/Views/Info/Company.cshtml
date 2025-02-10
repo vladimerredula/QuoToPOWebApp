@@ -1,0 +1,270 @@
+﻿@model Company
+
+@{
+    ViewData["Title"] = "Company";
+
+    var companies = ViewData["companies"] as List<Company>;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <button type="button" class="btn btn-success" onclick="addCompany()">Create New</button>
+</p>
+<table class="datatable table table-hover">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Company_name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Company_name_jpn)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Address)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Address_jpn)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Postal_code)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Telephone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Fax)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in companies) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Company_name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Company_name_jpn)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address_jpn)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Postal_code)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Telephone)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Fax)
+                </td>
+                <td>
+                    <a href="#" onclick="editCompany(@item.Company_ID)">Edit</a> |
+                    <a href="#" onclick="deleteCompany(@item.Company_ID)">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="modal fade" id="companyModal" tabindex="-1" aria-labelledby="createModalLabel" >
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="companyModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="companyForm" asp-controller="Info" asp-action="" method="post">
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Company_ID" />
+                    <div class="form-group mb-3">
+                        <label asp-for="Company_name" class="control-label"></label>
+                        <input asp-for="Company_name" class="form-control" />
+                        <span asp-validation-for="Company_name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Company_name_jpn" class="control-label"></label>
+                        <input asp-for="Company_name_jpn" class="form-control" />
+                        <span asp-validation-for="Company_name_jpn" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Address" class="control-label"></label>
+                        <input asp-for="Address" class="form-control" />
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Address_jpn" class="control-label"></label>
+                        <input asp-for="Address_jpn" class="form-control" />
+                        <span asp-validation-for="Address_jpn" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Postal_code" class="control-label"></label>
+                        <input asp-for="Postal_code" class="form-control" />
+                        <span asp-validation-for="Postal_code" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Telephone" class="control-label"></label>
+                        <input asp-for="Telephone" class="form-control" />
+                        <span asp-validation-for="Telephone" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Fax" class="control-label"></label>
+                        <input asp-for="Fax" class="form-control" />
+                        <span asp-validation-for="Fax" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="form-group">
+                        <a href="#" class="btn btn-primary" id="modalButton"></a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" >
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Entry</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-sm-3">
+                        @Html.DisplayNameFor(model => model.Company_name)
+                    </dt>
+                    <dd class="col-sm-9" id="company_name">
+                    </dd>
+                    <dt class="col-sm-3">
+                        @Html.DisplayNameFor(model => model.Company_name_jpn)
+                    </dt>
+                    <dd class="col-sm-9" id="company_name_jpn">
+                    </dd>
+                    <dt class="col-sm-3">
+                        @Html.DisplayNameFor(model => model.Address)
+                    </dt>
+                    <dd class="col-sm-9" id="address">
+                    </dd>
+                    <dt class="col-sm-3">
+                        @Html.DisplayNameFor(model => model.Address_jpn)
+                    </dt>
+                    <dd class="col-sm-9" id="address_jpn">
+                    </dd>
+                    <dt class="col-sm-3">
+                        @Html.DisplayNameFor(model => model.Postal_code)
+                    </dt>
+                    <dd class="col-sm-9" id="postal_code">
+                    </dd>
+                    <dt class="col-sm-3">
+                        @Html.DisplayNameFor(model => model.Telephone)
+                    </dt>
+                    <dd class="col-sm-9" id="telephone">
+                    </dd>
+                    <dt class="col-sm-3">
+                        @Html.DisplayNameFor(model => model.Fax)
+                    </dt>
+                    <dd class="col-sm-9" id="fax">
+                    </dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <form asp-action="DeleteCompany">
+                    <input type="hidden" name="id" id="deleteID" />
+                    <input type="submit" value="Delete" class="btn btn-danger" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            $("table.datatable").DataTable({
+                responsive: true,
+                fixedHeader: true
+            });
+        });
+
+        function addCompany() {
+            $(".modal-title").text("Add Company");
+
+            $("#modalButton").text("Create");
+
+            $("#companyForm").attr("action", "/Info/CreateCompany");
+
+            clearModal();
+
+            // Show the modal
+            $("#companyModal").modal("show");
+        }
+
+        function editCompany(id) {
+            clearModal();
+
+            var postData = {
+                id: id
+                // __RequestVerificationToken: getToken()
+            };
+
+            $.post("/Info/GetCompany", postData, function (data) {
+                // Iterate over the properties of the data object and set the corresponding form field values
+                $.each(data, function (key, value) {
+                    var elementId = key.charAt(0).toUpperCase() + key.slice(1); // Capitalize the first letter
+                    $("#" + elementId).val(value);
+                });
+
+                // Set the action attribute of the form
+                $("#companyForm").attr("action", "/Info/EditCompany/" + data["company_ID"]);
+                $("#companyModalLabel").text("Edit Company");
+                $("#modalButton").text("Update");
+
+                // Show the modal
+                $("#companyModal").modal("show");
+            });
+        };
+
+        function deleteCompany(id) {
+            var postData = {
+                id: id
+                // __RequestVerificationToken: getToken()
+            };
+
+            $.post("/Info/GetCompany", postData, function (data) {
+                // Iterate over the properties of the data object and set the corresponding form field values
+                $.each(data, function (key, value) {
+                    var $element = $("#" + key);
+                    if ($element.length) {
+                        $element.text(value);
+                    }
+                });
+
+                $("#deleteID").val(data["company_ID"]);
+
+                // Show the modal
+                $("#deleteModal").modal("show");
+            });
+        }
+
+        $("#modalButton").on("click", function() {
+            $("#companyForm").submit();
+        });
+        
+        function clearModal() {
+            $('input[type="text"]').val('');
+            // $('select').prop('selectedIndex', "");
+
+            $(".field-validation-error").text("");
+        }
+    </script>
+}
