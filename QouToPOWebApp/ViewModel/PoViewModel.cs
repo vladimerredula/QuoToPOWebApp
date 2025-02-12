@@ -36,6 +36,7 @@ namespace QouToPOWebApp.ViewModel
         [Required]
         public int? Delivery_address_ID { get; set; }
         public bool Include_tax { get; set; }
+        public string? Email { get; set; }
         public List<Quotation_item>? Quotation_items { get; set; }
 
         public virtual Company? Companies { get; set; }

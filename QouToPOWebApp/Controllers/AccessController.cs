@@ -63,6 +63,7 @@ namespace QouToPOWebApp.Controllers
                     new Claim(ClaimTypes.Name, userdetails.Username),
                     new Claim(ClaimTypes.GivenName, userdetails.First_name),
                     new Claim(ClaimTypes.Surname, userdetails.Last_name),
+                    new Claim(ClaimTypes.Email, userdetails.Email),
                     new Claim("Personnelid", userdetails.Personnel_ID.ToString())
                 };
 

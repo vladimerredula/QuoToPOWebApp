@@ -124,8 +124,10 @@ namespace QouToPOWebApp.Services
             //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 385, y+ rowHeight * 4, 154, 10);
             gfx.DrawString("☎：03-4335-3000", new XFont("Meiryo", 7), XBrushes.Black, new XRect(385, y + rowHeight * 4, 154, 10), XStringFormats.CenterLeft);
 
+            // Employee email
+            var email = po?.Email ?? string.Empty;
             //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 385, y+ rowHeight * 5, 154, 10);
-            gfx.DrawString("✉：e.mployee@faradaygroup.co", new XFont("Meiryo", 8), XBrushes.Black, new XRect(385, y + rowHeight * 5, 154, 10), XStringFormats.CenterLeft);
+            gfx.DrawString($"✉：{email}", new XFont("Meiryo", 8), XBrushes.Black, new XRect(385, y + rowHeight * 5, 154, 10), XStringFormats.CenterLeft);
 
 
             y += 12;

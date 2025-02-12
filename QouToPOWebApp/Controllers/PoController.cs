@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using QouToPOWebApp.Models;
 using QouToPOWebApp.Services;
 using QouToPOWebApp.ViewModel;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 
 namespace QouToPOWebApp.Controllers
@@ -581,6 +582,7 @@ namespace QouToPOWebApp.Controllers
             po.Payment_terms = _db.Payment_terms.FirstOrDefault(p => p.Payment_term_ID == po.Payment_term_ID);
             po.Delivery_terms = _db.Delivery_terms.FirstOrDefault(d => d.Delivery_term_ID == po.Delivery_term_ID);
             po.Companies = _db.Companies.FirstOrDefault(c => c.Company_ID == po.Delivery_address_ID);
+            po.Email = User.FindFirst(ClaimTypes.Email)?.Value;
 
             byte[] pdfBytes = _pdf.CreatePo(po);
 

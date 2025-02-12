@@ -30,6 +30,7 @@ namespace QouToPOWebApp.Models
         [Display(Name = "Last name")]
         [StringLength(50)]
         public string? Last_name { get; set; }
+        public string? Email { get; set; }
 
         public int Status { get; set; } = 0;
         public DateTime? Last_password_changed { get; set; }

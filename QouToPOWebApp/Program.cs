@@ -35,7 +35,9 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true; // Indicate that the session cookie is essential for the application
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Send session cookie only over HTTPS
     options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout set to 30 minutes
-});
+}); 
+
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
