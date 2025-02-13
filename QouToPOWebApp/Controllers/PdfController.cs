@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using QouToPOWebApp.Services;
-using QouToPOWebApp.ViewModel;
 
 namespace QouToPOWebApp.Controllers
 {
+    [Authorize]
     public class PdfController : Controller
     {
         private readonly PdfiumViewerService _pdfViewer;

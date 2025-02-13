@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QouToPOWebApp.Models;
 
 namespace QouToPOWebApp.Controllers
 {
+    [Authorize]
     public class InfoController : Controller
     {
         private readonly ApplicationDbContext _db;

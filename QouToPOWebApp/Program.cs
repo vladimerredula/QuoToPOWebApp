@@ -25,9 +25,11 @@ builder.Services.AddAuthentication(
     {
         options.LoginPath = "/Access/Login";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-        //options.AccessDeniedPath = "/AccessDenied";
+        options.AccessDeniedPath = "/AccessDenied";
         options.SlidingExpiration = true;
     });
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddSession(options =>
 {
@@ -54,15 +56,13 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthorization();
-
 app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
-    //pattern: "{controller=Home}/{action=Index}/{id?}");
     pattern: "{controller=Access}/{action=Index}/{id?}");
 
 app.Run();

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QouToPOWebApp.Models;
@@ -9,6 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace QouToPOWebApp.Controllers
 {
+    [Authorize]
     public class PoController : Controller
     {
         private readonly ApplicationDbContext _db;
