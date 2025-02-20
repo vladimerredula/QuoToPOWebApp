@@ -31,21 +31,21 @@
         </div>
         <div class="row mb-3">
             <div class="col-12">
-                <label class="form-label" asp-for="Supplier_ID"></label><span class="text-danger" title="Required">*</span>
+                <label class="form-label" asp-for="Contact_person_ID"></label><span class="text-danger" title="Required">*</span>
                 <div class="row">
                     <div class="col col-md-6 mb-2">
-                        <select class="form-select" asp-for="Supplier_ID" asp-items="ViewBag.supplierList">
+                        <select class="form-select" asp-for="Contact_person_ID" asp-items="ViewBag.contactPersonList">
                             <option selected disabled>Choose..</option>
                         </select>
                     </div>
                     <div class="col-auto ps-0">
-                        <a href="#" class="btn btn-outline-secondary" id="customSupplier">Custom supplier</a>
+                        <a href="#" class="btn btn-outline-secondary" id="customContactPerson">Custom company</a>
                     </div>
                 </div>
-                <span asp-validation-for="Supplier_ID" class="text-danger"></span>
+                <span asp-validation-for="Contact_person_ID" class="text-danger"></span>
             </div>
             <div class="col-12">
-                <textarea type="text" class="form-control" id="supplierAddress" placeholder="Supplier address" readonly></textarea>
+                <textarea type="text" class="form-control" id="contactPersonAddress" placeholder="Company address" readonly></textarea>
             </div>
         </div>
         <div class="row mb-3">
@@ -80,7 +80,7 @@
         </div>
         <div class="row mb-3">
             <div class="col-12">
-                <label class="form-label" asp-for="Delivery_address_ID">Deliver Address</label><span class="text-danger" title="Required">*</span>
+                <label class="form-label" asp-for="Delivery_address_ID">Delivery Address</label><span class="text-danger" title="Required">*</span>
                 <div class="row">
                     <div class="col col-md-6 mb-2">
                         <select class="form-select" asp-for="Delivery_address_ID">
@@ -163,23 +163,23 @@
     </form>
 </div>
 
-<!-- Supplier Modal -->
-<div class="modal fade" id="supplierModal" tabindex="-1" aria-labelledby="supplierModalLabel">
+<!-- Contact Person Modal -->
+<div class="modal fade" id="contactPersonModal" tabindex="-1" aria-labelledby="contactPersonModalLabel">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="supplierModalLabel">Custom supplier</h1>
+                <h1 class="modal-title fs-5" id="contactPersonModalLabel">Custom company</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="supplierForm">
+                <form id="contactPersonForm">
                     <div class="row">
                         <div class="col-12 mb-3">
-                            <label class="form-label">Supplier name</label><span class="text-danger" title="Required">*</span>
+                            <label class="form-label">Company name</label><span class="text-danger" title="Required">*</span>
                             <input class="form-control" name="Company_name" required/>
                         </div>
                         <div class="col-12 mb-3">
-                            <label class="form-label">Supplier address</label><span class="text-danger" title="Required">*</span>
+                            <label class="form-label">Company address</label><span class="text-danger" title="Required">*</span>
                             <textarea class="form-control" name="Company_address" required></textarea>
                         </div>
                         <div class="col-6 mb-3">
@@ -191,14 +191,14 @@
                             <input class="form-control" name="Fax" />
                         </div>
                         <div class="col-12 mb-3">
-                            <label class="form-label">Person in-charge</label><span class="text-danger" title="Required">*</span>
+                            <label class="form-label">Contact person name</label><span class="text-danger" title="Required">*</span>
                             <input class="form-control" name="Contact_person" required/>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-primary" href="#" onclick="addCustomSupplier()">Save</a>
+                <a class="btn btn-primary" href="#" onclick="addCustomContactPerson()">Save</a>
             </div>
         </div>
     </div>

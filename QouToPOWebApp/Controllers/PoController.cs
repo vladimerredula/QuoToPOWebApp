@@ -57,7 +57,7 @@ namespace QouToPOWebApp.Controllers
 
             var quoNumber = string.Empty;
             var quoDate = DateTime.MinValue;
-            int? supplierID = null;
+            int? contactPersonID = null;
             int? paymentTerm = null;
             int? deliveryTerm = null;
             bool isTaxable = false;
@@ -77,9 +77,9 @@ namespace QouToPOWebApp.Controllers
                     quoDate = ParseQuotationDate(cleanedText);
                 }
 
-                if (!supplierID.HasValue)
+                if (!contactPersonID.HasValue)
                 {
-                    supplierID = GetSupplier(cleanedText);
+                    contactPersonID = GetContactPerson(cleanedText);
                 }
 
                 if (!paymentTerm.HasValue)
@@ -118,7 +118,7 @@ namespace QouToPOWebApp.Controllers
 
             model.Quotation_number = quoNumber;
             model.Quotation_date = quoDate;
-            model.Supplier_ID = supplierID;
+            model.Contact_person_ID = contactPersonID;
             model.Payment_term_ID = paymentTerm;
             model.Delivery_term_ID = deliveryTerm;
             model.Delivery_address_ID = 1;
@@ -132,7 +132,7 @@ namespace QouToPOWebApp.Controllers
             ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name", model.Pdf_type_ID);
             ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Payment_term_ID);
             ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Delivery_term_ID);
-            ViewData["supplierList"] = GetSupplierList(model.Supplier_ID);
+            ViewData["contactPersonList"] = GetContactPersonList(model.Contact_person_ID);
 
             return View("ExtractText", model);
         }
@@ -143,7 +143,7 @@ namespace QouToPOWebApp.Controllers
 
             var quoNumber = string.Empty;
             var quoDate = DateTime.MinValue;
-            int? supplierID = null;
+            int? contactPersonID = null;
             int? paymentTerm = null;
             int? deliveryTerm = null;
             bool withTax = false;
@@ -162,9 +162,9 @@ namespace QouToPOWebApp.Controllers
                 quoDate = ParseQuotationDate(cleanedText);
             }
 
-            if (!supplierID.HasValue)
+            if (!contactPersonID.HasValue)
             {
-                supplierID = GetSupplier(cleanedText);
+                contactPersonID = GetContactPerson(cleanedText);
             }
 
             if (!paymentTerm.HasValue)
@@ -185,7 +185,7 @@ namespace QouToPOWebApp.Controllers
 
             model.Quotation_number = quoNumber;
             model.Quotation_date = quoDate;
-            model.Supplier_ID = supplierID;
+            model.Contact_person_ID = contactPersonID;
             model.Payment_term_ID = paymentTerm;
             model.Delivery_term_ID = deliveryTerm;
             model.File_path = filePath;
@@ -198,7 +198,7 @@ namespace QouToPOWebApp.Controllers
             ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Payment_term_ID);
             ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Delivery_term_ID);
             ViewData["deliveryAddressList"] = GetDeliveryAddressList(1);
-            ViewData["supplierList"] = GetSupplierList(model.Supplier_ID);
+            ViewData["contactPersonList"] = GetContactPersonList(model.Contact_person_ID);
 
             return View("ExtractText", model);
         }
@@ -443,27 +443,27 @@ namespace QouToPOWebApp.Controllers
             return DateTime.MinValue;
         }
 
-        public int? GetSupplier(string text)
+        public int? GetContactPerson(string text)
         {
-            var suppliers = _db.Suppliers.Include(s => s.Company).ToList();
+            var contactPersons = _db.Contact_persons.Include(s => s.Company).ToList();
 
-            foreach (var supplier in suppliers)
+            foreach (var contactPerson in contactPersons)
             {
                 var keywords = new List<string>();
 
-                if (supplier.Key_words != null)
+                if (contactPerson.Key_words != null)
                 {
-                    keywords = supplier.Key_words.Split(",").ToList();
+                    keywords = contactPerson.Key_words.Split(",").ToList();
                 } else
                 {
-                    keywords.Add(supplier.Company.Company_name ?? supplier.Company.Company_name_jpn);
+                    keywords.Add(contactPerson.Company.Company_name ?? contactPerson.Company.Company_name_jpn);
                 }
 
                 foreach (var keyword in keywords)
                 {
                     if (text.Contains(keyword.Replace(" ", "")))
                     {
-                        return supplier.Supplier_ID;
+                        return contactPerson.Contact_person_ID;
                     }
                 }
             }
@@ -471,18 +471,18 @@ namespace QouToPOWebApp.Controllers
             return null;
         }
 
-        public SelectList GetSupplierList(int? selected = null)
+        public SelectList GetContactPersonList(int? selected = null)
         {
-            var supplierList = _db.Suppliers
+            var contactPersonList = _db.Contact_persons
                 .Select(s => new
                 {
-                    s.Supplier_ID,
+                    s.Contact_person_ID,
                     Supplier_name = s.Company.Company_name
                 })
                 .OrderBy(s => s.Supplier_name)
                 .ToList();
 
-            return new SelectList(supplierList, "Supplier_ID", "Supplier_name", selected);
+            return new SelectList(contactPersonList, "Contact_person_ID", "Supplier_name", selected);
         }
 
         public int? GetPaymentTerms(string text)
@@ -555,7 +555,7 @@ namespace QouToPOWebApp.Controllers
         public IActionResult CreateNewPo()
         {
             ViewBag.deliveryAddressList = GetDeliveryAddressList();
-            ViewBag.supplierList = GetSupplierList();
+            ViewBag.contactPersonList = GetContactPersonList();
             ViewBag.paymentTermList = new SelectList(_db.Payment_terms.ToList(), "Payment_term_ID", "Payment_term_name");
             ViewBag.deliveryTermList = new SelectList(_db.Delivery_terms.ToList(), "Delivery_term_ID", "Delivery_term_name");
             return View(nameof(CreateNew));
@@ -566,7 +566,7 @@ namespace QouToPOWebApp.Controllers
             if (!ModelState.IsValid)
             {
                 ViewBag.deliveryAddressList = GetDeliveryAddressList(po.Delivery_address_ID);
-                ViewBag.supplierList = GetSupplierList(po.Supplier_ID);
+                ViewBag.contactPersonList = GetContactPersonList(po.Contact_person_ID);
                 ViewBag.paymentTermList = new SelectList(_db.Payment_terms.ToList(), "Payment_term_ID", "Payment_term_name", po.Payment_term_ID);
                 ViewBag.deliveryTermList = new SelectList(_db.Delivery_terms.ToList(), "Delivery_term_ID", "Delivery_term_name", po.Delivery_term_ID);
                 return View(po);
@@ -577,9 +577,9 @@ namespace QouToPOWebApp.Controllers
 
         public IActionResult GeneratePo(PoViewModel po)
         {
-            po.Suppliers = _db.Suppliers
+            po.Contact_persons = _db.Contact_persons
                 .Include(s => s.Company)
-                .FirstOrDefault(s => s.Supplier_ID == po.Supplier_ID);
+                .FirstOrDefault(s => s.Contact_person_ID == po.Contact_person_ID);
 
             po.Payment_terms = _db.Payment_terms.FirstOrDefault(p => p.Payment_term_ID == po.Payment_term_ID);
             po.Delivery_terms = _db.Delivery_terms.FirstOrDefault(d => d.Delivery_term_ID == po.Delivery_term_ID);

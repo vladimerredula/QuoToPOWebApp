@@ -1,15 +1,15 @@
-﻿@model Supplier
+﻿@model Contact_person
 
 @{
-    ViewData["Title"] = "Supplier";
+    ViewData["Title"] = "Contact Person";
 
-    var companies = ViewData["suppliers"] as List<Supplier>;
+    var contactPersons = ViewData["ContactPersons"] as List<Contact_person>;
 }
 
 <h1>@ViewData["Title"]</h1>
 
 <p>
-    <button type="button" class="btn btn-success" onclick="addSupplier()">Create New</button>
+    <button type="button" class="btn btn-success" onclick="addContactPerson()">Create New</button>
 </p>
 <table class="datatable table table-hover">
     <thead>
@@ -18,7 +18,7 @@
                 @Html.DisplayNameFor(model => model.Company.Company_name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Contact_person)
+                @Html.DisplayNameFor(model => model.Contact_person_name)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Key_words)
@@ -27,37 +27,38 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in companies) {
+        @foreach (var item in contactPersons)
+        {
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.Company.Company_name)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Contact_person)
+                    @Html.DisplayFor(modelItem => item.Contact_person_name)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Key_words)
                 </td>
                 <td>
-                    <a href="#" onclick="editSupplier(@item.Supplier_ID)">Edit</a> |
-                    <a href="#" onclick="deleteSupplier(@item.Supplier_ID)">Delete</a>
+                    <a href="#" onclick="editContactPerson(@item.Contact_person_ID)">Edit</a> |
+                    <a href="#" onclick="deleteContactPerson(@item.Contact_person_ID)">Delete</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
-<div class="modal fade" id="supplierModal" tabindex="-1" aria-labelledby="createModalLabel" >
+<div class="modal fade" id="contactPersonModal" tabindex="-1" aria-labelledby="createModalLabel" >
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="supplierModalLabel"></h5>
+                <h5 class="modal-title" id="contactPersonModalLabel"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="supplierForm" asp-controller="Info" asp-action="" method="post">
+            <form id="contactPersonForm" asp-controller="Info" asp-action="" method="post">
                 <div class="modal-body">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <input type="hidden" asp-for="Supplier_ID" />
+                    <input type="hidden" asp-for="Contact_person_ID" />
                     <div class="form-group mb-3">
                         <label asp-for="Company_ID" class="form-label"></label>
                         <select class="form-select" asp-for="Company_ID" asp-items="ViewBag.CompanyList">
@@ -66,14 +67,14 @@
                         <span asp-validation-for="Company_ID" class="text-danger"></span>
                     </div>
                     <div class="form-group mb-3">
-                        <label asp-for="Contact_person" class="control-label"></label>
-                        <input asp-for="Contact_person" class="form-control" />
-                        <span asp-validation-for="Contact_person" class="text-danger"></span>
+                        <label asp-for="Contact_person_name" class="control-label"></label>
+                        <input asp-for="Contact_person_name" class="form-control" />
+                        <span asp-validation-for="Contact_person_name" class="text-danger"></span>
                     </div>
                     <div class="form-group mb-3">
-                        <label asp-for="Contact_person_jpn" class="control-label"></label>
-                        <input asp-for="Contact_person_jpn" class="form-control" />
-                        <span asp-validation-for="Contact_person_jpn" class="text-danger"></span>
+                        <label asp-for="Contact_person_name_jpn" class="control-label"></label>
+                        <input asp-for="Contact_person_name_jpn" class="form-control" />
+                        <span asp-validation-for="Contact_person_name_jpn" class="text-danger"></span>
                     </div>
                     <div class="form-group mb-3">
                         <label asp-for="Key_words" class="control-label"></label>
@@ -106,14 +107,14 @@
                     <dd class="col-sm-8" id="company_name">
                     </dd>
                     <dt class="col-sm-4">
-                        @Html.DisplayNameFor(model => model.Contact_person)
+                        @Html.DisplayNameFor(model => model.Contact_person_name)
                     </dt>
-                    <dd class="col-sm-8" id="contact_person">
+                    <dd class="col-sm-8" id="contact_person_name">
                     </dd>
                     <dt class="col-sm-4">
-                        @Html.DisplayNameFor(model => model.Contact_person_jpn)
+                        @Html.DisplayNameFor(model => model.Contact_person_name_jpn)
                     </dt>
-                    <dd class="col-sm-8" id="contact_person_jpn">
+                    <dd class="col-sm-8" id="contact_person_name_jpn">
                     </dd>
                     <dt class="col-sm-4">
                         @Html.DisplayNameFor(model => model.Key_words)
@@ -123,7 +124,7 @@
                 </dl>
             </div>
             <div class="modal-footer">
-                <form asp-action="DeleteSupplier">
+                <form asp-action="DeleteContactPerson">
                     <input type="hidden" name="id" id="deleteID" />
                     <input type="submit" value="Delete" class="btn btn-danger" />
                 </form>
@@ -144,20 +145,20 @@
             });
         });
 
-        function addSupplier() {
-            $(".modal-title").text("Add Supplier");
+        function addContactPerson() {
+            $(".modal-title").text("Add Contact Person");
 
             $("#modalButton").text("Create");
 
-            $("#supplierForm").attr("action", "/Info/CreateSupplier");
+            $("#contactPersonForm").attr("action", "/Info/CreateContactPerson");
 
             clearModal();
 
             // Show the modal
-            $("#supplierModal").modal("show");
+            $("#contactPersonModal").modal("show");
         }
 
-        function editSupplier(id) {
+        function editContactPerson(id) {
             clearModal();
 
             var postData = {
@@ -165,7 +166,7 @@
                 // __RequestVerificationToken: getToken()
             };
 
-            $.post("/Info/GetSupplier", postData, function (data) {
+            $.post("/Info/GetContactPerson", postData, function (data) {
                 // Iterate over the properties of the data object and set the corresponding form field values
                 $.each(data, function (key, value) {
                     var elementId = key.charAt(0).toUpperCase() + key.slice(1); // Capitalize the first letter
@@ -173,23 +174,22 @@
                 });
 
                 // Set the action attribute of the form
-                $("#supplierForm").attr("action", "/Info/EditSupplier/" + data["supplier_ID"]);
-                $("#supplierModalLabel").text("Edit Supplier");
+                $("#contactPersonForm").attr("action", "/Info/EditContactPerson/" + data["Contact_person_ID"]);
+                $("#contactPersonModalLabel").text("Edit Contact Person");
                 $("#modalButton").text("Update");
 
                 // Show the modal
-                $("#supplierModal").modal("show");
+                $("#contactPersonModal").modal("show");
             });
         };
 
-        function deleteSupplier(id) {
+        function deleteContactPerson(id) {
             var postData = {
                 id: id
                 // __RequestVerificationToken: getToken()
             };
 
-            $.post("/Info/GetSupplier", postData, function (data) {
-                console.log(data);
+            $.post("/Info/GetContactPerson", postData, function (data) {
                 // Iterate over the properties of the data object and set the corresponding form field values
                 $.each(data, function (key, value) {
                     var $element = $("#" + key);
@@ -198,7 +198,7 @@
                     }
                 });
 
-                $("#deleteID").val(data["supplier_ID"]);
+                $("#deleteID").val(data["Contact_person_ID"]);
 
                 // Show the modal
                 $("#deleteModal").modal("show");
@@ -206,7 +206,7 @@
         }
 
         $("#modalButton").on("click", function() {
-            $("#supplierForm").submit();
+            $("#contactPersonForm").submit();
         });
         
         function clearModal() {

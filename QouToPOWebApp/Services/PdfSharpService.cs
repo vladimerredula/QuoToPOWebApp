@@ -93,7 +93,7 @@ namespace QouToPOWebApp.Services
 
             // Supplier Company name
             //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 36, y+3, 300, 20);
-            var supplierName = po?.Suppliers?.Company?.Company_name_jpn ?? po?.Suppliers?.Company?.Company_name ?? string.Empty;
+            var supplierName = po?.Contact_persons?.Company?.Company_name_jpn ?? po?.Contact_persons?.Company?.Company_name ?? string.Empty;
             gfx.DrawString(supplierName, new XFont("Meiryo", 14), XBrushes.Black, new XRect(36, y+3, 300, 20), XStringFormats.Center);
 
 
@@ -107,8 +107,8 @@ namespace QouToPOWebApp.Services
 
             // Supplier Company address
             //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 36, 194, 300, 12);
-            var supplierAddress = po?.Suppliers?.Company?.Address_jpn ?? po?.Suppliers?.Company?.Address ?? string.Empty;
-            var postalCode = po?.Suppliers?.Company?.Postal_code ?? string.Empty;
+            var supplierAddress = po?.Contact_persons?.Company?.Address_jpn ?? po?.Contact_persons?.Company?.Address ?? string.Empty;
+            var postalCode = po?.Contact_persons?.Company?.Postal_code ?? string.Empty;
             gfx.DrawString($"〒 {postalCode}　{supplierAddress}", new XFont("Meiryo", 9), XBrushes.Black, new XRect(36, 194, 300, 12), XStringFormats.Center);
 
             gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 370, y, 184, 95);
@@ -133,7 +133,7 @@ namespace QouToPOWebApp.Services
             y += 12;
 
             // Supplier contact person name
-            var contactPerson = po?.Suppliers?.Contact_person_jpn ?? po?.Suppliers?.Contact_person ?? string.Empty;
+            var contactPerson = po?.Contact_persons?.Contact_person_name_jpn ?? po?.Contact_persons?.Contact_person_name ?? string.Empty;
             gfx.DrawString($"担当者：{contactPerson} 様", bodyFont2, XBrushes.Black, new XRect(36, y, 300, rowHeight), XStringFormats.Center);
 
             y += rowHeight*2 + 3;

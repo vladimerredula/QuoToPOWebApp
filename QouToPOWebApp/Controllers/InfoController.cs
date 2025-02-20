@@ -113,7 +113,7 @@ namespace QouToPOWebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCustomSupplier(string Company_name, string Company_address, string Telephone, string Fax, string Contact_person)
+        public async Task<IActionResult> AddCustomContactPerson(string Company_name, string Company_address, string Telephone, string Fax, string Contact_person)
         {
             try
             {
@@ -128,18 +128,18 @@ namespace QouToPOWebApp.Controllers
                 await _db.Companies.AddAsync(company);
                 await _db.SaveChangesAsync();
 
-                var supplier = new Supplier
+                var contactPerson = new Contact_person
                 {
-                    Contact_person = Contact_person,
+                    Contact_person_name = Contact_person,
                     Company_ID = company.Company_ID
                 };
 
-                await _db.Suppliers.AddAsync(supplier);
+                await _db.Contact_persons.AddAsync(contactPerson);
                 await _db.SaveChangesAsync();
 
                 return Ok( new
                 {
-                    supplerId = supplier.Supplier_ID,
+                    contactPersonId = contactPerson.Contact_person_ID,
                     companyName = company.Company_name
                 });
             }
@@ -147,46 +147,46 @@ namespace QouToPOWebApp.Controllers
             {
                 return Json(new
                 {
-                    message = "Failed to save custom supplier. Please try again"
+                    message = "Failed to save custom contactPerson. Please try again"
                 });
             }
         }
         #endregion
 
 
-        #region Supplier Functions
-        // GET: Supplier
-        public async Task<IActionResult> Supplier()
+        #region Contact_person Functions
+        // GET: ContactPerson
+        public async Task<IActionResult> ContactPerson()
         {
-            ViewData["suppliers"] = await _db.Suppliers.Include(s => s.Company).ToListAsync();
+            ViewData["contactPersons"] = await _db.Contact_persons.Include(s => s.Company).ToListAsync();
             ViewBag.CompanyList = new SelectList(_db.Companies.ToList(), "Company_ID", "Company_name");
             return View();
         }
 
-        // POST: Info/CreateSupplier
+        // POST: Info/CreateContactPerson
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateSupplier([Bind("Company_ID,Contact_person,Contact_person_jpn,Key_words")] Supplier supplier)
+        public async Task<IActionResult> CreateContactPerson([Bind("Company_ID,Contact_person_name,Contact_person_name_jpn,Key_words")] Contact_person contactPerson)
         {
             if (ModelState.IsValid)
             {
-                _db.Add(supplier);
+                _db.Add(contactPerson);
                 await _db.SaveChangesAsync();
-                return RedirectToAction(nameof(Supplier));
+                return RedirectToAction(nameof(ContactPerson));
             }
 
-            return View(nameof(Supplier), supplier);
+            return View(nameof(ContactPerson), contactPerson);
         }
 
-        // POST: Info/EditSupplier/5
+        // POST: Info/EditContactPerson/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditSupplier(int id, [Bind("Supplier_ID,Contact_person,Contact_person_jpn,Company_ID,Key_words")] Supplier supplier)
+        public async Task<IActionResult> EditContactPerson(int id, [Bind("Contact_person_ID,Contact_person_name,Contact_person_name_jpn,Company_ID,Key_words")] Contact_person contactPerson)
         {
-            if (id != supplier.Supplier_ID)
+            if (id != contactPerson.Contact_person_ID)
             {
                 return NotFound();
             }
@@ -195,12 +195,12 @@ namespace QouToPOWebApp.Controllers
             {
                 try
                 {
-                    _db.Update(supplier);
+                    _db.Update(contactPerson);
                     await _db.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!SupplierExists(supplier.Supplier_ID))
+                    if (!ContactPersonExists(contactPerson.Contact_person_ID))
                     {
                         return NotFound();
                     }
@@ -209,65 +209,66 @@ namespace QouToPOWebApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Supplier));
+                return RedirectToAction(nameof(ContactPerson));
             }
-            return View(nameof(Supplier), supplier);
+            return View(nameof(ContactPerson), contactPerson);
         }
 
-        // POST: Info/DeleteSupplier/5
-        [HttpPost, ActionName("DeleteSupplier")]
+        // POST: Info/DeleteContactPerson/5
+        [HttpPost, ActionName("DeleteContactPerson")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteSupplierConfirmed(int id)
+        public async Task<IActionResult> DeleteContactPersonConfirmed(int id)
         {
-            var supplier = await _db.Suppliers.FindAsync(id);
-            if (supplier != null)
+            var contactPerson = await _db.Contact_persons.FindAsync(id);
+            if (contactPerson != null)
             {
-                _db.Suppliers.Remove(supplier);
+                _db.Contact_persons.Remove(contactPerson);
             }
 
             await _db.SaveChangesAsync();
-            return RedirectToAction(nameof(Supplier));
+            return RedirectToAction(nameof(ContactPerson));
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetSupplier(int? id)
+        public async Task<IActionResult> GetContactPerson(int? id)
         {
-            if (id == null || _db.Suppliers == null)
+            if (id == null || _db.Contact_persons == null)
             {
-                return RedirectToAction(nameof(Supplier));
+                return RedirectToAction(nameof(Contact_person));
             }
 
-            var supplier = await _db.Suppliers.Include(s => s.Company).FirstOrDefaultAsync(s => s.Supplier_ID == id);
-            if (supplier == null)
+            var contactPerson = await _db.Contact_persons.Include(s => s.Company).FirstOrDefaultAsync(s => s.Contact_person_ID == id);
+            if (contactPerson == null)
             {
-                return RedirectToAction(nameof(Supplier));
+                return RedirectToAction(nameof(Contact_person));
             }
 
             return Json(new
             {
-                company_name = supplier.Company.Company_name,
-                contact_person = supplier.Contact_person,
-                contact_person_jpn = supplier.Contact_person_jpn,
-                key_words = supplier.Key_words
+                company_ID = contactPerson.Company_ID,
+                company_name = contactPerson.Company.Company_name,
+                contact_person_name = contactPerson.Contact_person_name,
+                contact_person_name_jpn = contactPerson.Contact_person_name_jpn,
+                key_words = contactPerson.Key_words
             });
         }
 
-        private bool SupplierExists(int id)
+        private bool ContactPersonExists(int id)
         {
-            return _db.Suppliers.Any(e => e.Supplier_ID == id);
+            return _db.Contact_persons.Any(e => e.Contact_person_ID == id);
         }
 
         [HttpPost]
-        public IActionResult GetSupplierAddress(int id)
+        public IActionResult GetContactPersonAddress(int id)
         {
-            var supplier = _db.Suppliers.Find(id);
+            var contactPerson = _db.Contact_persons.Find(id);
 
-            if (supplier == null)
+            if (contactPerson == null)
             {
                 return NotFound();
             }
 
-            return GetDeliveryAddress((int)supplier.Company_ID);
+            return GetDeliveryAddress((int)contactPerson.Company_ID);
         }
 
         [HttpPost]

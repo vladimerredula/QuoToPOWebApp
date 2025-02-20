@@ -3,8 +3,8 @@ $(document).ready(function () {
     getThumbnail();
     taxSwitch();
 
-    var supplierId = $("#Supplier_ID").val();
-    getSupplierAddress(supplierId);
+    var contactPersonId = $("#Contact_person_ID").val();
+    getContactPersonAddress(contactPersonId);
     var companyId = $("#Delivery_address_ID").val();
     getDeliveryAddress(companyId);
 });
@@ -44,9 +44,9 @@ $("#selectFileBtn").on("click", function () {
     $("#pdfFile").click(); // Trigger the hidden file input
 });
 
-$("#Supplier_ID").change(function () {
+$("#Contact_person_ID").change(function () {
     const id = $(this).val();
-    getSupplierAddress(id);
+    getContactPersonAddress(id);
 });
 
 $("#Delivery_address_ID").change(function () {
@@ -135,16 +135,16 @@ function renderPreview(data) {
     }
 }
 
-function getSupplierAddress(id) {
+function getContactPersonAddress(id) {
     if (id != null) {
         $.ajax({
-            url: '/Info/GetSupplierAddress',
+            url: '/Info/GetContactPersonAddress',
             type: 'POST',
             data: {
                 id: id
             },
             success: function (response) {
-                $("#supplierAddress").val(response);
+                $("#contactPersonAddress").val(response);
             },
             error: function (response) {
                 console.log(response);
@@ -226,8 +226,8 @@ $("#saveItem").on("click", function () {
     }
 });
 
-$("#customSupplier").on("click", function () {
-    $("#supplierModal").modal("show");
+$("#customContactPerson").on("click", function () {
+    $("#contactPersonModal").modal("show");
 });
 
 $("#addItem").on("click", function () {
@@ -268,10 +268,10 @@ $("#editItem").on("click", function () {
     $("#itemEditModal").modal("show");
 });
 
-function addCustomSupplier() {
-    if ($("#supplierForm").valid()) {
+function addCustomContactPerson() {
+    if ($("#contactPersonForm").valid()) {
         $.ajax({
-            url: '/Info/AddCustomSupplier',
+            url: '/Info/AddCustomContactPerson',
             type: 'POST',
             data: {
                 Company_name: $("input[name=Company_name]").val(),
@@ -281,10 +281,10 @@ function addCustomSupplier() {
                 Contact_person: $("input[name=Contact_person]").val()
             },
             success: function (response) {
-                var supplier = $("#Supplier_ID");
-                supplier.append(new Option(response.companyName, response.supplerId));
-                supplier.val(response.supplerId).trigger("change");
-                $("#supplierModal").modal("hide");
+                var contactPerson = $("#Contact_person_ID");
+                contactPerson.append(new Option(response.companyName, response.supplerId));
+                contactPerson.val(response.supplerId).trigger("change");
+                $("#contactPersonModal").modal("hide");
             },
             error: function (response) {
                 console.log(response);

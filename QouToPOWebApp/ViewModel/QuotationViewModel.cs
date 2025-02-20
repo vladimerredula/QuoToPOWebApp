@@ -16,10 +16,10 @@ namespace QouToPOWebApp.ViewModel
         [Required]
         public DateTime? Quotation_date { get; set; }
 
-        [Display(Name = "Suppliers")]
-        [ForeignKey("Supplier")]
+        [Display(Name = "Company")]
+        [ForeignKey("Contact_persons")]
         [Required]
-        public int? Supplier_ID { get; set; }
+        public int? Contact_person_ID { get; set; }
 
         [Display(Name = "Payment term")]
         [ForeignKey("Payment_terms")]
@@ -48,7 +48,7 @@ namespace QouToPOWebApp.ViewModel
         public string? ExtractMode { get; set; }
 
         public virtual Company? Companies { get; set; }
-        public virtual Supplier? Suppliers { get; set; }
+        public virtual Contact_person? Contact_persons { get; set; }
         public virtual Payment_term? Payment_terms { get; set; }
         public virtual Delivery_term? Delivery_terms { get; set; }
     }

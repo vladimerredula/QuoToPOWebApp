@@ -31,7 +31,7 @@ namespace QouToPOWebApp.Models
             }
         }
 
-        public int? Supplier_ID { get; set; }
+        public int? Contact_person_ID { get; set; }
         public int? Payment_term_ID { get; set; }
         public int? Delivery_term_ID { get; set; }
         public string? File_name { get; set; }
