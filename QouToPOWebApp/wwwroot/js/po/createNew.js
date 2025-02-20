@@ -33,6 +33,23 @@ var itemTable = $('table.datatable').DataTable({
     }
 });
 
+$("#Quotation_date").change(function () {
+    let dateValue = $(this).val(); // Get the selected date (YYYY-MM-DD)
+    let poNumber = formatDateToPoNumber(dateValue);
+    console.log(poNumber); // Display formatted date
+    $("#Quotation_number").val(poNumber); // Show formatted date in a div/span
+});
+
+
+// Function to format date from YYYY-MM-DD to DD/MM/YYYY
+function formatDateToPoNumber(dateString) {
+    let date = new Date(dateString);
+    let day = date.getDate().toString().padStart(2, "0");
+    let month = (date.getMonth() + 1).toString().padStart(2, "0");
+    let year = date.getFullYear();
+    return `${year}${month}${day}/FF-000-000`; // Change this format as needed
+}
+
 $("#Include_tax").on("change", function () {
     taxSwitch();
 });
