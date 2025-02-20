@@ -113,14 +113,27 @@ namespace QouToPOWebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCustomContactPerson(string Company_name, string Company_address, string Telephone, string Fax, string Contact_person)
+        public async Task<IActionResult> AddCustomContactPerson(
+            string Company_name, 
+            string Company_name_jpn, 
+            string Address, 
+            string Address_jpn, 
+            string Postal_code, 
+            string Telephone, 
+            string Fax, 
+            string Contact_person, 
+            string Contact_person_jpn
+            )
         {
             try
             {
                 var company = new Company
                 {
                     Company_name = Company_name,
-                    Address = Company_address,
+                    Company_name_jpn = Company_name_jpn,
+                    Address = Address,
+                    Address_jpn = Address_jpn,
+                    Postal_code = Postal_code,
                     Telephone = Telephone,
                     Fax = Fax
                 };
@@ -131,23 +144,26 @@ namespace QouToPOWebApp.Controllers
                 var contactPerson = new Contact_person
                 {
                     Contact_person_name = Contact_person,
+                    Contact_person_name_jpn = Contact_person_jpn,
                     Company_ID = company.Company_ID
                 };
 
                 await _db.Contact_persons.AddAsync(contactPerson);
                 await _db.SaveChangesAsync();
 
+                var contactPersonName = contactPerson.Contact_person_name != null ? contactPerson.Contact_person_name : contactPerson.Contact_person_name_jpn != null ? contactPerson.Contact_person_name_jpn : "";
+
                 return Ok( new
                 {
                     contactPersonId = contactPerson.Contact_person_ID,
-                    companyName = company.Company_name
+                    companyName = company.Company_name + (contactPersonName != "" ? ": " + contactPersonName : "")
                 });
             }
             catch (Exception ex)
             {
                 return Json(new
                 {
-                    message = "Failed to save custom contactPerson. Please try again"
+                    message = "Failed to save custom Company. Please try again"
                 });
             }
         }

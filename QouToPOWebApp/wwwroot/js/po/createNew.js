@@ -128,6 +128,9 @@ $("#removeItem").on("click", function () {
 
     itemTable.rows().deselect();
 
+    $('#editItem').addClass('disabled');
+    $('#removeItem').addClass('disabled');
+
     calculateTotal();
 });
 
@@ -152,17 +155,32 @@ function addCustomContactPerson() {
             url: '/Info/AddCustomContactPerson',
             type: 'POST',
             data: {
-                Company_name: $("input[name=Company_name]").val(),
-                Company_address: $("textarea[name=Company_address]").val(),
-                Telephone: $("input[name=Telephone]").val(),
-                Fax: $("input[name=Fax]").val(),
-                Contact_person: $("input[name=Contact_person]").val()
+                Company_name: $("#Company_name").val(),
+                Company_name_jpn: $("#Company_name_jpn").val(),
+                Address: $("#Company_address").val(),
+                Address_jpn: $("#Company_address_jpn").val(),
+                Telephone: $("#Telephone").val(),
+                Fax: $("#Fax").val(),
+                Postal_code: $("#Postal_code").val(),
+                Contact_person: $("#Contact_person").val(),
+                Contact_person_jpn: $("#Contact_person_jpn").val()
             },
             success: function (response) {
                 var contactPerson = $("#Contact_person_ID");
-                contactPerson.append(new Option(response.companyName, response.supplerId));
-                contactPerson.val(response.supplerId).trigger("change");
+                contactPerson.append(new Option(response.companyName, response.contactPersonId));
+                contactPerson.val(response.contactPersonId).trigger("change");
                 $("#contactPersonModal").modal("hide");
+
+
+                $("#Company_name").val(null);
+                $("#Company_name_jpn").val(null);
+                $("#Company_address").val(null);
+                $("#Company_address_jpn").val(null);
+                $("#Telephone").val(null);
+                $("#Fax").val(null);
+                $("#Postal_code").val(null);
+                $("#Contact_person").val(null);
+                $("#Contact_person_jpn").val(null);
             },
             error: function (response) {
                 console.log(response);
@@ -171,10 +189,10 @@ function addCustomContactPerson() {
     }
 };
 
-$("#Contact_person_ID").change(function () {
-    const id = $(this).val();
-    getContactPersonAddress(id);
-});
+//$("#Contact_person_ID").change(function () {
+//    const id = $(this).val();
+//    getContactPersonAddress(id);
+//});
 
 function getContactPersonAddress(id) {
     if (id != null) {
@@ -194,10 +212,10 @@ function getContactPersonAddress(id) {
     }
 }
 
-$("#Delivery_address_ID").change(function () {
-    const id = $(this).val();
-    getDeliveryAddress(id);
-});
+//$("#Delivery_address_ID").change(function () {
+//    const id = $(this).val();
+//    getDeliveryAddress(id);
+//});
 
 function getDeliveryAddress(id) {
     if (id != null) {

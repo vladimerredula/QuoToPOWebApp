@@ -477,7 +477,7 @@ namespace QouToPOWebApp.Controllers
                 .Select(s => new
                 {
                     s.Contact_person_ID,
-                    Supplier_name = s.Company.Company_name
+                    Supplier_name = s.Company.Company_name + (s.Contact_person_name != null ? ": " + s.Contact_person_name : s.Contact_person_name_jpn != null ? ": " + s.Contact_person_name_jpn : "")
                 })
                 .OrderBy(s => s.Supplier_name)
                 .ToList();

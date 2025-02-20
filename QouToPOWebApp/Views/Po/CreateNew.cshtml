@@ -7,7 +7,7 @@
 @model PoViewModel
 
 @{
-    ViewData["Title"] = "Create new";
+    ViewData["Title"] = "Create PO";
 
     var paymentTerms = ViewBag.paymentTerms as List<Payment_term>;
     var deliveryTerms = ViewBag.deliveryTerms as List<Delivery_term>;
@@ -18,6 +18,11 @@
     <form asp-action="CreateNew" id="poForm">
         <h4>Details</h4>
         <div class="row mb-3">
+            <div class="col mb-2">
+                <label class="form-label" asp-for="Po_title">PO Title</label><span class="text-danger" title="Required">*</span>
+                <input class="form-control" type="text" asp-for="Po_title" required />
+                <span asp-validation-for="Po_title" class="text-danger"></span>
+            </div>
             <div class="col mb-2">
                 <label class="form-label" asp-for="Quotation_date"></label><span class="text-danger" title="Required">*</span>
                 <input class="form-control" type="date" asp-for="Quotation_date" />
@@ -30,80 +35,57 @@
             </div>
         </div>
         <div class="row mb-3">
-            <div class="col-12 mb-2">
+            <div class="col-6 mb-2">
                 <label class="form-label" asp-for="Contact_person_ID"></label><span class="text-danger" title="Required">*</span>
-                <div class="row">
-                    <div class="col col-md-6">
-                        <select class="form-select" asp-for="Contact_person_ID" asp-items="ViewBag.contactPersonList">
-                            <option selected disabled>Choose..</option>
-                        </select>
-                    </div>
-                    <div class="col-auto ps-0">
-                        <a href="#" class="btn btn-outline-secondary" id="customContactPerson">Custom company</a>
-                    </div>
+                <div class="input-group">
+                    <select class="form-select" asp-for="Contact_person_ID" asp-items="ViewBag.contactPersonList">
+                        <option selected disabled>Choose..</option>
+                    </select>
+                    <a href="#" class="btn btn-light border" id="customContactPerson">Add</a>
                 </div>
                 <span asp-validation-for="Contact_person_ID" class="text-danger"></span>
             </div>
-            <div class="col-12">
-                <textarea type="text" class="form-control" id="contactPersonAddress" placeholder="Company address" readonly></textarea>
+            @* <div class="col-12">
+                <textarea type="text" class="form-control visually-hidden" id="contactPersonAddress" placeholder="Company address" readonly></textarea>
+            </div> *@
+            <div class="col-6 mb-2">
+                <label class="form-label" asp-for="Delivery_address_ID">Delivery Address</label><span class="text-danger" title="Required">*</span>
+                <select class="form-select" asp-for="Delivery_address_ID">
+                    <option selected disabled>Choose..</option>
+                    <option value="1">FFJ Zama</option>
+                    <option value="2">FFJ Hachioji</option>
+                    <option value="3">FFJ Hashimoto</option>
+                    <option value="4">FFJ SIC</option>
+                </select>
+                <span asp-validation-for="Delivery_address_ID" class="text-danger"></span>
             </div>
+            @* <div class="col-12">
+                <textarea type="text" class="form-control visually-hidden" id="deliveryAddress" placeholder="Delivery address" readonly></textarea>
+            </div> *@
         </div>
         <div class="row mb-3">
             <div class="col mb-2">
                 <label class="form-label" asp-for="Payment_term_ID"></label><span class="text-danger" title="Required">*</span>
-                <div class="row">
-                    <div class="col">
-                        <select class="form-select" asp-for="Payment_term_ID" asp-items="ViewBag.paymentTermList">
-                            <option selected disabled>Choose..</option>
-                        </select>
-                    </div>
-                    <div class="col-auto ps-0">
-                        <a href="#" class="btn btn-outline-secondary" id="customPaymentTerm">Add</a>
-                    </div>
+                <div class="input-group">
+                    <select class="form-select" asp-for="Payment_term_ID" asp-items="ViewBag.paymentTermList">
+                        <option selected disabled>Choose..</option>
+                    </select>
+                    <a href="#" class="btn btn-light border" id="customPaymentTerm">Add</a>
                 </div>
                 <span asp-validation-for="Payment_term_ID" class="text-danger"></span>
             </div>
             <div class="col mb-2">
                 <label class="form-label" asp-for="Delivery_term_ID"></label><span class="text-danger" title="Required">*</span>
-                <div class="row">
-                    <div class="col">
-                        <select class="form-select" asp-for="Delivery_term_ID" asp-items="ViewBag.deliveryTermList">
-                            <option selected disabled>Choose..</option>
-                        </select>
-                    </div>
-                    <div class="col-auto ps-0">
-                        <a href="#" class="btn btn-outline-secondary" id="customDeliveryTerm">Add</a>
-                    </div>
+                <div class="input-group">
+                    <select class="form-select" asp-for="Delivery_term_ID" asp-items="ViewBag.deliveryTermList">
+                        <option selected disabled>Choose..</option>
+                    </select>
+                    <a href="#" class="btn btn-light border" id="customDeliveryTerm">Add</a>
                 </div>
                 <span asp-validation-for="Delivery_term_ID" class="text-danger"></span>
             </div>
         </div>
         <div class="row mb-3">
-            <div class="col-12 mb-2">
-                <label class="form-label" asp-for="Delivery_address_ID">Delivery Address</label><span class="text-danger" title="Required">*</span>
-                <div class="row">
-                    <div class="col col-md-6">
-                        <select class="form-select" asp-for="Delivery_address_ID">
-                            <option selected disabled>Choose..</option>
-                            <option value="1">FFJ Zama</option>
-                            <option value="2">FFJ Hachioji</option>
-                            <option value="3">FFJ Hashimoto</option>
-                            <option value="4">FFJ SIC</option>
-                        </select>
-                    </div>
-                </div>
-                <span asp-validation-for="Delivery_address_ID" class="text-danger"></span>
-            </div>
-            <div class="col-12">
-                <textarea type="text" class="form-control" id="deliveryAddress" placeholder="Delivery address" readonly></textarea>
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col col-md-6 mb-2">
-                <label class="form-label" asp-for="Po_title">Po Title</label><span class="text-danger" title="Required">*</span>
-                <input class="form-control" type="text" asp-for="Po_title" />
-                <span asp-validation-for="Po_title" class="text-danger"></span>
-            </div>
         </div>
         <br />
 
@@ -175,31 +157,58 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="contactPersonModalLabel">Custom company</h1>
+                <h1 class="modal-title fs-5" id="contactPersonModalLabel">New company</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="contactPersonForm">
-                    <div class="row">
-                        <div class="col-12 mb-3">
+                    <div class="row align-items-start">
+                        <div class="col-12 mb-2">
                             <label class="form-label">Company name</label><span class="text-danger" title="Required">*</span>
-                            <input class="form-control" name="Company_name" required/>
+                            <input class="form-control" name="Company_name" id="Company_name" data-val="true" data-val-required="The Company name field is required." required />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Company_name" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-12 mb-3">
-                            <label class="form-label">Company address</label><span class="text-danger" title="Required">*</span>
-                            <textarea class="form-control" name="Company_address" required></textarea>
+                            <input class="form-control" name="Company_name_jpn" id="Company_name_jpn" placeholder="Company name (Japanese)" />
                         </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-2">
+                            <label class="form-label">Company address</label><span class="text-danger" title="Required">* </span><span class="text-secondary fs-6 fw-light"><small>without postal code</small></span>
+                            <textarea class="form-control" name="Company_address" id="Company_address" data-val="true" data-val-required="The Company address field is required." required></textarea>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Company_address" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <textarea class="form-control" name="Company_address_jpn" id="Company_address_jpn" placeholder="Company address (Japanese)"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Postal code</label><span class="text-danger" title="Required">*</span>
+                            <div class="input-group">
+                                <span class="input-group-text" id="postalSign">〒</span>
+                                <input class="form-control" name="Postal_code" id="Postal_code" data-val="true" data-val-required="The Postal code field is required." required />
+                            </div>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Postal_code" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-6"></div>
                         <div class="col-6 mb-3">
                             <label class="form-label">Telephone</label>
-                            <input class="form-control" name="Telephone" />
+                            <input class="form-control" name="Telephone" id="Telephone" />
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label">Fax</label>
-                            <input class="form-control" name="Fax" />
+                            <input class="form-control" name="Fax" id="Fax" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-2">
+                            <label class="form-label">Contact person name</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" name="Contact_person" id="Contact_person" data-val="true" data-val-required="The Contact person field is required." required />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Contact_person" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-12 mb-3">
-                            <label class="form-label">Contact person name</label><span class="text-danger" title="Required">*</span>
-                            <input class="form-control" name="Contact_person" required/>
+                            <input class="form-control" name="Contact_person_jpn" id="Contact_person_jpn" placeholder="Contact person name (Japanese)"/>
                         </div>
                     </div>
                 </form>
