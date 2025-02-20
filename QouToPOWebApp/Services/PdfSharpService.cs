@@ -31,6 +31,81 @@ namespace QouToPOWebApp.Services
             }
         }
 
+        public byte[] SamplePo()
+        {
+            var po = new PoViewModel
+            {
+                Quotation_number = "20250219/FF-001-092",
+                Quotation_date = DateTime.Parse("2025-2-19"),
+                Include_tax = true,
+                Email = "sample@faradaygroup.com",
+                Po_title = "Sample title",
+                Payment_terms = new Models.Payment_term
+                {
+                    Payment_term_name = "Closed at the end of the month and paid at the end of the following month",
+                    Payment_term_name_jpn = "月末締め翌月末支払い"
+                },
+                Delivery_terms = new Models.Delivery_term
+                {
+                    Delivery_term_name = "After consultation",
+                    Delivery_term_name_jpn = "別途ご相談の上"
+                },
+                Companies = new Models.Company
+                {
+                    Address = "Zama factory, 5-12-15 Hibarigaoka, Zama, Kanagawa, 252-0003",
+                    Address_jpn = "座間工場 〒252-0003 神奈川県座間市ひばりが丘5⁻12⁻15"
+                },
+                Contact_persons = new Models.Contact_person
+                {
+                    Contact_person_name = "△△  □□",
+                    Contact_person_name_jpn = "△△  □□ ",
+                    Company = new Models.Company
+                    {
+                        Company_name = "Company Sample Inc.",
+                        Company_name_jpn = "株式会社サンプル　〇〇支社",
+                        Address = "1-2-3 〇〇〇, Setagaya Ward, Tokyo",
+                        Address_jpn = "東京都世田谷区〇〇〇 1-2-3",
+                        Postal_code = "123-1234"
+                    }
+                },
+                Quotation_items = new List<Models.Quotation_item>
+                {
+                    new Models.Quotation_item 
+                    {
+                        Item_name = "○○○○○○　サンプル　タイプＡ",
+                        Item_price = 123456,
+                        Item_quantity = 10
+                    },
+                    new Models.Quotation_item 
+                    {
+                        Item_name = "△△△△　システム機器（ 自動調整タイプ ）",
+                        Item_price = 2,
+                        Item_quantity = 123456789
+                    },
+                    new Models.Quotation_item 
+                    {
+                        Item_name = "△△△△　システムの取付作業",
+                        Item_price = 3,
+                        Item_quantity = 30000
+                    },
+                    new Models.Quotation_item 
+                    {
+                        Item_name = "△△△△　システムの操作説明　講習会",
+                        Item_price = 40,
+                        Item_quantity = 4000
+                    },
+                    new Models.Quotation_item 
+                    {
+                        Item_name = "□□□□○○○○素材　（　✖✖　を含む　）",
+                        Item_price = 50,
+                        Item_quantity = 5000
+                    }
+                }
+            };
+
+            return CreatePo(po);
+        }
+
         public byte[] CreatePo(PoViewModel po)
         {
             var fontPaths = new Dictionary<string, string>

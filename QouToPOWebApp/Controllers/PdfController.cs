@@ -92,7 +92,8 @@ namespace QouToPOWebApp.Controllers
             string title = "Sample PDF Document";
             string content = "This is a sample PDF generated using PDFsharp 6.1 in ASP.NET Core MVC.";
             //byte[] pdfBytes = _pdf.CreatePdf(title, content);
-            byte[] pdfBytes = _pdf.CreatePo(new ViewModel.PoViewModel());
+            byte[] pdfBytes = _pdf.SamplePo();
+            //byte[] pdfBytes = _pdf.CreatePo(new ViewModel.PoViewModel());
 
             // Return the PDF file as a download
             return File(pdfBytes, "application/pdf", "Sample.pdf");
