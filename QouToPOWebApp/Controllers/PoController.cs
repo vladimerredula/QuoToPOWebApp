@@ -589,7 +589,7 @@ namespace QouToPOWebApp.Controllers
             byte[] pdfBytes = _pdf.CreatePo(po);
 
             // Return the PDF file as a download
-            return File(pdfBytes, "application/pdf", "Sample.pdf");
+            return File(pdfBytes, "application/pdf", $"{po.Po_title}.pdf");
         }
     }
 }

@@ -30,10 +30,10 @@
             </div>
         </div>
         <div class="row mb-3">
-            <div class="col-12">
+            <div class="col-12 mb-2">
                 <label class="form-label" asp-for="Contact_person_ID"></label><span class="text-danger" title="Required">*</span>
                 <div class="row">
-                    <div class="col col-md-6 mb-2">
+                    <div class="col col-md-6">
                         <select class="form-select" asp-for="Contact_person_ID" asp-items="ViewBag.contactPersonList">
                             <option selected disabled>Choose..</option>
                         </select>
@@ -52,7 +52,7 @@
             <div class="col mb-2">
                 <label class="form-label" asp-for="Payment_term_ID"></label><span class="text-danger" title="Required">*</span>
                 <div class="row">
-                    <div class="col mb-2">
+                    <div class="col">
                         <select class="form-select" asp-for="Payment_term_ID" asp-items="ViewBag.paymentTermList">
                             <option selected disabled>Choose..</option>
                         </select>
@@ -66,7 +66,7 @@
             <div class="col mb-2">
                 <label class="form-label" asp-for="Delivery_term_ID"></label><span class="text-danger" title="Required">*</span>
                 <div class="row">
-                    <div class="col mb-2">
+                    <div class="col">
                         <select class="form-select" asp-for="Delivery_term_ID" asp-items="ViewBag.deliveryTermList">
                             <option selected disabled>Choose..</option>
                         </select>
@@ -79,10 +79,10 @@
             </div>
         </div>
         <div class="row mb-3">
-            <div class="col-12">
+            <div class="col-12 mb-2">
                 <label class="form-label" asp-for="Delivery_address_ID">Delivery Address</label><span class="text-danger" title="Required">*</span>
                 <div class="row">
-                    <div class="col col-md-6 mb-2">
+                    <div class="col col-md-6">
                         <select class="form-select" asp-for="Delivery_address_ID">
                             <option selected disabled>Choose..</option>
                             <option value="1">FFJ Zama</option>
@@ -96,6 +96,13 @@
             </div>
             <div class="col-12">
                 <textarea type="text" class="form-control" id="deliveryAddress" placeholder="Delivery address" readonly></textarea>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col col-md-6 mb-2">
+                <label class="form-label" asp-for="Po_title">Po Title</label><span class="text-danger" title="Required">*</span>
+                <input class="form-control" type="text" asp-for="Po_title" />
+                <span asp-validation-for="Po_title" class="text-danger"></span>
             </div>
         </div>
         <br />
