@@ -17,7 +17,6 @@ namespace QouToPOWebApp.Controllers
         private readonly TabulaService _tabula;
         private readonly PdfPigService _pdfPig;
         private readonly TabulaJarService _tabulaJar;
-        private readonly PdfSharpService _pdf;
 
         public PoController(ApplicationDbContext dbContext, TabulaService tabula, PdfPigService pdfPig)
         {
@@ -25,7 +24,6 @@ namespace QouToPOWebApp.Controllers
             _tabula = tabula;
             _pdfPig = pdfPig;
             _tabulaJar = new TabulaJarService();
-            _pdf = new PdfSharpService();
         }
 
         public IActionResult FromQuotation()
@@ -586,7 +584,8 @@ namespace QouToPOWebApp.Controllers
             po.Companies = _db.Companies.FirstOrDefault(c => c.Company_ID == po.Delivery_address_ID);
             po.Email = User.FindFirst(ClaimTypes.Email)?.Value;
 
-            byte[] pdfBytes = _pdf.CreatePo(po);
+            var pdf = new PdfSharpService();
+            byte[] pdfBytes = pdf.CreatePo(po);
 
             // Return the PDF file as a download
             return File(pdfBytes, "application/pdf", $"{po.Po_title}.pdf");
