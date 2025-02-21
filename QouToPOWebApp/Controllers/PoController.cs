@@ -570,10 +570,10 @@ namespace QouToPOWebApp.Controllers
                 return View(po);
             }
 
-            return GeneratePo(po);
+            return DownloadPo(po);
         }
 
-        public IActionResult GeneratePo(PoViewModel po)
+        public byte[] GeneratePo(PoViewModel po)
         {
             po.Contact_persons = _db.Contact_persons
                 .Include(s => s.Company)
@@ -585,10 +585,24 @@ namespace QouToPOWebApp.Controllers
             po.Email = User.FindFirst(ClaimTypes.Email)?.Value;
 
             var pdf = new PdfSharpService();
-            byte[] pdfBytes = pdf.CreatePo(po);
 
+            return pdf.CreatePo(po);
+        }
+
+        public IActionResult DownloadPo(PoViewModel po)
+        {
             // Return the PDF file as a download
-            return File(pdfBytes, "application/pdf", $"{po.Po_title}.pdf");
+            return File(GeneratePo(po), "application/pdf", $"{po.Po_title}.pdf");
+        }
+
+        [HttpPost]
+        public IActionResult PreviewPo(PoViewModel po)
+        {
+            byte[] pdfData = GeneratePo(po);
+            string base64Pdf = Convert.ToBase64String(pdfData);
+            string dataUrl = "data:application/pdf;base64," + base64Pdf;
+
+            return Json(new { PdfDataUrl = dataUrl });
         }
     }
 }

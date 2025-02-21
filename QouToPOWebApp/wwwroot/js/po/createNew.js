@@ -176,6 +176,34 @@ $("#editItem").on("click", function () {
     $("#itemEditModal").modal("show");
 });
 
+$("#generatePo").on("click", function () {
+    $("#poForm").submit();
+})
+
+$("#pdfPreview").on("click", function () {
+    var form = $("#poForm");
+    if (form.valid()) {
+        // Serialize form data
+        var formData = form.serialize();
+
+        // Send data via AJAX
+        $.ajax({
+            url: "/Po/PreviewPo", // Use the form's action URL
+            method: 'POST', // Use the form's method (POST/GET)
+            data: formData,
+            success: function (response) {
+                var dataUrl = response.pdfDataUrl;
+                console.log(response, dataUrl);
+                $('#pdfFrame').attr('src', dataUrl + "#toolbar=0&view=Fit&navpanes=0&scrollbar=0");
+                $("#pdfPreviewModal").modal("show");
+            },
+            error: function (xhr, status, error) {
+                console.log(error);
+            }
+        });
+    }
+})
+
 $("#poForm").on("submit", function (e) {
     if ($(this).valid()) {
         e.preventDefault();
