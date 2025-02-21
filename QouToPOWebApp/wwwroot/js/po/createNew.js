@@ -36,8 +36,8 @@ var itemTable = $('table.datatable').DataTable({
 $("#Quotation_date").change(function () {
     let dateValue = $(this).val(); // Get the selected date (YYYY-MM-DD)
     let poNumber = formatDateToPoNumber(dateValue);
-    console.log(poNumber); // Display formatted date
-    $("#Quotation_number").val(poNumber); // Show formatted date in a div/span
+
+    $("#Quotation_number").val(poNumber);
 });
 
 
@@ -54,47 +54,72 @@ $("#Include_tax").on("change", function () {
     taxSwitch();
 });
 
+// adding item
 $("#submitItem").on("click", function () {
-    var itemname = $('#itemName').val();
-    var quantity = parseInt($('#quantity').val());
-    var price = parseFloat($('#price').val());
-    var itemno = itemTable.rows().count() + 1;
-    var totalPrice = parseFloat(quantity * price).toLocaleString();
+    if ($("#itemForm").valid()) {
+        var itemname = $('#itemName').val();
+        var quantity = parseInt($('#quantity').val());
+        var unit = $('#unit').val();
+        var price = parseFloat($('#price').val());
+        var itemorder = itemTable.rows().count() + 1;
+        var totalprice = parseFloat(quantity * price);
 
-    $("#itemModal").modal("hide");
-    $('#itemName').val(null);
-    $('#quantity').val(null);
-    $('#price').val(null);
-    
-    itemTable.row.add([
-        "",
-        itemno,
-        `<span>${itemname}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_name' value='${itemname}'>`,
-        `<span>${quantity}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_quantity' value='${quantity}'>`,
-        `<span>${price.toLocaleString()}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_price' value='${price}'>`,
-        `<span class='itemPrice'>${totalPrice}</span>`
-    ]).draw();
-    calculateTotal();
+        $("#itemModal").modal("hide");
+        $('#itemName').val(null);
+        $('#unit').val(null);
+        $('#quantity').val(null);
+        $('#price').val(null);
+
+        itemTable.row.add([
+            "",
+            `<div><span>${itemorder}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Order' value='${itemorder}'></div>`,
+            `<div><span>${itemname}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_name' value='${itemname}'></div>`,
+            `<div><span>${quantity}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_quantity' value='${quantity}'></div>`,
+            `<div><span>${unit}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Unit' value='${unit}'></div>`,
+            `<div><span>${price.toLocaleString()}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_price' value='${price}'></div>`,
+            `<span class='itemPrice'>${totalprice.toLocaleString() }</span>`
+        ]).draw();
+        calculateTotal();
+    }
 });
 
+// updating item
 $("#saveItem").on("click", function () {
     var itemname = $('#itemEditName').val();
     var quantity = parseInt($('#itemEditQuantity').val());
+    var unit = $('#itemEditUnit').val();
     var price = parseFloat($('#itemEditPrice').val());
-    var totalPrice = parseFloat(quantity * price).toLocaleString();
+    var totalprice = parseFloat(quantity * price);
 
     $("#itemEditModal").modal("hide");
+    $('#itemEditOrder').val(null);
     $('#itemEditName').val(null);
     $('#itemEditQuantity').val(null);
+    $('#itemEditUnit').val(null);
     $('#itemEditPrice').val(null);
 
     var row = itemTable.row(".selected");
     var rowData = row.data();
 
-    rowData[2] = `<span>${itemname}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_name' value='${itemname}'>`;
-    rowData[3] = `<span>${quantity}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_quantity' value='${quantity}'>`;
-    rowData[4] = `<span>${price.toLocaleString()}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_price' value='${price}'>`;
-    rowData[5] = `<span class='itemPrice'>${totalPrice}</span>`;
+    var itemName = $(rowData[2]);
+    itemName.find("input").attr("value", itemname);
+    itemName.find("span").text(itemname);
+    var itemQty = $(rowData[3]);
+    itemQty.find("input").attr("value", quantity);
+    itemQty.find("span").text(quantity);
+    var itemUnit = $(rowData[4]);
+    itemUnit.find("input").attr("value", unit);
+    itemUnit.find("span").text(unit);
+    var itemPrice = $(rowData[5]);
+    itemPrice.find("input").attr("value", price);
+    itemPrice.find("span").text(price.toLocaleString());
+
+
+    rowData[2] = itemName.html();
+    rowData[3] = itemQty.html();
+    rowData[4] = itemUnit.html();
+    rowData[5] = itemPrice.html();
+    rowData[6] = `<span class="itemPrice">${totalprice.toLocaleString()}</span>`;
 
     row.data(rowData).draw();
 
@@ -138,15 +163,35 @@ $("#editItem").on("click", function () {
     var row = itemTable.row(".selected");
     var rowData = row.data();
 
-    var itemName = $(rowData[2]).next("input").val();
-    var itemQty = $(rowData[3]).next("input").val();
-    var itemPrice = $(rowData[4]).next("input").val();
+    var itemName = $(rowData[2]).find("input").val();
+    var itemQty = $(rowData[3]).find("input").val();
+    var itemUnit = $(rowData[4]).find("input").val();
+    var itemPrice = $(rowData[5]).find("input").val();
 
     $("#itemEditName").val(itemName);
     $("#itemEditQuantity").val(itemQty);
+    $("#itemEditUnit").val(itemUnit);
     $("#itemEditPrice").val(getFloatValue(itemPrice));
 
     $("#itemEditModal").modal("show");
+});
+
+$("#poForm").on("submit", function (e) {
+    if ($(this).valid()) {
+        e.preventDefault();
+
+        var rowIndex = 1;
+        itemTable.cells(null, 1).every(function () {
+            var element = $(this.data());
+            element.find("input").attr("name", `Quotation_items[${this.index().row}].Order`);
+            this.data(element.prop("outerHTML"));
+            rowIndex++;
+        });
+
+        //console.log(itemTable.column(1).data());
+
+        this.submit();
+    }
 });
 
 function addCustomContactPerson() {
@@ -269,7 +314,11 @@ function calculateTotal() {
 }
 
 function getFloatValue(string) {
-    return parseFloat(string.replace(/,/g, ''))
+    if (typeof string == "string") {
+        return Number(string.replace(/,/g, ''));
+    }
+
+    return string;
 }
 
 $("#customPaymentTerm").on("click", function () {

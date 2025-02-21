@@ -74,31 +74,35 @@ namespace QouToPOWebApp.Services
                     {
                         Item_name = "○○○○○○　サンプル　タイプＡ",
                         Item_price = 123456,
-                        Item_quantity = 10
+                        Item_quantity = 10,
+                        Unit = "sets"
                     },
                     new Models.Quotation_item 
                     {
-                        Item_name = "△△△△　システム機器（ 自動調整タイプ ）",
+                        Item_name = "△△△△　システム機器",
                         Item_price = 2,
-                        Item_quantity = 123456789
+                        Item_quantity = 12345,
+                        Unit = "pcs"
                     },
                     new Models.Quotation_item 
                     {
                         Item_name = "△△△△　システムの取付作業",
                         Item_price = 3,
-                        Item_quantity = 30000
+                        Item_quantity = 30000,
                     },
                     new Models.Quotation_item 
                     {
                         Item_name = "△△△△　システムの操作説明　講習会",
                         Item_price = 40,
-                        Item_quantity = 4000
+                        Item_quantity = 400,
+                        Unit = "hours"
                     },
                     new Models.Quotation_item 
                     {
                         Item_name = "□□□□○○○○素材　（　✖✖　を含む　）",
                         Item_price = 50,
-                        Item_quantity = 5000
+                        Item_quantity = 5000,
+                        Unit = "kg"
                     }
                 }
             };
@@ -234,8 +238,8 @@ namespace QouToPOWebApp.Services
             y += 20;
 
             var tableWitdh = 520;
-            var column1 = 300;
-            var column2 = 45;
+            var column1 = 290;
+            var column2 = 55;
             var column3 = 85;
             var column4 = 90;
             var tableRowHeight = 26;
@@ -261,10 +265,10 @@ namespace QouToPOWebApp.Services
 
             if (po?.Quotation_items?.Count() > 0)
             {
-                foreach (var item in po?.Quotation_items)
+                foreach (var item in po?.Quotation_items.OrderBy(q => q.Order))
                 {
                     gfx.DrawString(item.Item_name, bodyFont, XBrushes.Black, new XRect(42, y1, column1, tableRowHeight), XStringFormats.CenterLeft);
-                    gfx.DrawString(item.Item_quantity?.ToString(), bodyFont, XBrushes.Black, new XRect(36 + column1, y1, column2, tableRowHeight), XStringFormats.Center);
+                    gfx.DrawString(item.Item_quantity?.ToString() + (item.Unit != null ? " "+item.Unit : ""), bodyFont, XBrushes.Black, new XRect(36 + column1, y1, column2, tableRowHeight), XStringFormats.Center);
                     gfx.DrawString(item.Item_price?.ToString("N0", new CultureInfo("ja-JP")), bodyFont, XBrushes.Black, new XRect(32 + column1 + column2, y1, column3, tableRowHeight), XStringFormats.CenterRight);
 
                     float totalprice = (float)(item.Item_price * item.Item_quantity);

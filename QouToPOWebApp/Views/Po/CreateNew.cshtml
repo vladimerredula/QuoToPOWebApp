@@ -112,6 +112,7 @@
                             <th>No.</th>
                             <th>Item name</th>
                             <th>Quantity</th>
+                            <th>Unit</th>
                             <th>Price</th>
                             <th>Total price</th>
                         </tr>
@@ -233,17 +234,32 @@
                     <div class="row">
                         <div class="col-12 mb-3">
                             <label class="form-label">Item name</label><span class="text-danger" title="Required">*</span>
-                            <input class="form-control" id="itemName" required />
+                            <input class="form-control" name="itemName" id="itemName" data-val="true" data-val-required="The Item name field is required." required />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="itemName" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label">Quantity</label><span class="text-danger" title="Required">*</span>
-                            <input class="form-control" type="number" id="quantity" required />
+                            <input class="form-control" type="number" data-val="true" data-val-required="The Quantity field is required." name="quantity" id="quantity" required />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="quantity" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Unit</label>
+                            <input class="form-control" list="unitList" type="text" id="unit" />
+                            <datalist id="unitList">
+                                <option value="pcs" />
+                                <option value="sets" />
+                                <option value="kg" />
+                                <option value="t" />
+                                <option value="L" />
+                                <option value="m" />
+                            </datalist>
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label">Price</label><span class="text-danger" title="Required">*</span>
                             <div class="input-group mb-3">
                                 <span class="input-group-text" id="yenSign">¥</span>
-                                <input class="form-control" id="price" required/>
+                                <input class="form-control" name="price" id="price" data-val="true" data-val-required="The Price field is required." required />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="price" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                     </div>
@@ -266,20 +282,36 @@
             </div>
             <div class="modal-body">
                 <form id="itemEditForm">
+                    <input id="itemEditOrder" type="number" hidden />
                     <div class="row">
                         <div class="col-12 mb-3">
                             <label class="form-label">Item name</label><span class="text-danger" title="Required">*</span>
-                            <input class="form-control" id="itemEditName" required/>
+                            <input class="form-control" name="itemEditName" id="itemEditName" data-val="true" data-val-required="The Item name field is required." required />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="itemEditName" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label">Quantity</label><span class="text-danger" title="Required">*</span>
-                            <input class="form-control" type="number" id="itemEditQuantity" required/>
+                            <input class="form-control" type="number" name="itemEditQuatity" id="itemEditQuantity" data-val="true" data-val-required="The Quantity field is required." required />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="itemEditQuantity" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Unit</label>
+                            <input class="form-control" list="unitList" type="text" id="itemEditUnit" />
+                            <datalist id="unitList">
+                                <option value="pcs" />
+                                <option value="sets" />
+                                <option value="kg" />
+                                <option value="t" />
+                                <option value="L" />
+                                <option value="m" />
+                            </datalist>
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label">Price</label><span class="text-danger" title="Required">*</span>
                             <div class="input-group mb-3">
                                 <span class="input-group-text" id="yenSign">¥</span>
-                                <input class="form-control" id="itemEditPrice" required/>
+                                <input class="form-control" name="itemEditPrice" id="itemEditPrice" data-val="true" data-val-required="The Price field is required." required />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="itemEditPrice" data-valmsg-replace="true"></span>
                             </div>
                         </div>
                     </div>
@@ -305,7 +337,8 @@
                     <div class="row">
                         <div class="col-12 mb-3">
                             <label class="form-label">Term name</label><span class="text-danger" title="Required">*</span>
-                            <input class="form-control" id="payTermName" required/>
+                            <input class="form-control" name="payTermName" id="payTermName" data-val="true" data-val-required="The Payment term name field is required." required />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="payTermName" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-12 mb-3">
                             <label class="form-label">Japanese translation</label>
@@ -334,7 +367,8 @@
                     <div class="row">
                         <div class="col-12 mb-3">
                             <label class="form-label">Term name</label><span class="text-danger" title="Required">*</span>
-                            <input class="form-control" id="delTermName" required/>
+                            <input class="form-control" name="delTermName" id="delTermName" data-val="true" data-val-required="The Delivery term name field is required." required />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="delTermName" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-12 mb-3">
                             <label class="form-label">Japanese translation</label>
