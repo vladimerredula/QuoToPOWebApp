@@ -143,7 +143,14 @@ namespace QouToPOWebApp.Services
             XBrush ClayCreekBrush = new XSolidBrush(ClayCreek);
             XPen ClayCreekPen = new XPen(ClayCreek, 2);
 
+            // Header
             gfx.DrawString("発注書", headerFont, XBrushes.Black, new XRect(0, y, page.Width, rowHeight), XStringFormats.Center);
+
+            // Approvers
+            gfx.DrawString("承認①", new XFont("Meiryo", 8), XBrushes.Black, new XRect(380, y-7, 87, 15), XStringFormats.Center);
+            gfx.DrawString("承認②", new XFont("Meiryo", 8), XBrushes.Black, new XRect(467, y-7, 87, 15), XStringFormats.Center);
+            gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 380, y+10, 87, 15);
+            gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 467, y+10, 87, 15);
 
             y += 51;
 
@@ -190,6 +197,7 @@ namespace QouToPOWebApp.Services
             var postalCode = po?.Contact_persons?.Company?.Postal_code ?? string.Empty;
             gfx.DrawString($"〒 {postalCode}　{supplierAddress}", new XFont("Meiryo", 9), XBrushes.Black, new XRect(36, y, 300, 12), XStringFormats.Center);
 
+            // User details
             gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 370, y, 184, 95);
             //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 385, y+10, 154, rowHeight);
             gfx.DrawString("Faraday Factory Japan合同会社", new XFont("Meiryo-bold", 9), XBrushes.Black, new XRect(385, y + 10, 154, rowHeight), XStringFormats.CenterLeft);
