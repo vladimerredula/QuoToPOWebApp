@@ -193,6 +193,9 @@ namespace QouToPOWebApp.Controllers
                 return RedirectToAction(nameof(ContactPerson));
             }
 
+            ViewData["contactPersons"] = await _db.Contact_persons.Include(s => s.Company).ToListAsync();
+            ViewBag.CompanyList = new SelectList(_db.Companies.ToList(), "Company_ID", "Company_name");
+
             return View(nameof(ContactPerson), contactPerson);
         }
 
@@ -227,6 +230,10 @@ namespace QouToPOWebApp.Controllers
                 }
                 return RedirectToAction(nameof(ContactPerson));
             }
+
+            ViewData["contactPersons"] = await _db.Contact_persons.Include(s => s.Company).ToListAsync();
+            ViewBag.CompanyList = new SelectList(_db.Companies.ToList(), "Company_ID", "Company_name");
+
             return View(nameof(ContactPerson), contactPerson);
         }
 
@@ -326,6 +333,8 @@ namespace QouToPOWebApp.Controllers
                 return RedirectToAction(nameof(DeliveryTerm));
             }
 
+            ViewData["deliveryTerms"] = await _db.Delivery_terms.ToListAsync();
+
             return View(nameof(DeliveryTerm), deliveryTerm);
         }
 
@@ -360,6 +369,9 @@ namespace QouToPOWebApp.Controllers
                 }
                 return RedirectToAction(nameof(DeliveryTerm));
             }
+
+            ViewData["deliveryTerms"] = await _db.Delivery_terms.ToListAsync();
+
             return View(nameof(DeliveryTerm), deliveryTerm);
         }
 
@@ -454,6 +466,8 @@ namespace QouToPOWebApp.Controllers
                 return RedirectToAction(nameof(PaymentTerm));
             }
 
+            ViewData["paymentTerms"] = await _db.Payment_terms.ToListAsync();
+
             return View(nameof(PaymentTerm), paymentTerm);
         }
 
@@ -488,6 +502,9 @@ namespace QouToPOWebApp.Controllers
                 }
                 return RedirectToAction(nameof(PaymentTerm));
             }
+
+            ViewData["paymentTerms"] = await _db.Payment_terms.ToListAsync();
+
             return View(nameof(PaymentTerm), paymentTerm);
         }
 
