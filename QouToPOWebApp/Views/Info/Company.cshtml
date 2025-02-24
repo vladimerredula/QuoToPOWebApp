@@ -211,48 +211,56 @@
 
         function editCompany(id) {
             clearModal();
+            
+            $.ajax({
+                url: "/Info/GetCompany",
+                type: "POST",
+                data: {id: id},
+                success: function (data) {
+                    // Iterate over the properties of the data object and set the corresponding form field values
+                    $.each(data, function (key, value) {
+                        var elementId = key.charAt(0).toUpperCase() + key.slice(1); // Capitalize the first letter
+                        $("#" + elementId).val(value);
+                    });
 
-            var postData = {
-                id: id
-                // __RequestVerificationToken: getToken()
-            };
+                    // Set the action attribute of the form
+                    $("#companyForm").attr("action", "/Info/EditCompany/" + data["company_ID"]);
+                    $("#companyModalLabel").text("Edit Company");
+                    $("#modalButton").text("Update");
 
-            $.post("/Info/GetCompany", postData, function (data) {
-                // Iterate over the properties of the data object and set the corresponding form field values
-                $.each(data, function (key, value) {
-                    var elementId = key.charAt(0).toUpperCase() + key.slice(1); // Capitalize the first letter
-                    $("#" + elementId).val(value);
-                });
-
-                // Set the action attribute of the form
-                $("#companyForm").attr("action", "/Info/EditCompany/" + data["company_ID"]);
-                $("#companyModalLabel").text("Edit Company");
-                $("#modalButton").text("Update");
-
-                // Show the modal
-                $("#companyModal").modal("show");
+                    // Show the modal
+                    $("#companyModal").modal("show");
+                },
+                error: function (response) {
+                    console.error("Error:", response.status, response.responseJSON.message);
+                    alert("Error: " + response.responseJSON.message);
+                }
             });
         };
 
         function deleteCompany(id) {
-            var postData = {
-                id: id
-                // __RequestVerificationToken: getToken()
-            };
+            $.ajax({
+                url: "/Info/GetCompany",
+                type: "POST",
+                data: {id: id},
+                success: function (data) {
+                    // Iterate over the properties of the data object and set the corresponding form field values
+                    $.each(data, function (key, value) {
+                        var $element = $("#" + key);
+                        if ($element.length) {
+                            $element.text(value);
+                        }
+                    });
 
-            $.post("/Info/GetCompany", postData, function (data) {
-                // Iterate over the properties of the data object and set the corresponding form field values
-                $.each(data, function (key, value) {
-                    var $element = $("#" + key);
-                    if ($element.length) {
-                        $element.text(value);
-                    }
-                });
+                    $("#deleteID").val(data["company_ID"]);
 
-                $("#deleteID").val(data["company_ID"]);
-
-                // Show the modal
-                $("#deleteModal").modal("show");
+                    // Show the modal
+                    $("#deleteModal").modal("show");
+                },
+                error: function (response) {
+                    console.error("Error:", response.status, response.responseJSON.message);
+                    alert("Error: " + response.responseJSON.message);
+                }
             });
         }
 

@@ -35,10 +35,13 @@ namespace QouToPOWebApp.Controllers
             {
                 _db.Add(company);
                 await _db.SaveChangesAsync();
+
+                TempData["message"] = "success-Successfully created Company!";
                 return RedirectToAction(nameof(Company));
             }
 
-            return View("Company/_FormPartial", company);
+            ViewData["companies"] = await _db.Companies.ToListAsync();
+            return View(nameof(Company), company);
         }
 
         // POST: Info/EditCompany/5
@@ -49,7 +52,8 @@ namespace QouToPOWebApp.Controllers
         {
             if (id != company.Company_ID)
             {
-                return NotFound();
+                TempData["message"] = "danger-Company not found!";
+                return RedirectToAction(nameof(Company));
             }
 
             if (ModelState.IsValid)
@@ -58,21 +62,22 @@ namespace QouToPOWebApp.Controllers
                 {
                     _db.Update(company);
                     await _db.SaveChangesAsync();
+
+                    TempData["message"] = "success-Successfully updated Company!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!CompanyExists(company.Company_ID))
-                    {
-                        return NotFound();
-                    }
+                        TempData["message"] = "danger-Company not found!";
                     else
-                    {
-                        throw;
-                    }
+                        TempData["message"] = "danger-Something went wrong please try again.";
                 }
+
                 return RedirectToAction(nameof(Company));
             }
-            return View("Company/Index", company);
+
+            ViewData["companies"] = await _db.Companies.ToListAsync();
+            return View(nameof(Company), company);
         }
 
         // POST: Info/DeleteCompany/5
@@ -81,12 +86,25 @@ namespace QouToPOWebApp.Controllers
         public async Task<IActionResult> DeleteCompanyConfirmed(int id)
         {
             var company = await _db.Companies.FindAsync(id);
-            if (company != null)
+            if (company == null)
             {
-                _db.Companies.Remove(company);
+                TempData["message"] = "danger-Delete unsuccessful. Company not found!";
+                return RedirectToAction(nameof(Company));
             }
 
-            await _db.SaveChangesAsync();
+            try
+            {
+                _db.Companies.Remove(company);
+                await _db.SaveChangesAsync();
+
+                TempData["message"] = "success-Successfully deleted Company!";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to delete Company: {id} - {ex}");
+                TempData["message"] = "danger-Something went wrong please try again.";
+            }
+
             return RedirectToAction(nameof(Company));
         }
 
@@ -95,16 +113,16 @@ namespace QouToPOWebApp.Controllers
         {
             if (id == null || _db.Companies == null)
             {
-                return RedirectToAction(nameof(Company));
+                return NoContent();
             }
 
             var company = await _db.Companies.FindAsync(id);
             if (company == null)
             {
-                return RedirectToAction(nameof(company));
+                return NotFound(new { message = "Company not found!" });
             }
 
-            return Json(company);
+            return Ok(company);
         }
 
         private bool CompanyExists(int id)
@@ -190,12 +208,13 @@ namespace QouToPOWebApp.Controllers
             {
                 _db.Add(contactPerson);
                 await _db.SaveChangesAsync();
+
+                TempData["message"] = "success-Successfully created Contact Person!";
                 return RedirectToAction(nameof(ContactPerson));
             }
 
             ViewData["contactPersons"] = await _db.Contact_persons.Include(s => s.Company).ToListAsync();
             ViewBag.CompanyList = new SelectList(_db.Companies.ToList(), "Company_ID", "Company_name");
-
             return View(nameof(ContactPerson), contactPerson);
         }
 
@@ -207,7 +226,8 @@ namespace QouToPOWebApp.Controllers
         {
             if (id != contactPerson.Contact_person_ID)
             {
-                return NotFound();
+                TempData["message"] = "danger-Contact Person not found!";
+                return RedirectToAction(nameof(ContactPerson));
             }
 
             if (ModelState.IsValid)
@@ -216,24 +236,22 @@ namespace QouToPOWebApp.Controllers
                 {
                     _db.Update(contactPerson);
                     await _db.SaveChangesAsync();
+
+                    TempData["message"] = "success-Successfully updated Contact Person.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!ContactPersonExists(contactPerson.Contact_person_ID))
-                    {
-                        return NotFound();
-                    }
+                        TempData["message"] = "danger-Contact Person not found!";
                     else
-                    {
-                        throw;
-                    }
+                        TempData["message"] = "danger-Something went wrong. Please try again.";
                 }
+
                 return RedirectToAction(nameof(ContactPerson));
             }
 
             ViewData["contactPersons"] = await _db.Contact_persons.Include(s => s.Company).ToListAsync();
             ViewBag.CompanyList = new SelectList(_db.Companies.ToList(), "Company_ID", "Company_name");
-
             return View(nameof(ContactPerson), contactPerson);
         }
 
@@ -243,12 +261,25 @@ namespace QouToPOWebApp.Controllers
         public async Task<IActionResult> DeleteContactPersonConfirmed(int id)
         {
             var contactPerson = await _db.Contact_persons.FindAsync(id);
-            if (contactPerson != null)
+            if (contactPerson == null)
             {
-                _db.Contact_persons.Remove(contactPerson);
+                TempData["message"] = "danger-Delete unsuccessful. Contact Person not found!";
+                return RedirectToAction(nameof(ContactPerson));
             }
 
-            await _db.SaveChangesAsync();
+            try
+            {
+                _db.Contact_persons.Remove(contactPerson);
+                await _db.SaveChangesAsync();
+
+                TempData["message"] = "success-Successfully deleted Contact Person!";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to delete Contact Person: {id} - {ex}");
+                TempData["message"] = "danger-Something went wrong please try again.";
+            }
+
             return RedirectToAction(nameof(ContactPerson));
         }
 
@@ -257,23 +288,16 @@ namespace QouToPOWebApp.Controllers
         {
             if (id == null || _db.Contact_persons == null)
             {
-                return RedirectToAction(nameof(Contact_person));
+                return NoContent();
             }
 
             var contactPerson = await _db.Contact_persons.Include(s => s.Company).FirstOrDefaultAsync(s => s.Contact_person_ID == id);
             if (contactPerson == null)
             {
-                return RedirectToAction(nameof(Contact_person));
+                return NotFound(new { message = "Contact Person not found!" });
             }
 
-            return Json(new
-            {
-                company_ID = contactPerson.Company_ID,
-                company_name = contactPerson.Company.Company_name,
-                contact_person_name = contactPerson.Contact_person_name,
-                contact_person_name_jpn = contactPerson.Contact_person_name_jpn,
-                key_words = contactPerson.Key_words
-            });
+            return Ok(contactPerson);
         }
 
         private bool ContactPersonExists(int id)
@@ -330,6 +354,8 @@ namespace QouToPOWebApp.Controllers
             {
                 _db.Add(deliveryTerm);
                 await _db.SaveChangesAsync();
+
+                TempData["message"] = "success-Successfully created Delivery Term!";
                 return RedirectToAction(nameof(DeliveryTerm));
             }
 
@@ -346,7 +372,8 @@ namespace QouToPOWebApp.Controllers
         {
             if (id != deliveryTerm.Delivery_term_ID)
             {
-                return NotFound();
+                TempData["message"] = "danger-Delivery Term not found!";
+                return RedirectToAction(nameof(DeliveryTerm));
             }
 
             if (ModelState.IsValid)
@@ -355,18 +382,17 @@ namespace QouToPOWebApp.Controllers
                 {
                     _db.Update(deliveryTerm);
                     await _db.SaveChangesAsync();
+
+                    TempData["message"] = "success-Successfully updated Delivery Term!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!DeliveryTermExists(deliveryTerm.Delivery_term_ID))
-                    {
-                        return NotFound();
-                    }
+                        TempData["message"] = "danger-Delivery Term not found!";
                     else
-                    {
-                        throw;
-                    }
+                        TempData["message"] = "danger-Something went worng. PLease try again.";
                 }
+
                 return RedirectToAction(nameof(DeliveryTerm));
             }
 
@@ -381,12 +407,25 @@ namespace QouToPOWebApp.Controllers
         public async Task<IActionResult> DeleteDeliveryTermConfirmed(int id)
         {
             var deliveryTerm = await _db.Delivery_terms.FindAsync(id);
-            if (deliveryTerm != null)
+            if (deliveryTerm == null)
             {
-                _db.Delivery_terms.Remove(deliveryTerm);
+                TempData["message"] = "danger-Delete unsuccessful. Delivery Term not found!";
+                return RedirectToAction(nameof(DeliveryTerm));
             }
 
-            await _db.SaveChangesAsync();
+            try
+            {
+                _db.Delivery_terms.Remove(deliveryTerm);
+                await _db.SaveChangesAsync();
+
+                TempData["message"] = "success-Successfully deleted Delivery Term!";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to delete Delivery Term: {id} - {ex}");
+                TempData["message"] = "danger-Something went wrong please try again.";
+            }
+
             return RedirectToAction(nameof(DeliveryTerm));
         }
 
@@ -395,16 +434,16 @@ namespace QouToPOWebApp.Controllers
         {
             if (id == null || _db.Delivery_terms == null)
             {
-                return RedirectToAction(nameof(DeliveryTerm));
+                return NoContent();
             }
 
             var deliveryTerm = await _db.Delivery_terms.FindAsync(id);
             if (deliveryTerm == null)
             {
-                return RedirectToAction(nameof(DeliveryTerm));
+                return NotFound(new { message = "danger-Delivery Term not found!" });
             }
 
-            return Json(deliveryTerm);
+            return Ok(deliveryTerm);
         }
 
         private bool DeliveryTermExists(int id)
@@ -463,6 +502,8 @@ namespace QouToPOWebApp.Controllers
             {
                 _db.Add(paymentTerm);
                 await _db.SaveChangesAsync();
+
+                TempData["message"] = "success-Successfully created Payment Term!";
                 return RedirectToAction(nameof(PaymentTerm));
             }
 
@@ -479,7 +520,8 @@ namespace QouToPOWebApp.Controllers
         {
             if (id != paymentTerm.Payment_term_ID)
             {
-                return NotFound();
+                TempData["message"] = "danger-Payment Term not found!";
+                return RedirectToAction(nameof(PaymentTerm));
             }
 
             if (ModelState.IsValid)
@@ -488,18 +530,17 @@ namespace QouToPOWebApp.Controllers
                 {
                     _db.Update(paymentTerm);
                     await _db.SaveChangesAsync();
+
+                    TempData["message"] = "success-Successfully updated Payment Term!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!PaymentTermExists(paymentTerm.Payment_term_ID))
-                    {
-                        return NotFound();
-                    }
+                        TempData["message"] = "danger-Payment Term not found!";
                     else
-                    {
-                        throw;
-                    }
+                        TempData["message"] = "danger-Something went wrong. Please try again.";
                 }
+
                 return RedirectToAction(nameof(PaymentTerm));
             }
 
@@ -514,12 +555,25 @@ namespace QouToPOWebApp.Controllers
         public async Task<IActionResult> DeletePaymentTermConfirmed(int id)
         {
             var paymentTerm = await _db.Payment_terms.FindAsync(id);
-            if (paymentTerm != null)
+            if (paymentTerm == null)
             {
-                _db.Payment_terms.Remove(paymentTerm);
+                TempData["message"] = "danger-Delete unsuccessful. Payment Term not found!";
+                return RedirectToAction(nameof(PaymentTerm));
             }
 
-            await _db.SaveChangesAsync();
+            try
+            {
+                _db.Payment_terms.Remove(paymentTerm);
+                await _db.SaveChangesAsync();
+
+                TempData["message"] = "success-Successfully deleted Payment Term!";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to delete Payment Term: {id} - {ex}");
+                TempData["message"] = "danger-Something went wrong please try again.";
+            }
+
             return RedirectToAction(nameof(PaymentTerm));
         }
 
@@ -528,16 +582,16 @@ namespace QouToPOWebApp.Controllers
         {
             if (id == null || _db.Payment_terms == null)
             {
-                return RedirectToAction(nameof(PaymentTerm));
+                return NoContent();
             }
 
             var paymentTerm = await _db.Payment_terms.FindAsync(id);
             if (paymentTerm == null)
             {
-                return RedirectToAction(nameof(PaymentTerm));
+                return NotFound(new { message = "Payment Term not found!"});
             }
 
-            return Json(paymentTerm);
+            return Ok(paymentTerm);
         }
 
         private bool PaymentTermExists(int id)

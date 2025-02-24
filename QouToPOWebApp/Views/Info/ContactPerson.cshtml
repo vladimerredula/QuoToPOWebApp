@@ -60,15 +60,15 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <input type="hidden" asp-for="Contact_person_ID" />
                     <div class="form-group mb-3">
-                        <label asp-for="Company_ID" class="form-label"></label>
+                        <label asp-for="Company_ID" class="form-label"></label><span class="text-danger" title="Required">*</span>
                         <select class="form-select" asp-for="Company_ID" asp-items="ViewBag.CompanyList">
                             <option selected disabled>Choose..</option>
                         </select>
                         <span asp-validation-for="Company_ID" class="text-danger"></span>
                     </div>
                     <div class="form-group mb-3">
-                        <label asp-for="Contact_person_name" class="control-label"></label>
-                        <input asp-for="Contact_person_name" class="form-control" />
+                        <label asp-for="Contact_person_name" class="control-label"></label><span class="text-danger" title="Required">*</span>
+                        <input asp-for="Contact_person_name" class="form-control" required />
                         <span asp-validation-for="Contact_person_name" class="text-danger"></span>
                     </div>
                     <div class="form-group mb-3">
@@ -161,47 +161,56 @@
         function editContactPerson(id) {
             clearModal();
 
-            var postData = {
-                id: id
-                // __RequestVerificationToken: getToken()
-            };
+            $.ajax({
+                url: "/Info/GetContactPerson",
+                type: "POST",
+                data: {id: id},
+                success: function (data) {
+                    console.log(data);
+                    // Iterate over the properties of the data object and set the corresponding form field values
+                    $.each(data, function (key, value) {
+                        var elementId = key.charAt(0).toUpperCase() + key.slice(1); // Capitalize the first letter
+                        $("#" + elementId).val(value);
+                    });
 
-            $.post("/Info/GetContactPerson", postData, function (data) {
-                // Iterate over the properties of the data object and set the corresponding form field values
-                $.each(data, function (key, value) {
-                    var elementId = key.charAt(0).toUpperCase() + key.slice(1); // Capitalize the first letter
-                    $("#" + elementId).val(value);
-                });
+                    // Set the action attribute of the form
+                    $("#contactPersonForm").attr("action", "/Info/EditContactPerson/" + data["contact_person_ID"]);
+                    $("#contactPersonModalLabel").text("Edit Contact Person");
+                    $("#modalButton").text("Update");
 
-                // Set the action attribute of the form
-                $("#contactPersonForm").attr("action", "/Info/EditContactPerson/" + data["Contact_person_ID"]);
-                $("#contactPersonModalLabel").text("Edit Contact Person");
-                $("#modalButton").text("Update");
-
-                // Show the modal
-                $("#contactPersonModal").modal("show");
+                    // Show the modal
+                    $("#contactPersonModal").modal("show");
+                },
+                error: function (response) {
+                    console.error("Error:", response.status, response.responseJSON.message);
+                    alert("Error: " + response.responseJSON.message);
+                }
             });
         };
 
         function deleteContactPerson(id) {
-            var postData = {
-                id: id
-                // __RequestVerificationToken: getToken()
-            };
+            $.ajax({
+                url: "/Info/GetContactPerson",
+                type: "POST",
+                data: {id: id},
+                success: function (data) {
+                    // Iterate over the properties of the data object and set the corresponding form field values
+                    $.each(data, function (key, value) {
+                        var $element = $("#" + key);
+                        if ($element.length) {
+                            $element.text(value);
+                        }
+                    });
 
-            $.post("/Info/GetContactPerson", postData, function (data) {
-                // Iterate over the properties of the data object and set the corresponding form field values
-                $.each(data, function (key, value) {
-                    var $element = $("#" + key);
-                    if ($element.length) {
-                        $element.text(value);
-                    }
-                });
+                    $("#deleteID").val(data["contact_person_ID"]);
 
-                $("#deleteID").val(data["Contact_person_ID"]);
-
-                // Show the modal
-                $("#deleteModal").modal("show");
+                    // Show the modal
+                    $("#deleteModal").modal("show");
+                },
+                error: function (response) {
+                    console.error("Error:", response.status, response.responseJSON.message);
+                    alert("Error: " + response.responseJSON.message);
+                }
             });
         }
 
