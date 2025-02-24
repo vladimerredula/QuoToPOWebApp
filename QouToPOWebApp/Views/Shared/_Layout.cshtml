@@ -36,7 +36,7 @@
                                     <a asp-controller="Po" asp-action="CreateNewPo" class="dropdown-item">Create new</a>
                                 </li>
                                 <li>
-                                    <a asp-controller="Po" asp-action="FromQuotation" class="dropdown-item">Create from Quotation file</a>
+                                    <a asp-controller="Po" asp-action="FromQuotation" class="dropdown-item disabled">Create from Quotation file</a>
                                 </li>
                             </ul>
                         </li>
@@ -132,6 +132,11 @@
             &copy; 2025 - QuoToPO - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
+    <input id="haserror" value="@(TempData["passerror"] != null ? TempData["passerror"] : "")" hidden />
+
+    <partial name="_Notification" />
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
