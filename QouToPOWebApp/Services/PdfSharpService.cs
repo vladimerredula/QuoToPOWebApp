@@ -35,7 +35,7 @@ namespace QouToPOWebApp.Services
         {
             var po = new PoViewModel
             {
-                Quotation_number = "20250219/FF-001-092",
+                Po_number = "20250219/FF-001-092",
                 Quotation_date = DateTime.Parse("2025-2-19"),
                 Include_tax = true,
                 Email = "sample@faradaygroup.com",
@@ -157,9 +157,9 @@ namespace QouToPOWebApp.Services
             //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, x, y, 50, rowHeight);
             gfx.DrawString("伝票番号：", bodyFont, XBrushes.Black, new XRect(x, y, 50, rowHeight), XStringFormats.CenterLeft);
 
-            // Quotation number
+            // PO number
             //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 100, y, 100, rowHeight);
-            gfx.DrawString(po?.Quotation_number ?? string.Empty, bodyFont, XBrushes.Black, new XRect(100, y, 100, rowHeight), XStringFormats.CenterLeft);
+            gfx.DrawString(po?.Po_number ?? string.Empty, bodyFont, XBrushes.Black, new XRect(100, y, 100, rowHeight), XStringFormats.CenterLeft);
 
             // FFJ logo
             string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "AppData/Images", "FFJ_LOGO.jpg");

@@ -8,8 +8,11 @@ namespace QouToPOWebApp.ViewModel
     [Keyless]
     public class PoViewModel
     {
-        [Display(Name = "Quotation number")]
+        [Display(Name = "PO number")]
         [Required]
+        public string? Po_number { get; set; }
+
+        [Display(Name = "Quotation number")]
         public string? Quotation_number { get; set; }
 
         [Display(Name = "Date")]

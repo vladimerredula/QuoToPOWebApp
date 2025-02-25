@@ -108,7 +108,7 @@ namespace QouToPOWebApp.Controllers
                 quoNumber = GetQuotationNumber(text);
             }
 
-            var model = new QuotationViewModel()
+            var model = new PoViewModel()
             {
                 Quotation_items = new List<Quotation_item>(),
                 ExtractMode = Request.Form["extractMode"]

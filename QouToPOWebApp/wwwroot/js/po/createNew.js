@@ -37,7 +37,7 @@ $("#Quotation_date").change(function () {
     let dateValue = $(this).val(); // Get the selected date (YYYY-MM-DD)
     let poNumber = formatDateToPoNumber(dateValue);
 
-    $("#Quotation_number").val(poNumber);
+    $("#Po_number").val(poNumber);
 });
 
 
