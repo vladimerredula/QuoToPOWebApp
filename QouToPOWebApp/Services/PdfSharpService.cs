@@ -147,10 +147,10 @@ namespace QouToPOWebApp.Services
             gfx.DrawString("発注書", headerFont, XBrushes.Black, new XRect(0, y, page.Width, rowHeight), XStringFormats.Center);
 
             // Approvers
-            gfx.DrawString("承認①", new XFont("Meiryo", 8), XBrushes.Black, new XRect(380, y-7, 87, 15), XStringFormats.Center);
-            gfx.DrawString("承認②", new XFont("Meiryo", 8), XBrushes.Black, new XRect(467, y-7, 87, 15), XStringFormats.Center);
-            gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 380, y+10, 87, 15);
-            gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 467, y+10, 87, 15);
+            //gfx.DrawString("承認①", new XFont("Meiryo", 8), XBrushes.Black, new XRect(380, y-7, 87, 15), XStringFormats.Center);
+            //gfx.DrawString("承認②", new XFont("Meiryo", 8), XBrushes.Black, new XRect(467, y-7, 87, 15), XStringFormats.Center);
+            //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 380, y+10, 87, 15);
+            //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 467, y+10, 87, 15);
 
             y += 51;
 
