@@ -17,6 +17,14 @@
     <link rel="stylesheet" href="~/css/datatables.min.css" asp-append-version="true" />
 </head>
 <body>
+    @{
+        var routeData = ViewContext.RouteData.Values;
+        var controller = routeData["controller"]?.ToString();
+        var action = routeData["action"]?.ToString();
+        var firstName = User.FindFirstValue(ClaimTypes.GivenName);
+        var lastName = User.FindFirstValue(ClaimTypes.Surname);
+    }
+
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
@@ -64,8 +72,6 @@
                     <ul class="navbar-nav navbar-right">
                         @if (User.Identity.IsAuthenticated)
                         {
-                            var firstName = User.FindFirstValue(ClaimTypes.GivenName);
-                            var lastName = User.FindFirstValue(ClaimTypes.Surname);
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="userDropdownMenu">
                                     @firstName @lastName
@@ -89,6 +95,11 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            @if (ViewData["Breadcrumbs"] is List<Breadcrumb> breadcrumbs && controller != "Home" && action != "Profile" && controller != "Error")
+            {
+                @await Html.PartialAsync("_Breadcrumb", breadcrumbs)
+            }
+
             @RenderBody()
         </main>
     </div>

@@ -1,16 +1,23 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using QouToPOWebApp;
+using QouToPOWebApp.Filters;
 using QouToPOWebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<BreadcrumbActionFilter>();
+});
 
 builder.Services.AddScoped<PdfiumViewerService>();
 builder.Services.AddScoped<PdfPigService>();
 builder.Services.AddScoped<TabulaService>();
+
+builder.Services.AddScoped<IBreadcrumbService, BreadcrumbService>();
+builder.Services.AddScoped<BreadcrumbActionFilter>();
 
 // Add DbContext with MySQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
