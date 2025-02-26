@@ -44,26 +44,15 @@
     </form>
     <form asp-action="GeneratePo">
         <div class="row g-5 mb-4">
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <h4>Preview</h4>
                 <div class="row justify-content-center" id="preview">
                     <div class="col-12 bg-secondary-subtle p-0 rounded-2 d-flex justify-content-center">
-                        <img id="pdfPreview" class="border" src="" filename="@Model.File_path" alt="PDF Preview" style="max-width:340px;" />
+                        <iframe id="pdfPreview" src="" filename="@Model.File_path" height="459" width="340" style="border:none;overflow:hidden"></iframe>
                     </div>
-                    <div class="mt-2 row p-0 justify-content-between" style="max-width:337px;">
-                        <div class="col-auto">
-                            <a class="btn btn-sm btn-outline-secondary disabled" id="prev" onclick="prevPage()">Previous</a>
                         </div>
-                        <div class="col-auto">
-                            Page <span id="currentPage">0</span> of <span id="totalPage">0</span>
                         </div>
-                        <div class="col-auto">
-                            <a class="btn btn-sm btn-outline-secondary disabled" id="next" onclick="nextPage()">Next</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-7">
+            <div class="col-md-8">
                 <h4>Details</h4>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">

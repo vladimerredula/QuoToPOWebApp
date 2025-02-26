@@ -39,10 +39,12 @@ namespace QouToPOWebApp.Controllers
                     await pdfFile.CopyToAsync(stream);
                 }
 
-                return GenerateThumbnail(filePath);
+                //return GenerateThumbnail(filePath);
+                return GetPdfData(filePath);
             }
             catch (System.Exception ex)
             {
+                Console.WriteLine("Error uploading pdf file: " + ex.Message);
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -74,6 +76,26 @@ namespace QouToPOWebApp.Controllers
                 totalPages = totalPages
             });
         }
+
+        [HttpPost]
+        public IActionResult GetPdfData(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                return BadRequest("File path is required.");
+            }
+
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+            var currentImage = $"data:application/pdf;base64,{Convert.ToBase64String(fileBytes)}";
+
+            return Json(new
+            {
+                image = currentImage,
+                fileName = Path.GetFileName(filePath),
+                filePath = filePath
+            });
+        }
+
         public IActionResult GenerateTablePdf()
         {
             string[][] tableData = new string[][]

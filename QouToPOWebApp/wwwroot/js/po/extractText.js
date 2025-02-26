@@ -1,6 +1,7 @@
 ﻿
 $(document).ready(function () {
-    getThumbnail();
+    //getThumbnail();
+    getPdfRender();
     taxSwitch();
 
     var contactPersonId = $("#Contact_person_ID").val();
@@ -68,18 +69,34 @@ async function uploadPdf(fileInput) {
     formData.append('pdfFile', file);
 
     try {
-        // Perform the AJAX request using fetch
-        const response = await fetch('/Pdf/UploadPdf', {
-            method: 'POST',
-            body: formData
+        $.ajax({
+            url: "/Pdf/UploadPdf",
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                console.log(data);
+                renderPdf(data);
+            },
+            error: function (response) {
+                console.error("Error:", response.status, response.responseJSON.message);
+                alert("Error: " + response.responseJSON.message);
+            }
         });
-
-        const data = await response.json();
-
-        renderPreview(data);
     } catch (error) {
         console.error('Upload error:', error);
     }
+}
+
+function renderPdf(data) {
+    $("#divPreview").removeClass("visually-hidden");
+    $("#dropArea").addClass("visually-hidden");
+
+    $('#pdfPreview').attr("src", data.image + "#toolbar=0&view=Fit&navpanes=0");
+    $('#pdfPreview').attr("filename", data.filePath);
+    $('#filePath').val(data.filePath);
+    $('#selectFileInput').val(data.fileName);
 }
 
 function nextPage() {
@@ -112,6 +129,28 @@ function getThumbnail(pageIndex) {
         },
         success: function (data) {
             renderPreview(data);
+        },
+        error: function (response) {
+            console.log(response);
+        }
+    });
+}
+function getPdfRender() {
+    const preview = $('#pdfPreview');
+    const filePath = preview.attr("filename");
+
+    if (!filePath) {
+        return;
+    }
+
+    $.ajax({
+        url: '/Pdf/GetPdfData',
+        type: 'POST',
+        data: {
+            filePath: filePath
+        },
+        success: function (data) {
+            renderPdf(data);
         },
         error: function (response) {
             console.log(response);
