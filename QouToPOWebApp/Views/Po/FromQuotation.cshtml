@@ -8,31 +8,33 @@
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
-<div class="container">
-    <form asp-action="Extract" method="post" id="quoForm">
-        <div class="row g-3 mb-2">
-            <div class="col-md">
-                <label class="form-label">Upload a Quotation file</label>
-                <input type="file" id="pdfFile" accept=".pdf" onchange="uploadPdf(this)" hidden>
-                <input name="filePath" id="filePath" type="text" value="" hidden />
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="No file chosen" id="selectFileInput" readonly>
-                    <a href="#" class="btn btn-light border" type="button" id="selectFileBtn">Choose File</a>
+<form asp-action="Extract" method="post" id="quoForm">
+    <div class="card p-3 border-0 shadow-sm mb-4">
+        <div id="dropArea">
+            <div id="dropZone" class="border rounded-3 bg-light-subtle p-5 text-center">
+                <p class="m-0">Drag and drop a file here</p>
+                <p class="my-3">or</p>
+                <a href="#" class="btn btn-primary" type="button" id="selectFileBtn">Choose File</a>
+            </div>
+        </div>
+        <div class="visually-hidden" id="extractSettings">
+            <div class="row g-3">
+                <div class="col-md">
+                    <label class="form-label">Quotation file</label>
+                    <input type="file" id="pdfFile" accept=".pdf" onchange="uploadPdf(this)" hidden>
+                    <input name="filePath" id="filePath" type="text" value="" hidden />
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="No file chosen" id="selectFileInput" readonly>
+                        <a href="#" class="btn btn-light border" type="button" id="selectFileBtn">Choose File</a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div id="dropArea">
-            <p class="text-center">- or -</p>
-            <div id="dropZone" class="border rounded-3 bg-light-subtle p-5 text-center" style="cursor: pointer;">
-                <p class="m-0">Drag & drop a file here</p>
-            </div>
-        </div>
-        <div class="visually-hidden" id="divPreview">
-            <div class="row mb-3">
-                <h4>Extraction Settings</h4>
+            <div class="row">
                 <div class="col-md-4 mb-2">
                     <label for="pdfType" class="form-label col-xl-4">PDF type</label>
-                <select class="form-select col-xl-8" aria-label="PDF type" name="pdfType" id="pdfType" asp-items="ViewBag.pdfTypeList">
+                    <select class="form-select col-xl-8" asp-for="Pdf_type_ID">
+                        <option value="1">Native</option>
+                        <option value="2" disabled>Scanned</option>
                     </select>
                 </div>
                 <div class="col-md-4 mb-2">
@@ -50,19 +52,17 @@
                     </a>
                 </div>
             </div>
-            <div class="row mb-4">
-                <div class="col-md-4">
-                    <h4>Preview</h4>
-                    <div class="row justify-content-center" id="preview">
-                        <div class="col-12 bg-secondary-subtle p-0 rounded-2 d-flex justify-content-center">
-                            <iframe id="pdfPreview" src="" height="443" width="340" style="border:none;overflow:hidden"></iframe>
-                        </div>
-                    </div>
-                </div>
+        </div>
+    </div>
+    <div class="visually-hidden" id="divPreview">
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <h4>Preview</h4>
+                <iframe id="pdfPreview" src="" height="400" style="width:100%;border:none;overflow:hidden"></iframe>
             </div>
         </div>
-    </form>
-</div>
+    </div>
+</form>
 
 @section Scripts {
     @{

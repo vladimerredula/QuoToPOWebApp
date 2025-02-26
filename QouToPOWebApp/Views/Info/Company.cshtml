@@ -8,68 +8,71 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<p>
-    <button type="button" class="btn btn-success" onclick="addCompany()">Create New</button>
+<p class="mb-4">
+    <a type="button" class="btn btn-success shadow" onclick="addCompany()">Create New</a>
 </p>
-<table class="datatable table table-hover">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Company_name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Company_name_jpn)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Address)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Address_jpn)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Postal_code)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Telephone)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Fax)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in companies) {
+
+<div class="card p-3 border-0 shadow-sm">
+    <table class="datatable table table-hover">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Company_name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Company_name_jpn)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Address)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Address_jpn)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Postal_code)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Telephone)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Fax)
-                </td>
-                <td>
-                    <a href="#" onclick="editCompany(@item.Company_ID)">Edit</a> |
-                    <a href="#" onclick="deleteCompany(@item.Company_ID)">Delete</a>
-                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.Company_name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Company_name_jpn)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Address)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Address_jpn)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Postal_code)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Telephone)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Fax)
+                </th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in companies) {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Company_name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Company_name_jpn)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Address)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Address_jpn)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Postal_code)
+                    </td>
+                    <td class="text-nowrap">
+                        @Html.DisplayFor(modelItem => item.Telephone)
+                    </td>
+                    <td class="text-nowrap">
+                        @Html.DisplayFor(modelItem => item.Fax)
+                    </td>
+                    <td class="text-nowrap">
+                        <a href="#" onclick="editCompany(@item.Company_ID)">Edit</a> |
+                        <a href="#" onclick="deleteCompany(@item.Company_ID)">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 <div class="modal fade" id="companyModal" tabindex="-1" aria-labelledby="createModalLabel" >
     <div class="modal-dialog">

@@ -14,9 +14,9 @@ const dropZone = $("#dropZone");
 const fileInput = document.getElementById("pdfFile");
 const table = document.getElementById("csvTable");
 
-dropZone.on("click", function () {
-    fileInput.click();
-});
+//dropZone.on("click", function () {
+//    fileInput.click();
+//});
 
 dropZone.on("mouseenter", function () {
     $(this).removeClass("bg-light-subtle").addClass("bg-light");
@@ -120,6 +120,51 @@ function submitForm() {
     $("#quoForm").submit();
 }
 
+$("#generatePo").on("click", function () {
+    $("#poForm").submit();
+})
+
+$("#previewPo").on("click", function () {
+    var form = $("#poForm");
+    if (form.valid()) {
+        // Serialize form data
+        var formData = form.serialize();
+
+        // Send data via AJAX
+        $.ajax({
+            url: "/Po/PreviewPo", // Use the form's action URL
+            method: 'POST', // Use the form's method (POST/GET)
+            data: formData,
+            success: function (response) {
+                var dataUrl = response.pdfDataUrl;
+                $('#pdfPreviewFrame').attr('src', dataUrl + "#toolbar=0&view=Fit&navpanes=0&scrollbar=0");
+                $("#pdfPreviewModal").modal("show");
+            },
+            error: function (xhr, status, error) {
+                console.log(error);
+            }
+        });
+    }
+})
+
+$("#poForm").on("submit", function (e) {
+    if ($(this).valid()) {
+        e.preventDefault();
+
+        var rowIndex = 1;
+        itemTable.cells(null, 1).every(function () {
+            var element = $(this.data());
+            element.find("input").attr("name", `Quotation_items[${this.index().row}].Order`);
+            this.data(element.prop("outerHTML"));
+            rowIndex++;
+        });
+
+        //console.log(itemTable.column(1).data());
+
+        this.submit();
+    }
+});
+
 async function uploadPdf(fileInput) {
     const file = fileInput.files[0];
 
@@ -152,6 +197,7 @@ async function uploadPdf(fileInput) {
 
 function renderPdf(data) {
     $("#divPreview").removeClass("visually-hidden");
+    $("#extractSettings").removeClass("visually-hidden");
     $("#dropArea").addClass("visually-hidden");
 
     $('#pdfPreview').attr("src", data.image + "#toolbar=0&view=Fit&navpanes=0");

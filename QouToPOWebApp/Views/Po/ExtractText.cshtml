@@ -9,10 +9,10 @@
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
-<div class="container">
-    <div class="row g-3 mb-2">
+<div class="card p-3 border-0 shadow-sm mb-4">
+    <div class="row g-3">
         <div class="col-md">
-            <label class="form-label">Upload a Quotation file</label>
+            <label class="form-label">Quotation file</label>
             <input type="file" id="pdfFile" accept=".pdf" onchange="uploadPdf(this)" hidden>
             <div class="input-group mb-3">
                 <input type="text" class="form-control" placeholder="No file chosen" id="selectFileInput" readonly>
@@ -22,12 +22,12 @@
     </div>
     <form asp-action="Extract" method="post" id="quoForm">
         <input name="filePath" id="filePath" type="text" value="" hidden />
-        <div class="row mb-3">
-            <h4>Extraction Settings</h4>
+        <div class="row">
             <div class="col-md-4 mb-2">
                 <label asp-for="Pdf_type_ID" class="form-label col-xl-4">PDF type</label>
-                <select class="form-select col-xl-8" asp-for="Pdf_type_ID" asp-items="ViewBag.pdfTypeList">
-                    <option selected disabled>Choose..</option>
+                <select class="form-select col-xl-8" asp-for="Pdf_type_ID">
+                    <option value="1">Native</option>
+                    <option value="2" disabled>Scanned</option>
                 </select>
             </div>
             <div class="col-md-4 mb-2">
@@ -46,19 +46,17 @@
             </div>
         </div>
     </form>
-    <form asp-action="GeneratePo">
-        <div class="row g-5 mb-4">
-            <div class="col-md-4">
-                <h4>Preview</h4>
-                <div class="row justify-content-center" id="preview">
-                    <div class="col-12 bg-secondary-subtle p-0 rounded-2 d-flex justify-content-center">
-                        <iframe id="pdfPreview" src="" filename="@Model.File_path" height="459" width="340" style="border:none;overflow:hidden"></iframe>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-8">
-                <h4>Details</h4>
-                <div class="row g-3 mb-3">
+</div>
+<form asp-action="DownloadPo" id="poForm">
+    <div class="row g-4 mb-3">
+        <div class="col-md-4 justify-content-center">
+            <h4>Preview</h4>
+            <iframe class="rounded-2" id="pdfPreview" src="" filename="@Model.File_path" height="400" style="width:100%;"></iframe>
+        </div>
+        <div class="col-md-8">
+            <h4>Details</h4>
+            <div class="card p-3 border-0 shadow-sm mb-3">
+                <div class="row g-4 mb-3">
                     <div class="col-md-6">
                         <label asp-for="Po_title" class="form-label"></label><span class="text-danger" title="Required">*</span>
                         <input asp-for="Po_title" class="form-control" />
@@ -79,8 +77,6 @@
                         <input asp-for="Po_number" class="form-control" />
                         <span asp-validation-for="Po_number" class="text-danger"></span>
                     </div>
-                </div>
-                <div class="row g-3 mb-3">
                     <div class="col-6">
                         <label asp-for="Contact_person_ID" class="form-label"></label><span class="text-danger" title="Required">*</span>
                         <div class="input-group">
@@ -102,8 +98,6 @@
                         </select>
                         <span asp-validation-for="Delivery_address_ID" class="text-danger"></span>
                     </div>
-                </div>
-                <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <label asp-for="Payment_term_ID" class="form-label text-nowrap"></label><span class="text-danger" title="Required">*</span>
                         <div class="input-group">
@@ -127,12 +121,14 @@
                 </div>
             </div>
         </div>
-        <span class="fs-3 fw-semibold">Items</span>&nbsp;
+    </div>
+    <h3>Items</h3>
+    <div class="card p-3 border-0 shadow-sm mb-4">
         <div class="row justify-content-between">
             <div class="col-auto">
-                <a class="mb-2 btn btn-light border" href="#" id="addItem">Add</a>&nbsp;
-                <a class="mb-2 btn btn-light border disabled" href="#" id="editItem">Edit</a>&nbsp;
-                <a class="mb-2 btn btn-light border disabled" href="#" id="removeItem">Remove</a>
+                <a class="btn btn-light border" href="#" id="addItem">Add</a>&nbsp;
+                <a class="btn btn-light border disabled" href="#" id="editItem">Edit</a>&nbsp;
+                <a class="btn btn-light border disabled" href="#" id="removeItem">Remove</a>
             </div>
             <div class="col-auto align-self-end">
                 <div class="form-check form-switch">
@@ -143,8 +139,8 @@
         </div>
         <div class="row g-5 mb-3">
             <div class="col-md">
-                <table class="table datatable table-hover">
-                    <thead>
+                <table class="table table-hover datatable">
+                    <thead class="table-light">
                         <tr>
                             <th></th>
                             <th>No.</th>
@@ -180,7 +176,7 @@
                 </table>
             </div>
         </div>
-        <div class="row mb-3 justify-content-end">
+        <div class="row justify-content-end">
             <div class="col-auto">
                 <table class="table">
                     <tbody>
@@ -203,13 +199,16 @@
                 </table>
             </div>
         </div>
-        <div class="row justify-content-end">
-            <div class="col-auto">
-                <button class="btn btn-lg btn-info text-white" type="submit">Generate PO</button>
-            </div>
+    </div>
+    <div class="row justify-content-end">
+        <div class="col-auto">
+            <a class="btn btn-lg btn-light border" href="#" id="previewPo">Preview</a>
         </div>
-    </form>
-</div>
+        <div class="col-auto">
+            <a class="btn btn-lg btn-info text-white shadow" href="#" id="generatePo">Generate PO</a>
+        </div>
+    </div>
+</form>
 
 <!-- Contact Person Modal -->
 <div class="modal fade" id="contactPersonModal" tabindex="-1">
@@ -451,7 +450,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <iframe id="pdfFrame" src="" width="100%" height="900px"></iframe>
+                <iframe id="pdfPreviewFrame" src="" width="100%" height="900px"></iframe>
             </div>
         </div>
     </div>

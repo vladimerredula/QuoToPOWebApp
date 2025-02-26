@@ -14,9 +14,10 @@
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
-<div class="container">
-    <form asp-action="CreateNew" id="poForm">
-        <h4>Details</h4>
+
+<form asp-action="CreateNew" id="poForm">
+    <h4>Details</h4>
+    <div class="card p-3 border-0 shadow-sm mb-3">
         <div class="row mb-3">
             <div class="col mb-2">
                 <label class="form-label" asp-for="Po_title">PO Title</label><span class="text-danger" title="Required">*</span>
@@ -63,7 +64,7 @@
                 <textarea type="text" class="form-control visually-hidden" id="deliveryAddress" placeholder="Delivery address" readonly></textarea>
             </div> *@
         </div>
-        <div class="row mb-3">
+        <div class="row">
             <div class="col mb-2">
                 <label class="form-label" asp-for="Payment_term_ID"></label><span class="text-danger" title="Required">*</span>
                 <div class="input-group">
@@ -85,16 +86,14 @@
                 <span asp-validation-for="Delivery_term_ID" class="text-danger"></span>
             </div>
         </div>
-        <div class="row mb-3">
-        </div>
-        <br />
-
+    </div>
+    <h3>Items</h3>
+    <div class="card p-3 border-0 shadow-sm mb-4">
         <div class="row justify-content-between">
             <div class="col-auto">
-                <span class="fs-3 fw-semibold">Items</span>&nbsp;
-                <a class="mb-2 btn btn-light border" href="#" id="addItem">Add</a>&nbsp;
-                <a class="mb-2 btn btn-light border disabled" href="#" id="editItem">Edit</a>&nbsp;
-                <a class="mb-2 btn btn-light border disabled" href="#" id="removeItem">Remove</a>
+                <a class="btn btn-light border" href="#" id="addItem">Add</a>&nbsp;
+                <a class="btn btn-light border disabled" href="#" id="editItem">Edit</a>&nbsp;
+                <a class="btn btn-light border disabled" href="#" id="removeItem">Remove</a>
             </div>
             <div class="col-auto align-self-end">
                 <div class="form-check form-switch">
@@ -122,7 +121,7 @@
                 </table>
             </div>
         </div>
-        <div class="row mb-3 justify-content-end">
+        <div class="row justify-content-end">
             <div class="col-auto">
                 <table class="table">
                     <tbody>
@@ -145,16 +144,16 @@
                 </table>
             </div>
         </div>
-        <div class="row justify-content-end">
-            <div class="col-auto">
-                <a class="btn btn-lg btn-light border" href="#" id="pdfPreview">Preview</a>
-            </div>
-            <div class="col-auto">
-                <a class="btn btn-lg btn-info text-white" href="#" id="generatePo">Generate PO</a>
-            </div>
+    </div>
+    <div class="row justify-content-end">
+        <div class="col-auto">
+            <a class="btn btn-lg btn-light border" href="#" id="pdfPreview">Preview</a>
         </div>
-    </form>
-</div>
+        <div class="col-auto">
+            <a class="btn btn-lg btn-info text-white shadow" href="#" id="generatePo">Generate PO</a>
+        </div>
+    </div>
+</form>
 
 <!-- Contact Person Modal -->
 <div class="modal fade" id="contactPersonModal" tabindex="-1">

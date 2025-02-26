@@ -8,44 +8,47 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<p>
-    <button type="button" class="btn btn-success" onclick="addDeliveryTerm()">Create New</button>
+<p class="mb-4">
+    <a type="button" class="btn btn-success shadow" onclick="addDeliveryTerm()">Create New</a>
 </p>
-<table class="datatable table table-hover">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Delivery_term_name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Delivery_term_name_jpn)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Key_words)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in deliveryTerms) {
+
+<div class="card p-3 border-0 shadow-sm">
+    <table class="datatable table table-hover">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Delivery_term_name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Delivery_term_name_jpn)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Key_words)
-                </td>
-                <td>
-                    <a href="#" onclick="editDeliveryTerm(@item.Delivery_term_ID)">Edit</a> |
-                    <a href="#" onclick="deleteDeliveryTerm(@item.Delivery_term_ID)">Delete</a>
-                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.Delivery_term_name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Delivery_term_name_jpn)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Key_words)
+                </th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in deliveryTerms) {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Delivery_term_name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Delivery_term_name_jpn)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Key_words)
+                    </td>
+                    <td>
+                        <a href="#" onclick="editDeliveryTerm(@item.Delivery_term_ID)">Edit</a> |
+                        <a href="#" onclick="deleteDeliveryTerm(@item.Delivery_term_ID)">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 <div class="modal fade" id="deliveryTermModal" tabindex="-1" aria-labelledby="createModalLabel">
     <div class="modal-dialog">

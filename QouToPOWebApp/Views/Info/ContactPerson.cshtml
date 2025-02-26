@@ -8,45 +8,48 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<p>
-    <button type="button" class="btn btn-success" onclick="addContactPerson()">Create New</button>
+<p class="mb-4">
+    <a type="button" class="btn btn-success shadow" onclick="addContactPerson()">Create New</a>
 </p>
-<table class="datatable table table-hover">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Company.Company_name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Contact_person_name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Key_words)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in contactPersons)
-        {
+
+<div class="card p-3 border-0 shadow-sm">
+    <table class="datatable table table-hover">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Company.Company_name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Contact_person_name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Key_words)
-                </td>
-                <td>
-                    <a href="#" onclick="editContactPerson(@item.Contact_person_ID)">Edit</a> |
-                    <a href="#" onclick="deleteContactPerson(@item.Contact_person_ID)">Delete</a>
-                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.Company.Company_name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contact_person_name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Key_words)
+                </th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in contactPersons)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Company.Company_name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Contact_person_name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Key_words)
+                    </td>
+                    <td>
+                        <a href="#" onclick="editContactPerson(@item.Contact_person_ID)">Edit</a> |
+                        <a href="#" onclick="deleteContactPerson(@item.Contact_person_ID)">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 <div class="modal fade" id="contactPersonModal" tabindex="-1" aria-labelledby="createModalLabel" >
     <div class="modal-dialog">
