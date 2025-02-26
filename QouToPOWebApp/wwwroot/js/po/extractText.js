@@ -10,6 +10,49 @@ $(document).ready(function () {
     getDeliveryAddress(companyId);
 });
 
+const dropZone = $("#dropZone");
+const fileInput = document.getElementById("pdfFile");
+const table = document.getElementById("csvTable");
+
+dropZone.on("click", function () {
+    fileInput.click();
+});
+
+dropZone.on("mouseenter", function () {
+    $(this).removeClass("bg-light-subtle").addClass("bg-light");
+});
+
+dropZone.on("mouseleave", function () {
+    $(this).removeClass("bg-light").addClass("bg-light-subtle");
+});
+
+dropZone.on("dragover", function (event) {
+    event.preventDefault();
+    $(this).removeClass("bg-light-subtle").addClass("bg-light");
+});
+
+dropZone.on("dragleave", function () {
+    $(this).addClass("bg-light-subtle").removeClass("bg-light");
+});
+
+dropZone.on("drop", function (event) {
+    event.preventDefault();
+    $(this).addClass("bg-light-subtle").removeClass("bg-light");
+
+    let files = event.originalEvent.dataTransfer.files;
+    if (files.length > 0) {
+        let file = files[0];
+
+        if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
+            $("#pdfFile")[0].files = files; // Assign files to input
+            $("#pdfFile").change();
+            getPdfRender();
+        } else {
+            alert("Please upload a valid PDF file.");
+        }
+    }
+});
+
 var itemTable = $('table.datatable').DataTable({
     info: false,
     responsive: true,

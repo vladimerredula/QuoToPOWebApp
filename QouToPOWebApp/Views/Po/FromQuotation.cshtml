@@ -2,7 +2,7 @@
 
 @model PoViewModel;
 
-﻿@{
+@{
     ViewData["Title"] = "Create from Quotation";
 }
 
@@ -21,6 +21,13 @@
                 </div>
             </div>
         </div>
+        <div id="dropArea">
+            <p class="text-center">- or -</p>
+            <div id="dropZone" class="border rounded-3 bg-light-subtle p-5 text-center" style="cursor: pointer;">
+                <p class="m-0">Drag & drop a file here</p>
+            </div>
+        </div>
+        <div class="visually-hidden" id="divPreview">
         <div class="row mb-3">
             <h4>Extraction Settings</h4>
             <div class="col-md-4 mb-2">
