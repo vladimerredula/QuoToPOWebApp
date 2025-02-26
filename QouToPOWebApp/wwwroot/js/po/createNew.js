@@ -114,11 +114,10 @@ $("#saveItem").on("click", function () {
     itemPrice.find("input").attr("value", price);
     itemPrice.find("span").text(price.toLocaleString());
 
-
-    rowData[2] = itemName.html();
-    rowData[3] = itemQty.html();
-    rowData[4] = itemUnit.html();
-    rowData[5] = itemPrice.html();
+    rowData[2] = itemName.prop("outerHTML");
+    rowData[3] = itemQty.prop("outerHTML");
+    rowData[4] = itemUnit.prop("outerHTML");
+    rowData[5] = itemPrice.prop("outerHTML");
     rowData[6] = `<span class="itemPrice">${totalprice.toLocaleString()}</span>`;
 
     row.data(rowData).draw();
