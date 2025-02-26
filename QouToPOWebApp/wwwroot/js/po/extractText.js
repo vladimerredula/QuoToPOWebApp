@@ -56,6 +56,8 @@ $("#Delivery_address_ID").change(function () {
 });
 
 function submitForm() {
+    $("#extractBtn").addClass("visually-hidden");
+    $("#loadingBtn").removeClass("visually-hidden");
     $("#quoForm").submit();
 }
 

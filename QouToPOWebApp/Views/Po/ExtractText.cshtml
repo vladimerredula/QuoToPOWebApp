@@ -38,7 +38,11 @@
                 </select>
             </div>
             <div class="col-md-auto mb-2 align-content-end text-end">
-                <a class="btn btn-info text-white align-content-center" onclick="submitForm()">Extract</a>
+                <a class="btn btn-info text-white align-content-center" id="extractBtn" onclick="submitForm()">Extract</a>
+                <a id="loadingBtn" class="btn btn-info text-white visually-hidden disabled">
+                    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                    <span role="status">Extracting...</span>
+                </a>
             </div>
         </div>
     </form>
