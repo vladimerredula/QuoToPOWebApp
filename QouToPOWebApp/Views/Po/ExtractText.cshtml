@@ -10,7 +10,7 @@
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
 <div class="container">
-    <div class="row g-3 mb-3">
+    <div class="row g-3 mb-2">
         <div class="col-md">
             <label class="form-label">Upload a Quotation file</label>
             <input type="file" id="pdfFile" accept=".pdf" onchange="uploadPdf(this)" hidden>
@@ -25,14 +25,14 @@
         <div class="row mb-3">
             <h4>Extraction Settings</h4>
             <div class="col-md-4 mb-2">
-                <label for="pdfType" class="form-label col-xl-4">PDF type</label>
-                <select class="form-select col-xl-8" aria-label="PDF type" name="pdfType" id="pdfType" asp-items="ViewBag.pdfTypeList">
+                <label asp-for="Pdf_type_ID" class="form-label col-xl-4">PDF type</label>
+                <select class="form-select col-xl-8" asp-for="Pdf_type_ID" asp-items="ViewBag.pdfTypeList">
                     <option selected disabled>Choose..</option>
                 </select>
             </div>
             <div class="col-md-4 mb-2">
                 <label for="extractMode" class="form-label col-xl-4">Extraction mode</label>
-                <select class="form-select" name="extractMode" id="extractMode">
+                <select class="form-select" asp-for="Extract_mode">
                     <option value="lattice">Lattice</option>
                     <option value="stream">Stream</option>
                 </select>
@@ -54,13 +54,18 @@
                     <div class="col-12 bg-secondary-subtle p-0 rounded-2 d-flex justify-content-center">
                         <iframe id="pdfPreview" src="" filename="@Model.File_path" height="459" width="340" style="border:none;overflow:hidden"></iframe>
                     </div>
-                        </div>
-                        </div>
+                </div>
+            </div>
             <div class="col-md-8">
                 <h4>Details</h4>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label asp-for="Quotation_date" class="form-label"></label>
+                        <label asp-for="Po_title" class="form-label"></label><span class="text-danger" title="Required">*</span>
+                        <input asp-for="Po_title" class="form-control" />
+                        <span asp-validation-for="Po_title" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Quotation_date" class="form-label"></label><span class="text-danger" title="Required">*</span>
                         <input asp-for="Quotation_date" type="date" class="form-control" value="@(Model.Quotation_date.Value.ToString("yyyy-MM-dd"))"/>
                         <span asp-validation-for="Quotation_date" class="text-danger"></span>
                     </div>
@@ -70,61 +75,59 @@
                         <span asp-validation-for="Quotation_number" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="Payment_term_ID" class="form-label text-nowrap"></label>
-                        <select asp-for="Payment_term_ID" class="form-select" asp-items="ViewBag.paymentTermList">
+                        <label asp-for="Po_number" class="form-label"></label><span class="text-danger" title="Required">*</span>
+                        <input asp-for="Po_number" class="form-control" />
+                        <span asp-validation-for="Po_number" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label asp-for="Contact_person_ID" class="form-label"></label><span class="text-danger" title="Required">*</span>
+                        <div class="input-group">
+                            <select class="form-select" asp-for="Contact_person_ID" asp-items="ViewBag.contactPersonList">
+                                <option selected disabled>Choose..</option>
+                            </select>
+                            <a href="#" class="btn btn-light border" id="customContactPerson">Add</a>
+                        </div>
+                        <span asp-validation-for="Contact_person_ID" class="text-danger"></span>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label" asp-for="Delivery_address_ID">Delivery Address</label><span class="text-danger" title="Required">*</span>
+                        <select class="form-select" asp-for="Delivery_address_ID">
                             <option selected disabled>Choose..</option>
+                            <option value="1">FFJ Zama</option>
+                            <option value="2">FFJ Hachioji</option>
+                            <option value="3">FFJ Hashimoto</option>
+                            <option value="4">FFJ SIC</option>
                         </select>
+                        <span asp-validation-for="Delivery_address_ID" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Payment_term_ID" class="form-label text-nowrap"></label><span class="text-danger" title="Required">*</span>
+                        <div class="input-group">
+                            <select class="form-select" asp-for="Payment_term_ID" asp-items="ViewBag.paymentTermList">
+                                <option selected disabled>Choose..</option>
+                            </select>
+                            <a href="#" class="btn btn-light border" id="customPaymentTerm">Add</a>
+                        </div>
                         <span asp-validation-for="Payment_term_ID" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="Delivery_term_ID" class="form-label text-nowrap"></label>
-                        <select asp-for="Delivery_term_ID" class="form-select" asp-items="ViewBag.deliveryTermList">
-                            <option selected disabled>Choose..</option>
-                        </select>
+                        <label asp-for="Delivery_term_ID" class="form-label text-nowrap"></label><span class="text-danger" title="Required">*</span>
+                        <div class="input-group">
+                            <select class="form-select" asp-for="Delivery_term_ID" asp-items="ViewBag.deliveryTermList">
+                                <option selected disabled>Choose..</option>
+                            </select>
+                            <a href="#" class="btn btn-light border" id="customDeliveryTerm">Add</a>
+                        </div>
                         <span asp-validation-for="Delivery_term_ID" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="row g-3 mb-3">
-                    <div class="col-12">
-                        <div class="row">
-                            <label asp-for="Contact_person_ID" class="form-label"></label>
-                            <div class="col col-md-6">
-                                <select asp-for="Contact_person_ID" class="form-select" asp-items="ViewBag.contactPersonList">
-                                    <option selected disabled>Choose..</option>
-                                </select>
-                            </div>
-                            <div class="col-auto">
-                                <a href="#" class="btn btn-secondary" id="customContactPerson">Custom</a>
-                            </div>
-                            <span asp-validation-for="Contact_person_ID" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <textarea type="text" class="form-control" id="contactPersonAddress" placeholder="Company address"></textarea>
-                    </div>
-                </div>
-                <div class="row g-3 mb-3">
-                    <div class="col-12">
-                        <div class="row">
-                            <label for="delivery" class="form-label">Delivery Address</label>
-                            <div class="col col-md-6">
-                                <select class="form-select" asp-for="Delivery_address_ID">
-                                    <option selected disabled>Choose..</option>
-                                    <option value="1">FFJ Zama</option>
-                                    <option value="2">FFJ Hachioji</option>
-                                    <option value="3">FFJ Hashimoto</option>
-                                    <option value="4">FFJ SIC</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <textarea type="text" class="form-control" id="deliveryAddress" placeholder="Delivery address"></textarea>
                     </div>
                 </div>
             </div>
         </div>
-        <span class="fs-4 fw-semibold">Items</span>&nbsp;
+        <span class="fs-3 fw-semibold">Items</span>&nbsp;
         <div class="row justify-content-between">
             <div class="col-auto">
                 <a class="mb-2 btn btn-light border" href="#" id="addItem">Add</a>&nbsp;
@@ -208,36 +211,63 @@
     </form>
 </div>
 
-<!-- Company Modal -->
+<!-- Contact Person Modal -->
 <div class="modal fade" id="contactPersonModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="contactPersonModalLabel">Custom company</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h1 class="modal-title fs-5" id="contactPersonModalLabel">New company</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="contactPersonForm">
-                    <div class="row">
-                        <div class="col-12 mb-3">
+                    <div class="row align-items-start">
+                        <div class="col-12 mb-2">
                             <label class="form-label">Company name</label><span class="text-danger" title="Required">*</span>
-                            <input class="form-control" name="Company_name" required/>
+                            <input class="form-control" name="Company_name" id="Company_name" data-val="true" data-val-required="The Company name field is required." required />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Company_name" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-12 mb-3">
-                            <label class="form-label">Company address</label><span class="text-danger" title="Required">*</span>
-                            <textarea class="form-control" name="Company_address" required></textarea>
+                            <input class="form-control" name="Company_name_jpn" id="Company_name_jpn" placeholder="Company name (Japanese)" />
                         </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-2">
+                            <label class="form-label">Company address</label><span class="text-danger" title="Required">* </span><span class="text-secondary fs-6 fw-light"><small>without postal code</small></span>
+                            <textarea class="form-control" name="Company_address" id="Company_address" data-val="true" data-val-required="The Company address field is required." required></textarea>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Company_address" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <textarea class="form-control" name="Company_address_jpn" id="Company_address_jpn" placeholder="Company address (Japanese)"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Postal code</label><span class="text-danger" title="Required">*</span>
+                            <div class="input-group">
+                                <span class="input-group-text" id="postalSign">〒</span>
+                                <input class="form-control" name="Postal_code" id="Postal_code" data-val="true" data-val-required="The Postal code field is required." required />
+                            </div>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Postal_code" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-6"></div>
                         <div class="col-6 mb-3">
                             <label class="form-label">Telephone</label>
-                            <input class="form-control" name="Telephone" />
+                            <input class="form-control" name="Telephone" id="Telephone" />
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label">Fax</label>
-                            <input class="form-control" name="Fax" />
+                            <input class="form-control" name="Fax" id="Fax" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-2">
+                            <label class="form-label">Contact person name</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" name="Contact_person" id="Contact_person" data-val="true" data-val-required="The Contact person field is required." required />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="Contact_person" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-12 mb-3">
-                            <label class="form-label">Person in-charge</label><span class="text-danger" title="Required">*</span>
-                            <input class="form-control" name="Contact_person" required/>
+                            <input class="form-control" name="Contact_person_jpn" id="Contact_person_jpn" placeholder="Contact person name (Japanese)" />
                         </div>
                     </div>
                 </form>
@@ -255,26 +285,43 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="itemModalLabel">Add item</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-12 mb-3">
-                        <label class="form-label">Item name</label>
-                        <input class="form-control" id="itemName" />
-                    </div>
-                    <div class="col-6 mb-3">
-                        <label class="form-label">Quantity</label>
-                        <input class="form-control" type="number" id="quantity" />
-                    </div>
-                    <div class="col-6 mb-3">
-                        <label class="form-label">Price</label>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="yenSign">¥</span>
-                            <input class="form-control" type="number" id="price" aria-describedby="yenSign" />
+                <form id="itemForm">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Item name</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" name="itemName" id="itemName" data-val="true" data-val-required="The Item name field is required." required />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="itemName" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Quantity</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" type="number" data-val="true" data-val-required="The Quantity field is required." name="quantity" id="quantity" required />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="quantity" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Unit</label>
+                            <input class="form-control" list="unitList" type="text" id="unit" />
+                            <datalist id="unitList">
+                                <option value="pcs" />
+                                <option value="sets" />
+                                <option value="kg" />
+                                <option value="t" />
+                                <option value="L" />
+                                <option value="m" />
+                            </datalist>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Price</label><span class="text-danger" title="Required">*</span>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="yenSign">¥</span>
+                                <input class="form-control" name="price" id="price" data-val="true" data-val-required="The Price field is required." required />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="price" data-valmsg-replace="true"></span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <a class="btn btn-primary" href="#" id="submitItem">Add</a>
@@ -288,30 +335,123 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="itemEditModalLabel">Add item</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></  >
+                <h1 class="modal-title fs-5" id="itemEditModalLabel">Edit item</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-12 mb-3">
-                        <label class="form-label">Item name</label>
-                        <input class="form-control" id="itemEditName" />
-                    </div>
-                    <div class="col-6 mb-3">
-                        <label class="form-label">Quantity</label>
-                        <input class="form-control" type="number" id="itemEditQuantity" />
-                    </div>
-                    <div class="col-6 mb-3">
-                        <label class="form-label">Price</label>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="yenSign">¥</span>
-                            <input class="form-control" type="number" id="itemEditPrice" aria-describedby="yenSign" />
+                <form id="itemEditForm">
+                    <input id="itemEditOrder" type="number" hidden />
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Item name</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" name="itemEditName" id="itemEditName" data-val="true" data-val-required="The Item name field is required." required />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="itemEditName" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Quantity</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" type="number" name="itemEditQuatity" id="itemEditQuantity" data-val="true" data-val-required="The Quantity field is required." required />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="itemEditQuantity" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Unit</label>
+                            <input class="form-control" list="unitList" type="text" id="itemEditUnit" />
+                            <datalist id="unitList">
+                                <option value="pcs" />
+                                <option value="sets" />
+                                <option value="kg" />
+                                <option value="t" />
+                                <option value="L" />
+                                <option value="m" />
+                            </datalist>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Price</label><span class="text-danger" title="Required">*</span>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="yenSign">¥</span>
+                                <input class="form-control" name="itemEditPrice" id="itemEditPrice" data-val="true" data-val-required="The Price field is required." required />
+                                <span class="text-danger field-validation-valid" data-valmsg-for="itemEditPrice" data-valmsg-replace="true"></span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <a class="btn btn-warning" href="#" id="saveItem">Save</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Payment Term Modal -->
+<div class="modal fade" id="paymentTermAddModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="paymentTermAddModalLabel">Add payment term</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="paymentTermForm">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Term name</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" name="payTermName" id="payTermName" data-val="true" data-val-required="The Payment term name field is required." required />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="payTermName" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Japanese translation</label>
+                            <input class="form-control" id="payJpnName" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" href="#" id="savePayTerm" onclick="addPaymentTerm()">Save</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Delivery Term Modal -->
+<div class="modal fade" id="deliveryTermAddModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="deliveryTermAddModalLabel">Add delivery term</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="deliveryTermForm">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Term name</label><span class="text-danger" title="Required">*</span>
+                            <input class="form-control" name="delTermName" id="delTermName" data-val="true" data-val-required="The Delivery term name field is required." required />
+                            <span class="text-danger field-validation-valid" data-valmsg-for="delTermName" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Japanese translation</label>
+                            <input class="form-control" id="delJpnName" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" href="#" id="saveDelTerm" onclick="addDeliveryTerm()">Save</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pdf preview Modal -->
+<div class="modal fade" id="pdfPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="pdfPreviewModalLabel">Preview</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <iframe id="pdfFrame" src="" width="100%" height="900px"></iframe>
             </div>
         </div>
     </div>

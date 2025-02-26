@@ -28,33 +28,33 @@
             </div>
         </div>
         <div class="visually-hidden" id="divPreview">
-        <div class="row mb-3">
-            <h4>Extraction Settings</h4>
-            <div class="col-md-4 mb-2">
-                <label for="pdfType" class="form-label col-xl-4">PDF type</label>
+            <div class="row mb-3">
+                <h4>Extraction Settings</h4>
+                <div class="col-md-4 mb-2">
+                    <label for="pdfType" class="form-label col-xl-4">PDF type</label>
                 <select class="form-select col-xl-8" aria-label="PDF type" name="pdfType" id="pdfType" asp-items="ViewBag.pdfTypeList">
-                </select>
-            </div>
-            <div class="col-md-4 mb-2">
-                <label for="extractMode" class="form-label col-xl-4">Extraction mode</label>
-                <select class="form-select" name="extractMode" id="extractMode">
-                    <option value="lattice">Lattice</option>
-                    <option value="stream">Stream</option>
-                </select>
-            </div>
-            <div class="col-md-auto mb-2 align-content-end text-end">
+                    </select>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <label for="extractMode" class="form-label col-xl-4">Extraction mode</label>
+                    <select class="form-select" asp-for="Extract_mode">
+                        <option value="lattice">Lattice</option>
+                        <option value="stream">Stream</option>
+                    </select>
+                </div>
+                <div class="col-md-auto mb-2 align-content-end text-end">
                     <a class="btn btn-info text-white align-content-center" id="extractBtn" onclick="submitForm()">Extract</a>
                     <a id="loadingBtn" class="btn btn-info text-white visually-hidden disabled">
                         <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
                         <span role="status">Extracting...</span>
                     </a>
+                </div>
             </div>
-        </div>
-        <div class="row mb-4">
+            <div class="row mb-4">
                 <div class="col-md-4">
-                <h4>Preview</h4>
+                    <h4>Preview</h4>
                     <div class="row justify-content-center" id="preview">
-                    <div class="col-12 bg-secondary-subtle p-0 rounded-2 d-flex justify-content-center">
+                        <div class="col-12 bg-secondary-subtle p-0 rounded-2 d-flex justify-content-center">
                             <iframe id="pdfPreview" src="" height="443" width="340" style="border:none;overflow:hidden"></iframe>
                         </div>
                     </div>

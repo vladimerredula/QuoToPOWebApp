@@ -111,7 +111,7 @@ namespace QouToPOWebApp.Controllers
             var model = new PoViewModel()
             {
                 Quotation_items = new List<Quotation_item>(),
-                ExtractMode = Request.Form["extractMode"]
+                Extract_mode = Request.Form["Extract_mode"]
             };
 
             model.Quotation_number = quoNumber;
@@ -124,7 +124,8 @@ namespace QouToPOWebApp.Controllers
             model.File_path = filePath;
             model.File_name = Path.GetFileName(filePath);
             model.Include_tax = isTaxable;
-            model.Pdf_type_ID = int.Parse(Request.Form["pdfType"]);
+            model.Pdf_type_ID = int.Parse(Request.Form["Pdf_type_ID"]);
+            model.Extract_mode = Request.Form["Extract_mode"];
 
             model.Quotation_items = GetQuotationItems(filePath);
 
@@ -204,7 +205,7 @@ namespace QouToPOWebApp.Controllers
 
         public List<Quotation_item> GetQuotationItems(string filePath)
         {
-            var extractionMode = Request.Form["extractMode"];
+            var extractionMode = Request.Form["Extract_mode"];
             string extractedTables = _tabulaJar.ExtractTables(filePath, extractionMode);
 
             var quotationItems = new List<Quotation_item>();
@@ -330,10 +331,12 @@ namespace QouToPOWebApp.Controllers
                 "見積書番号",
                 "伝票番号:",
                 "伝票番号",
+                "見積No",
                 "PurchaseOrder:",
                 "PurchaseOrder",
                 "Ref:",
-                "Ref"
+                "Ref",
+                "No:"
             };
 
             foreach (var keyWord in keyWords)

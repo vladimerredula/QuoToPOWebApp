@@ -279,10 +279,10 @@ $("#Include_tax").on("change", function () {
 // adding item
 $("#submitItem").on("click", function () {
     if ($("#itemForm").valid()) {
-    var itemname = $('#itemName').val();
-    var quantity = parseInt($('#quantity').val());
+        var itemname = $('#itemName').val();
+        var quantity = parseInt($('#quantity').val());
         var unit = $('#unit').val();
-    var price = parseFloat($('#price').val());
+        var price = parseFloat($('#price').val());
         var itemorder = itemTable.rows().count() + 1;
         var totalprice = parseFloat(quantity * price);
 
@@ -313,15 +313,15 @@ $("#saveItem").on("click", function () {
     var price = parseFloat($('#itemEditPrice').val());
     var totalprice = parseFloat(quantity * price);
 
-        $("#itemEditModal").modal("hide");
+    $("#itemEditModal").modal("hide");
     $('#itemEditOrder').val(null);
-        $('#itemEditName').val(null);
-        $('#itemEditQuantity').val(null);
+    $('#itemEditName').val(null);
+    $('#itemEditQuantity').val(null);
     $('#itemEditUnit').val(null);
-        $('#itemEditPrice').val(null);
+    $('#itemEditPrice').val(null);
 
-        var row = itemTable.row(".selected");
-        var rowData = row.data();
+    var row = itemTable.row(".selected");
+    var rowData = row.data();
 
     var itemName = $(rowData[2]);
     itemName.find("input").attr("value", itemname);
@@ -342,9 +342,9 @@ $("#saveItem").on("click", function () {
     rowData[5] = itemPrice.prop("outerHTML");
     rowData[6] = `<span class="itemPrice">${totalprice.toLocaleString()}</span>`;
 
-        row.data(rowData).draw();
+    row.data(rowData).draw();
 
-        calculateTotal();
+    calculateTotal();
 });
 
 $("#customContactPerson").on("click", function () {
@@ -397,17 +397,32 @@ function addCustomContactPerson() {
             url: '/Info/AddCustomContactPerson',
             type: 'POST',
             data: {
-                Company_name: $("input[name=Company_name]").val(),
-                Company_address: $("textarea[name=Company_address]").val(),
-                Telephone: $("input[name=Telephone]").val(),
-                Fax: $("input[name=Fax]").val(),
-                Contact_person: $("input[name=Contact_person]").val()
+                Company_name: $("#Company_name").val(),
+                Company_name_jpn: $("#Company_name_jpn").val(),
+                Address: $("#Company_address").val(),
+                Address_jpn: $("#Company_address_jpn").val(),
+                Telephone: $("#Telephone").val(),
+                Fax: $("#Fax").val(),
+                Postal_code: $("#Postal_code").val(),
+                Contact_person: $("#Contact_person").val(),
+                Contact_person_jpn: $("#Contact_person_jpn").val()
             },
             success: function (response) {
                 var contactPerson = $("#Contact_person_ID");
-                contactPerson.append(new Option(response.companyName, response.supplerId));
-                contactPerson.val(response.supplerId).trigger("change");
+                contactPerson.append(new Option(response.companyName, response.contactPersonId));
+                contactPerson.val(response.contactPersonId).trigger("change");
                 $("#contactPersonModal").modal("hide");
+
+
+                $("#Company_name").val(null);
+                $("#Company_name_jpn").val(null);
+                $("#Company_address").val(null);
+                $("#Company_address_jpn").val(null);
+                $("#Telephone").val(null);
+                $("#Fax").val(null);
+                $("#Postal_code").val(null);
+                $("#Contact_person").val(null);
+                $("#Contact_person_jpn").val(null);
             },
             error: function (response) {
                 console.log(response);
@@ -450,5 +465,67 @@ function calculateTotal() {
 }
 
 function getFloatValue(string) {
-    return parseFloat(string.replace(/,/g, ''))
+    if (typeof string == "string") {
+        return Number(string.replace(/,/g, ''));
+    }
+
+    return string;
+}
+
+$("#customPaymentTerm").on("click", function () {
+    $("#paymentTermAddModal").modal("show");
+});
+
+function addPaymentTerm() {
+    if ($("#paymentTermForm").valid()) {
+        $.ajax({
+            url: '/Info/AddCustomPaymentTerm',
+            type: 'POST',
+            data: {
+                PaymentTermName: $("#payTermName").val(),
+                PaymentTermNameJpn: $("#payJpnName").val()
+            },
+            success: function (response) {
+                var paymentTerm = $("#Payment_term_ID");
+                paymentTerm.append(new Option(response.paymentTermName, response.paymentTermId));
+                paymentTerm.val(response.paymentTermId);
+                $("#paymentTermAddModal").modal("hide");
+            },
+            error: function (response) {
+                console.log(response);
+            }
+        });
+
+        $("#payTermName").val(null);
+        $("#payJpnName").val(null);
+    }
+}
+
+$("#customDeliveryTerm").on("click", function () {
+    $("#deliveryTermAddModal").modal("show");
+});
+
+function addDeliveryTerm() {
+    if ($("#deliveryTermForm").valid()) {
+        $.ajax({
+            url: '/Info/AddCustomDeliveryTerm',
+            type: 'POST',
+            data: {
+                DeliveryTermName: $("#delTermName").val(),
+                DeliveryTermNameJpn: $("#delJpnName").val()
+            },
+            success: function (response) {
+                var deliveryTerm = $("#Delivery_term_ID");
+                deliveryTerm.append(new Option(response.deliveryTermName, response.deliveryTermId));
+                deliveryTerm.val(response.deliveryTermId);
+                $("#deliveryTermAddModal").modal("hide");
+            },
+            error: function (response) {
+                console.log(response);
+            }
+        });
+
+        $("#delTermName").val(null);
+        $("#delJpnName").val(null);
+    }
 }
