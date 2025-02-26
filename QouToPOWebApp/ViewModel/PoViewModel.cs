@@ -44,6 +44,14 @@ namespace QouToPOWebApp.ViewModel
         [Display(Name = "PO title")]
         [Required]
         public string? Po_title { get; set; }
+
+        public string? File_name { get; set; }
+        public string? File_path { get; set; }
+
+        [ForeignKey("Pdf_types")]
+        public int? Pdf_type_ID { get; set; }
+
+        public string? Extract_mode { get; set; }
         public List<Quotation_item>? Quotation_items { get; set; }
 
         public virtual Company? Companies { get; set; }
