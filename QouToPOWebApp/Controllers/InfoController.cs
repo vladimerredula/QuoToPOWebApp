@@ -16,6 +16,11 @@ namespace QouToPOWebApp.Controllers
             _db = context;
         }
 
+        public IActionResult Index()
+        {
+            return RedirectToAction(nameof(Company));
+        }
+
         #region Company Functions
         // GET: Company
         public async Task<IActionResult> Company()

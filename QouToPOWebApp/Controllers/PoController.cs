@@ -26,6 +26,11 @@ namespace QouToPOWebApp.Controllers
             _tabulaJar = new TabulaJarService();
         }
 
+        public IActionResult Index()
+        {
+            return RedirectToAction(nameof(CreateNewPo));
+        }
+
         public IActionResult FromQuotation()
         {
             ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name");
@@ -37,7 +42,7 @@ namespace QouToPOWebApp.Controllers
         {
             if (filePath == null || filePath.Length == 0)
             {
-                return RedirectToAction(nameof(FromQuotation));
+                return RedirectToAction(nameof(CreateNewPo));
             }
 
             switch (pdfType)
