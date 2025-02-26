@@ -143,6 +143,7 @@
                             <th>No.</th>
                             <th>Name</th>
                             <th>Quantity</th>
+                            <th>Unit</th>
                             <th>Price</th>
                             <th>Amount</th>
                         </tr>
@@ -158,11 +159,12 @@
                             totalAmount += price;
                             <tr>
                                 <td></td>
-                                <td>@(i + 1)</td>
-                                <td><span>@Model?.Quotation_items[i]?.Item_name</span><input hidden asp-for="Quotation_items[i].Item_name" value='@Model?.Quotation_items[i]?.Item_name'></td>
-                                <td><span>@Model?.Quotation_items[i]?.Item_quantity</span><input hidden asp-for="Quotation_items[i].Item_quantity" value='@Model?.Quotation_items[i]?.Item_quantity'></td>
-                                <td><span>@Model?.Quotation_items[i]?.Item_price?.ToString("N0")</span><input hidden asp-for="Quotation_items[i].Item_price" value='@Model?.Quotation_items[i]?.Item_price'></td>
-                                <td><span class='itemPrice'>@price.ToString("N0")</span></td>
+                                <td><div><span>@Model?.Quotation_items[i]?.Order</span><input hidden asp-for="Quotation_items[i].Order" value='@Model?.Quotation_items[i]?.Order'></div></td>
+                                <td><div><span>@Model?.Quotation_items[i]?.Item_name</span><input hidden asp-for="Quotation_items[i].Item_name" value='@Model?.Quotation_items[i]?.Item_name'></div></td>
+                                <td><div><span>@Model?.Quotation_items[i]?.Item_quantity</span><input hidden asp-for="Quotation_items[i].Item_quantity" value='@Model?.Quotation_items[i]?.Item_quantity'></div></td>
+                                <td><div><span>@Model?.Quotation_items[i]?.Unit</span><input hidden asp-for="Quotation_items[i].Unit" value='@Model?.Quotation_items[i]?.Unit'></div></td>
+                                <td><div><span>@Model?.Quotation_items[i]?.Item_price?.ToString("N0")</span><input hidden asp-for="Quotation_items[i].Item_price" value='@Model?.Quotation_items[i]?.Item_price'></div></td>
+                                <td><div><span class='itemPrice'>@price.ToString("N0")</span></div></td>
                             </tr>
 
                             counter++;

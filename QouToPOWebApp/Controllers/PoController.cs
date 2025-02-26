@@ -212,7 +212,8 @@ namespace QouToPOWebApp.Controllers
             var headerKeyWords = new List<(List<string> headerNames, int itemIndex)> {
                 (new List<string> {"品名", "Discription", "Product", "Specification" }, 0),
                 (new List<string> {"数量", "Quantity", "QTY", "Qnt" }, 1),
-                (new List<string> {"単価", "Price" }, 2)
+                (new List<string> {"単位", "Unit" }, 2),
+                (new List<string> {"単価", "Price" }, 3)
             };
 
             var itemMarker = false;
@@ -267,11 +268,13 @@ namespace QouToPOWebApp.Controllers
 
                     var itemname = headerKeyWords.SingleOrDefault(q => q.headerNames.Contains("品名"));
                     var itemquantity = headerKeyWords.SingleOrDefault(q => q.headerNames.Contains("数量"));
+                    var itemunit = headerKeyWords.SingleOrDefault(q => q.headerNames.Contains("単位"));
                     var itemprice = headerKeyWords.SingleOrDefault(q => q.headerNames.Contains("単価"));
 
                     if (result.Length > 2)
                     {
                         quotationItem.Item_name = result[itemname.itemIndex];
+                        quotationItem.Unit = result[itemunit.itemIndex];
 
                         int quantity;
                         if (int.TryParse(Regex.Replace(result[itemquantity.itemIndex], @"[^0-9.]", ""), out quantity))
