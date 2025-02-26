@@ -276,7 +276,11 @@ namespace QouToPOWebApp.Controllers
                     if (result.Length > 2)
                     {
                         quotationItem.Item_name = result[itemname.itemIndex];
-                        quotationItem.Unit = result[itemunit.itemIndex];
+
+                        if (itemquantity.itemIndex != itemunit.itemIndex)
+                        {
+                            quotationItem.Unit = result[itemunit.itemIndex];
+                        }
 
                         int quantity;
                         if (int.TryParse(Regex.Replace(result[itemquantity.itemIndex], @"[^0-9.]", ""), out quantity))
