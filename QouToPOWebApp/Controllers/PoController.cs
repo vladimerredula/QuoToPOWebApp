@@ -116,6 +116,7 @@ namespace QouToPOWebApp.Controllers
 
             model.Quotation_number = quoNumber;
             model.Quotation_date = quoDate;
+            model.Po_number = quoDate.ToString("yyyyMMdd") + "/FF-000-000";
             model.Contact_person_ID = contactPersonID;
             model.Payment_term_ID = paymentTerm;
             model.Delivery_term_ID = deliveryTerm;

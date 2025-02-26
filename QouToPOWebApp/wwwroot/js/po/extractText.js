@@ -84,6 +84,22 @@ var itemTable = $('table.datatable').DataTable({
     }
 });
 
+$("#Quotation_date").change(function () {
+    let dateValue = $(this).val(); // Get the selected date (YYYY-MM-DD)
+    let poNumber = formatDateToPoNumber(dateValue);
+
+    $("#Po_number").val(poNumber);
+});
+
+// Function to format date from YYYY-MM-DD to DD/MM/YYYY
+function formatDateToPoNumber(dateString) {
+    let date = new Date(dateString);
+    let day = date.getDate().toString().padStart(2, "0");
+    let month = (date.getMonth() + 1).toString().padStart(2, "0");
+    let year = date.getFullYear();
+    return `${year}${month}${day}/FF-000-000`; // Change this format as needed
+}
+
 $("#selectFileBtn").on("click", function () {
     $("#pdfFile").click(); // Trigger the hidden file input
 });
