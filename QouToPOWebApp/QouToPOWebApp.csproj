@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\uploads\" />
+    <Folder Include="AppData\" />
   </ItemGroup>
 
 </Project>
