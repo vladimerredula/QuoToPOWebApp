@@ -19,7 +19,6 @@ namespace QouToPOWebApp
         public DbSet<Payment_term> Payment_terms { get; set; }
         public DbSet<Pdf_type> Pdf_types { get; set; }
         public DbSet<User> Users { get; set; }
-
-
+        public DbSet<Correspondent> Correspondents { get; set; }
     }
 }
