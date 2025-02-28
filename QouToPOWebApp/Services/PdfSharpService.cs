@@ -206,7 +206,7 @@ namespace QouToPOWebApp.Services
                         Order = 3
                     },
                     new Models.Quotation_item
-        {
+                    {
                         Item_name = "System operation training session",
                         Item_price = 40,
                         Item_quantity = 400,
@@ -214,7 +214,7 @@ namespace QouToPOWebApp.Services
                         Order = 4
                     },
                     new Models.Quotation_item
-            {
+                    {
                         Item_name = "**Material (including **)",
                         Item_price = 50,
                         Item_quantity = 5000,
@@ -224,12 +224,23 @@ namespace QouToPOWebApp.Services
                 }
             };
 
-            // Set the global font resolver
-            GlobalFontSettings.FontResolver = new FontResolver(fontPaths);
+            return CreatePoEng(po);
+        }
 
-            // Create a new PDF document
+        public PdfDocument NewDocument()
+        {
             var document = new PdfDocument();
-            document.Info.Title = po?.Po_title ?? "Po"; ; // update title
+            document.Info.Creator = "Faraday Factory Japan LLC";
+            document.Info.Author = "Faraday Factory Japan LLC";
+
+            return document;
+        }
+
+        public byte[] CreatePo(PoViewModel po)
+        {
+            // Create a new PDF document
+            var document = NewDocument();
+            document.Info.Title = $"PO for {po?.Contact_persons?.Company?.Company_name}"; // update title according to supplier
 
             // Add a page
             PdfPage page = document.AddPage();
@@ -377,6 +388,12 @@ namespace QouToPOWebApp.Services
 
             var y1 = y;
 
+            // PO title
+            var title = po?.Po_title ?? string.Empty;
+            gfx.DrawString(title, bodyFont, XBrushes.Black, new XRect(42, y1, column1, tableRowHeight), XStringFormats.CenterLeft);
+
+            y1 += tableRowHeight;
+
             if (po?.Quotation_items?.Count() > 0)
             {
                 foreach (var item in po?.Quotation_items.OrderBy(q => q.Order))
@@ -448,15 +465,7 @@ namespace QouToPOWebApp.Services
 
             gfx.DrawLine(new XPen(ClayCreek, 3), 36 + column1, y, page.Width - 39, y);
 
-            y += 5;
-
-            // PO title
-            gfx.DrawString("件名：", new XFont("Meiryo-bold", 10), XBrushes.Black, new XRect(36, y, 50, rowHeight), XStringFormats.CenterLeft);
-            //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 86, y, 300, rowHeight);
-            var title = po?.Po_title ?? string.Empty;
-            gfx.DrawString(title, bodyFont, XBrushes.Black, new XRect(66, y, 300, rowHeight), XStringFormats.CenterLeft);
-
-            y += 18;
+            y += rowHeight + 5;
 
             // Delivery term
             gfx.DrawString("納期：", new XFont("Meiryo-bold", 10), XBrushes.Black, new XRect(36, y, 50, rowHeight), XStringFormats.CenterLeft);
