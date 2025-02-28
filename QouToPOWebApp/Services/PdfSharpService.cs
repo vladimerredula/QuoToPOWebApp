@@ -9,6 +9,26 @@ namespace QouToPOWebApp.Services
 {
     public class PdfSharpService
     {
+        public PdfSharpService()
+        {
+             var fontPaths = new Dictionary<string, string>
+            {
+                { "Meiryo", Path.Combine(Directory.GetCurrentDirectory(), "AppData/Fonts", "Meiryo.ttf") },
+                { "Meiryo-bold", Path.Combine(Directory.GetCurrentDirectory(), "AppData/Fonts", "Meiryo-bold.ttf") },
+                { "Calibri-regular", Path.Combine(Directory.GetCurrentDirectory(), "AppData/Fonts", "Calibri-regular.ttf") },
+                { "Calibri-bold", Path.Combine(Directory.GetCurrentDirectory(), "AppData/Fonts", "Calibri-bold.ttf") },
+                { "Calibri-bold-italic", Path.Combine(Directory.GetCurrentDirectory(), "AppData/Fonts", "Calibri-bold-italic.ttf") },
+                { "Calibri-italic", Path.Combine(Directory.GetCurrentDirectory(), "AppData/Fonts", "Calibri-italic.ttf") },
+                { "Arial", Path.Combine(Directory.GetCurrentDirectory(), "AppData/Fonts", "Arial.ttf") },
+                { "Arial-bold", Path.Combine(Directory.GetCurrentDirectory(), "AppData/Fonts", "Arial-bold.ttf") },
+                { "Arial-italic", Path.Combine(Directory.GetCurrentDirectory(), "AppData/Fonts", "Arial-italic.ttf") },
+                { "Times new roman-bold", Path.Combine(Directory.GetCurrentDirectory(), "AppData/Fonts", "Times new roman-bold.ttf") }
+            };
+
+            // Set the global font resolver
+            GlobalFontSettings.FontResolver = new FontResolver(fontPaths);
+        }
+
         public byte[] CreatePdf(string title, string content)
         {
             // Create a new PDF document
