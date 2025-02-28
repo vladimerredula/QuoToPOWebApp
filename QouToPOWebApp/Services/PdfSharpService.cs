@@ -251,7 +251,6 @@ namespace QouToPOWebApp.Services
             double x = 50; // Left margin
             double y = 65; // Top margin
             double rowHeight = 14;
-            double colWidth = 100;
 
             XColor ClayCreek = XColor.FromCmyk(0.00, 0.06, 0.36, 0.42);
             XFont headerFont = new XFont("Meiryo", 18.5);
@@ -362,7 +361,6 @@ namespace QouToPOWebApp.Services
 
             y += 20;
 
-            var tableWitdh = 520;
             var column1 = 290;
             var column2 = 55;
             var column3 = 85;
@@ -399,12 +397,12 @@ namespace QouToPOWebApp.Services
 
             if (po?.Quotation_items?.Count() > 0)
             {
-                foreach (var item in po?.Quotation_items.OrderBy(q => q.Order))
+                foreach (var item in po?.Quotation_items?.OrderBy(q => q.Order))
                 {
                     var y2 = y1;
                     var currentRowHeight = 12;
 
-                    var itemName = item.Item_name.Replace("\r", "").Split("\n");
+                    var itemName = item?.Item_name?.Replace("\r", "").Split("\n");
                     foreach (var lineName in itemName)
                     {
                         gfx.DrawString(lineName, bodyFont, XBrushes.Black, new XRect(42, y2 + 7, column1, 10), XStringFormats.CenterLeft);
@@ -415,10 +413,10 @@ namespace QouToPOWebApp.Services
                     //gfx.DrawString(item.Item_name, bodyFont, XBrushes.Black, new XRect(42, y1, column1, tableRowHeight), XStringFormats.CenterLeft);
                     gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36, y1, column1, currentRowHeight);
 
-                    gfx.DrawString(item.Item_quantity?.ToString() + (item.Unit != null ? " "+item.Unit : ""), bodyFont, XBrushes.Black, new XRect(36 + column1, y1, column2, currentRowHeight), XStringFormats.Center);
+                    gfx.DrawString(item?.Item_quantity?.ToString() + (item?.Unit != null ? " "+item.Unit : ""), bodyFont, XBrushes.Black, new XRect(36 + column1, y1, column2, currentRowHeight), XStringFormats.Center);
                     gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1, y1, column2, currentRowHeight);
 
-                    gfx.DrawString(item.Item_price?.ToString("N0", new CultureInfo("ja-JP")), bodyFont, XBrushes.Black, new XRect(32 + column1 + column2, y1, column3, currentRowHeight), XStringFormats.CenterRight);
+                    gfx.DrawString(item?.Item_price?.ToString("N0", new CultureInfo("ja-JP")), bodyFont, XBrushes.Black, new XRect(32 + column1 + column2, y1, column3, currentRowHeight), XStringFormats.CenterRight);
                     gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1 + column2, y1, column3, currentRowHeight);
 
                     float totalprice = (float)(item.Item_price * item.Item_quantity);
@@ -433,8 +431,9 @@ namespace QouToPOWebApp.Services
 
             y = y1;
 
+            var itemCount = po.Quotation_items != null ? po.Quotation_items.Count() : 0;
             // Draw table rows
-            for (int row = po.Quotation_items.Count(); row < 9; row++)
+            for (int row = itemCount; row < 9; row++)
             {
                 if (y < 600) // limit the number of blank rows when it reaches certain point
                 {
@@ -681,7 +680,7 @@ namespace QouToPOWebApp.Services
 
             if (po?.Quotation_items?.Count() > 0)
             {
-                foreach (var item in po?.Quotation_items.OrderBy(q => q.Order))
+                foreach (var item in po?.Quotation_items?.OrderBy(q => q.Order))
                 {
                     gfx.DrawString(item?.Order?.ToString(), calibri, XBrushes.Black, new XRect(x, y1, column1, rowHeight), XStringFormats.CenterLeft);
 
@@ -697,10 +696,10 @@ namespace QouToPOWebApp.Services
                     }
 
                     //gfx.DrawString(item.Item_name, calibri, XBrushes.Black, new XRect(x + column1, y1, column2, rowHeight), XStringFormats.CenterLeft);
-                    gfx.DrawString(item.Item_quantity?.ToString() + (item.Unit != null ? " " + item.Unit : ""), calibri, XBrushes.Black, new XRect(x + column1 + column2, y1, column3, rowHeight), XStringFormats.Center);
-                    gfx.DrawString(item.Item_price?.ToString("N2", new CultureInfo("en-US")), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3, y1, column4, rowHeight), XStringFormats.Center);
+                    gfx.DrawString(item?.Item_quantity?.ToString() + (item?.Unit != null ? " " + item?.Unit : ""), calibri, XBrushes.Black, new XRect(x + column1 + column2, y1, column3, rowHeight), XStringFormats.Center);
+                    gfx.DrawString(item?.Item_price?.ToString("N2", new CultureInfo("en-US")), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3, y1, column4, rowHeight), XStringFormats.Center);
 
-                    float totalprice = (float)(item.Item_price * item.Item_quantity);
+                    float totalprice = (float)(item?.Item_price * item?.Item_quantity);
                     gfx.DrawString(totalprice.ToString("N2", new CultureInfo("en-US")), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y1, column5, rowHeight), XStringFormats.Center);
 
                     totalAmount += totalprice;
@@ -741,7 +740,7 @@ namespace QouToPOWebApp.Services
             //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, 54, 10);
             gfx.DrawString("Lead Time:", calibriBold, XBrushes.Black, new XRect(x, y, 54, 10), XStringFormats.CenterLeft);
 
-            var deliveryTerm = po?.Delivery_terms.Delivery_term_name ?? string.Empty;
+            var deliveryTerm = po?.Delivery_terms?.Delivery_term_name ?? string.Empty;
             gfx.DrawString(deliveryTerm, calibri, XBrushes.Black, new XRect(x + 54, y, page.Width - (x * 2 + 54), 10), XStringFormats.CenterLeft);
 
             y += rowHeight;
@@ -749,7 +748,7 @@ namespace QouToPOWebApp.Services
             //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, 85, 10);
             gfx.DrawString("Term of Payment:", calibriBold, XBrushes.Black, new XRect(x, y, 85, 10), XStringFormats.CenterLeft);
 
-            var paymnetTerm = po?.Payment_terms.Payment_term_name ?? string.Empty;
+            var paymnetTerm = po?.Payment_terms?.Payment_term_name ?? string.Empty;
             gfx.DrawString(paymnetTerm, calibri, XBrushes.Black, new XRect(x + 85, y, page.Width - (x * 2 + 85), 10), XStringFormats.CenterLeft);
 
             y += rowHeight * 3;

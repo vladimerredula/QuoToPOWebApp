@@ -599,8 +599,16 @@ namespace QouToPOWebApp.Controllers
                 .Include(s => s.Company)
                 .FirstOrDefault(s => s.Contact_person_ID == po.Contact_person_ID);
 
-            po.Payment_terms = _db.Payment_terms.FirstOrDefault(p => p.Payment_term_ID == po.Payment_term_ID);
-            po.Delivery_terms = _db.Delivery_terms.FirstOrDefault(d => d.Delivery_term_ID == po.Delivery_term_ID);
+            if (po.Payment_term_ID.HasValue)
+            {
+                po.Payment_terms = _db.Payment_terms.FirstOrDefault(p => p.Payment_term_ID == po.Payment_term_ID);
+            }
+
+            if (po.Delivery_term_ID.HasValue)
+            {
+                po.Delivery_terms = _db.Delivery_terms.FirstOrDefault(d => d.Delivery_term_ID == po.Delivery_term_ID);
+            }
+
             po.Companies = _db.Companies.FirstOrDefault(c => c.Company_ID == po.Delivery_address_ID);
             po.Correspondents = _db.Correspondents.FirstOrDefault(c => c.Correspondent_ID == po.Correspondent_ID);
             po.Email = User.FindFirst(ClaimTypes.Email)?.Value;

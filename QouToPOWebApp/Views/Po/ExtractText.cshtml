@@ -68,7 +68,7 @@
                         <span asp-validation-for="Quotation_date" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="Quotation_number" class="form-label"></label>
+                        <label asp-for="Quotation_number" class="form-label" id="quoNumberLabel"></label><span class="text-danger" title="Required">*</span>
                         <input asp-for="Quotation_number" type="text" class="form-control" value="@(Model.Quotation_number ?? string.Empty)"/>
                         <span asp-validation-for="Quotation_number" class="text-danger"></span>
                     </div>
@@ -99,7 +99,7 @@
                         <span asp-validation-for="Delivery_address_ID" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="Payment_term_ID" class="form-label text-nowrap"></label><span class="text-danger" title="Required">*</span>
+                        <label asp-for="Payment_term_ID" class="form-label text-nowrap"></label>
                         <div class="input-group">
                             <select class="form-select" asp-for="Payment_term_ID" asp-items="ViewBag.paymentTermList">
                                 <option selected disabled>Choose..</option>
@@ -109,7 +109,7 @@
                         <span asp-validation-for="Payment_term_ID" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="Delivery_term_ID" class="form-label text-nowrap"></label><span class="text-danger" title="Required">*</span>
+                        <label asp-for="Delivery_term_ID" class="form-label text-nowrap"></label>
                         <div class="input-group">
                             <select class="form-select" asp-for="Delivery_term_ID" asp-items="ViewBag.deliveryTermList">
                                 <option selected disabled>Choose..</option>
@@ -127,7 +127,7 @@
                         <span asp-validation-for="Po_language" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label" asp-for="Correspondent_ID" id="correspondentLabel"></label>
+                        <label class="form-label" asp-for="Correspondent_ID" id="correspondentLabel"></label><span class="text-danger" title="Required">*</span>
                         <select class="form-select" asp-for="Correspondent_ID" data-val="true" data-val-required="The Correspondent field is required." asp-items="ViewBag.correspondentList">
                             <option selected disabled>Choose..</option>
                         </select>

@@ -37,7 +37,7 @@
         </div>
         <div class="row mb-3">
             <div class="col-3 mb-2">
-                <label class="form-label" asp-for="Quotation_number" id="quoNumberLabel"></label>
+                <label class="form-label" asp-for="Quotation_number" id="quoNumberLabel"></label><span class="text-danger" title="Required">*</span>
                 <input class="form-control" type="text" asp-for="Quotation_number" data-val="true" data-val-required="The Quotation number field is required." />
                 <span class="text-danger field-validation-valid" data-valmsg-for="Quotation_number" data-valmsg-replace="true"></span>
             </div>
@@ -54,7 +54,7 @@
         </div>
         <div class="row mb-3">
             <div class="col-auto mb-2">
-                <label class="form-label" asp-for="Payment_term_ID"></label><span class="text-danger" title="Required">*</span>
+                <label class="form-label" asp-for="Payment_term_ID"></label>
                 <div class="input-group">
                     <select class="form-select" asp-for="Payment_term_ID" asp-items="ViewBag.paymentTermList">
                         <option selected disabled>Choose..</option>
@@ -64,7 +64,7 @@
                 <span asp-validation-for="Payment_term_ID" class="text-danger"></span>
             </div>
             <div class="col-auto mb-2">
-                <label class="form-label" asp-for="Delivery_term_ID"></label><span class="text-danger" title="Required">*</span>
+                <label class="form-label" asp-for="Delivery_term_ID"></label>
                 <div class="input-group">
                     <select class="form-select" asp-for="Delivery_term_ID" asp-items="ViewBag.deliveryTermList">
                         <option selected disabled>Choose..</option>
@@ -94,7 +94,7 @@
                 <span asp-validation-for="Po_language" class="text-danger"></span>
             </div>
             <div class="col-3 mb-2">
-                <label class="form-label" asp-for="Correspondent_ID" id="correspondentLabel"></label>
+                <label class="form-label" asp-for="Correspondent_ID" id="correspondentLabel"></label><span class="text-danger" title="Required">*</span>
                 <select class="form-select" asp-for="Correspondent_ID" data-val="true" data-val-required="The Correspondent field is required." asp-items="ViewBag.correspondentList">
                     <option selected disabled>Choose..</option>
                 </select>
