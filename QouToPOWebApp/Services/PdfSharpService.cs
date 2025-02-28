@@ -409,6 +409,291 @@ namespace QouToPOWebApp.Services
             }
         }
 
+        public byte[] CreatePoEng(PoViewModel po)
+        {
+            // Create a new PDF document
+            var document = NewDocument();
+            var poTitle = po?.Po_title ?? string.Empty;
+            document.Info.Title = poTitle;
+
+            // Add a page
+            PdfPage page = document.AddPage();
+            XGraphics gfx = XGraphics.FromPdfPage(page);
+
+            // Define table dimensions
+            double x = 43; // X margin
+            double y = 43; // Y margin
+            double rowHeight = 13;
+
+            XFont calibri = new XFont("Calibri-regular", 11);
+            XFont calibriBold = new XFont("Calibri-bold", 11);
+            XFont calibriBoldItalic = new XFont("Calibri-bold-italic", 11);
+            XFont arial = new XFont("Arial", 10);
+            XFont arialBold = new XFont("Arial-bold", 10);
+            XFont arialItalic = new XFont("Arial-italic", 10);
+            XFont tnrBold = new XFont("Times new roman-bold", 10.5);
+
+            // FFJ logo
+            string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "AppData/Images", "FFJ_LOGO.jpg");
+            XImage image = XImage.FromFile(imagePath);
+            gfx.DrawImage(image, 58, y, 189, 71);
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, 282, y, 150, 10);
+            gfx.DrawString("Faraday Factory Japan LLC", tnrBold, XBrushes.Black, new XRect(282, y, 150, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, 282, y, 150, 10);
+            gfx.DrawString("FINE Bldg.,", calibri, XBrushes.Black, new XRect(282, y, 150, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, 282, y, 150, 10);
+            gfx.DrawString("2956-6 Ishikawa-machi, Hachioji,", calibri, XBrushes.Black, new XRect(282, y, 150, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, 282, y, 150, 10);
+            gfx.DrawString("Tokyo 192-0032, Japan", calibri, XBrushes.Black, new XRect(282, y, 150, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, 282, y, 150, 10);
+            gfx.DrawString("TEL: +81-42-707-7077", calibri, XBrushes.Black, new XRect(282, y, 150, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, 282, y, 150, 10);
+            gfx.DrawString("FAX: +81-42-707-9044", calibri, XBrushes.Black, new XRect(282, y, 150, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+            
+            gfx.DrawLine(new XPen(XColors.Black, 3), 37, y, page.Width - 42, y);
+            gfx.DrawLine(new XPen(XColors.Black, 1), 238, y + 3, page.Width - 42, y + 3);
+
+            var date = (bool)(po?.Quotation_date.HasValue) ? po?.Quotation_date.Value.ToString("MMMM d, yyyy") : DateTime.Now.ToString("MMMM d, yyyy");
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, 37, y+5, page.Width - 80, 10);
+            gfx.DrawString(date, calibri, XBrushes.Black, new XRect(37, y + 5, page.Width - 80, 10), XStringFormats.CenterRight);
+
+            y += 29;
+
+            // Contact person
+            var contactPerson = po?.Contact_persons?.Contact_person_name ?? po?.Contact_persons?.Contact_person_name_jpn ?? string.Empty;
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, 200, 10);
+            gfx.DrawString(contactPerson, arial, XBrushes.Black, new XRect(x, y, 200, 10), XStringFormats.CenterLeft);
+
+            // Po number
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, 300, y, 75, 10);
+            gfx.DrawString("Purchase Order:", arialBold, XBrushes.Black, new XRect(300, y, 75, 10), XStringFormats.CenterLeft);
+            gfx.DrawString(po?.Po_number ?? string.Empty, arial, XBrushes.Black, new XRect(383, y, 100, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+
+            // Supplier company name
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, 200, 10);
+            var supplierName = po?.Contact_persons?.Company?.Company_name ?? po?.Contact_persons?.Company?.Company_name_jpn ?? string.Empty;
+            gfx.DrawString(supplierName, arial, XBrushes.Black, new XRect(x, y, 200, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+
+            // Reference
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, 300, y, 25, 10);
+            gfx.DrawString("Ref.:", arialBold, XBrushes.Black, new XRect(300, y, 25, 10), XStringFormats.CenterLeft);
+
+            var quotationnumber = po?.Quotation_number ?? string.Empty;
+            gfx.DrawString(quotationnumber, calibri, XBrushes.Black, new XRect(328, y, 100, 10), XStringFormats.CenterLeft);
+            gfx.DrawString("Quotation for Faraday Factory Japan", arialItalic, XBrushes.Black, new XRect(328, y+rowHeight, 200, 10), XStringFormats.CenterLeft);
+
+            XTextFormatter tf = new XTextFormatter(gfx);
+            // Supplier Address
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y-3, 130, 66);
+            var supplierAddress = po?.Contact_persons?.Company?.Address ?? po?.Contact_persons?.Company?.Address_jpn ?? string.Empty;
+            var telephone = "\nTel.: " + (po?.Contact_persons?.Company?.Telephone ?? string.Empty);
+            var fax = "\nFax: " + (po?.Contact_persons?.Company?.Fax ?? string.Empty);
+            tf.DrawString($"{supplierAddress}{telephone}{fax}", arial, XBrushes.Black, new XRect(x, y-3, 130, 66), XStringFormats.TopLeft);
+
+            y += rowHeight * 8;
+
+            // Contact Person
+            gfx.DrawString($"Dear {contactPerson},", arial, XBrushes.Black, new XRect(x, y - 6, 200, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+
+            // Message
+            tf.DrawString($"Faraday Factory Japan LLC would like to place the Official Purchase Order for the {poTitle}, based on your Price Quotation {quotationnumber}.", calibri, XBrushes.Black, new XRect(x, y, page.Width - 85, 30), XStringFormats.TopLeft);
+
+            y += rowHeight + 26;
+
+            var column1 = 30;
+            var column2 = 270;
+            var column3 = 50;
+            var column4 = 80;
+            var column5 = 65;
+            var tableWitdh = column1 + column2 + column3 + column4 + column5;
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, column1, 10);
+            gfx.DrawString(" No", calibriBold, XBrushes.Black, new XRect(x, y, column1, 10), XStringFormats.CenterLeft);
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x + column1, y, column2, 10);
+            gfx.DrawString("Description", calibriBold, XBrushes.Black, new XRect(x + column1, y, column2, 10), XStringFormats.Center);
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x + column1 + column2, y, column3, 10);
+            gfx.DrawString("QTY", calibriBold, XBrushes.Black, new XRect(x + column1 + column2, y, column3, 10), XStringFormats.Center);
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x + column1 + column2 + column3, y, column4, 10);
+            gfx.DrawString("Unit Price", calibriBold, XBrushes.Black, new XRect(x + column1 + column2 + column3, y, column4, 10), XStringFormats.Center);
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x + column1 + column2 + column3 + column4, y, column5, 10);
+            gfx.DrawString("Total", calibriBold, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y, column5, 10), XStringFormats.Center);
+
+            y += rowHeight;
+
+            gfx.DrawString("USD", calibriBold, XBrushes.Black, new XRect(x + column1 + column2 + column3, y, column4, 10), XStringFormats.Center);
+            gfx.DrawString("USD", calibriBold, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y, column5, 10), XStringFormats.Center);
+
+            y += rowHeight;
+
+            gfx.DrawLine(new XPen(XColors.Black, 0.5), 37, y, tableWitdh + x, y);
+
+            float totalAmount = 0;
+
+            var y1 = y;
+
+            if (po?.Quotation_items?.Count() > 0)
+            {
+                foreach (var item in po?.Quotation_items.OrderBy(q => q.Order))
+                {
+                    gfx.DrawString(item?.Order?.ToString(), calibri, XBrushes.Black, new XRect(x, y1, column1, rowHeight), XStringFormats.CenterLeft);
+                    gfx.DrawString(item.Item_name, calibri, XBrushes.Black, new XRect(x + column1, y1, column2, rowHeight), XStringFormats.CenterLeft);
+                    gfx.DrawString(item.Item_quantity?.ToString() + (item.Unit != null ? " " + item.Unit : ""), calibri, XBrushes.Black, new XRect(x + column1 + column2, y1, column3, rowHeight), XStringFormats.Center);
+                    gfx.DrawString(item.Item_price?.ToString("N2", new CultureInfo("en-US")), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3, y1, column4, rowHeight), XStringFormats.Center);
+
+                    float totalprice = (float)(item.Item_price * item.Item_quantity);
+                    gfx.DrawString(totalprice.ToString("N2", new CultureInfo("en-US")), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y1, column5, rowHeight), XStringFormats.Center);
+
+                    totalAmount += totalprice;
+
+                    y1 += rowHeight;
+                }
+            }
+
+            if (po.Include_tax)
+            {
+                y1 += rowHeight;
+
+                float taxAmount = (float)(totalAmount * 0.1);
+
+                // Total tax
+                //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, x + column1, y1, column2, rowHeight);
+                gfx.DrawString("Consumption tax 10%", calibri, XBrushes.Black, new XRect(x + column1, y1, column2, rowHeight), XStringFormats.CenterLeft);
+                //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, x + column1, y1, column2, rowHeight);
+                gfx.DrawString(taxAmount.ToString("N2", new CultureInfo("en-US")), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y1, column5, rowHeight), XStringFormats.Center);
+
+                y1 += rowHeight;
+
+                totalAmount += taxAmount;
+            }
+
+            y = y1 + rowHeight;
+
+            gfx.DrawLine(new XPen(XColors.Black, 0.5), 37, y, tableWitdh + x, y);
+
+            y += rowHeight;
+
+            gfx.DrawString("TOTAL:", calibriBold, XBrushes.Black, new XRect(x + column1 + column2, y, column3, 10), XStringFormats.Center);
+            gfx.DrawString("USD", calibriBold, XBrushes.Black, new XRect(x + column1 + column2 + column3, y, column4, 10), XStringFormats.Center);
+            gfx.DrawString(totalAmount.ToString("N2", new CultureInfo("en-US")), calibriBold, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y, column5, 10), XStringFormats.Center);
+
+            y += rowHeight * 3;
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, 54, 10);
+            gfx.DrawString("Lead Time:", calibriBold, XBrushes.Black, new XRect(x, y, 54, 10), XStringFormats.CenterLeft);
+
+            var deliveryTerm = po?.Delivery_terms.Delivery_term_name ?? string.Empty;
+            gfx.DrawString(deliveryTerm, calibri, XBrushes.Black, new XRect(x + 54, y, page.Width - (x * 2 + 54), 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, 85, 10);
+            gfx.DrawString("Term of Payment:", calibriBold, XBrushes.Black, new XRect(x, y, 85, 10), XStringFormats.CenterLeft);
+
+            var paymnetTerm = po?.Payment_terms.Payment_term_name ?? string.Empty;
+            gfx.DrawString(paymnetTerm, calibri, XBrushes.Black, new XRect(x + 85, y, page.Width - (x * 2 + 85), 10), XStringFormats.CenterLeft);
+
+            y += rowHeight * 3;
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, 200, 10);
+            gfx.DrawString("Billing Address:", calibriBoldItalic, XBrushes.Black, new XRect(x, y, 200, 10), XStringFormats.CenterLeft);
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, 300, y, 200, 10);
+            gfx.DrawString("Shipping Address:", calibriBoldItalic, XBrushes.Black, new XRect(300, y, 200, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight * 2;
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, 150, 10);
+            gfx.DrawString("Faraday Factory Japan LLC", tnrBold, XBrushes.Black, new XRect(x, y, 150, 10), XStringFormats.CenterLeft);
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, 150, 10);
+            gfx.DrawString("Faraday Factory Japan LLC", tnrBold, XBrushes.Black, new XRect(300, y, 150, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+
+            var deliveryAddress = po?.Companies?.Address ?? po?.Companies?.Address_jpn ?? string.Empty;
+            var deliveryTelephone = "\nTel.: " + (po?.Companies?.Telephone ?? string.Empty);
+            var deliveryFax = "\nFax: " + (po?.Companies?.Fax ?? string.Empty);
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, 300, y, 150, 76);
+            tf.DrawString($"{deliveryAddress}{deliveryTelephone}{deliveryFax}", calibri, XBrushes.Black, new XRect(300, y, 150, 76), XStringFormats.TopLeft);
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, 150, 10);
+            gfx.DrawString("FINE Bldg.,", calibri, XBrushes.Black, new XRect(x, y, 150, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, 150, 10);
+            gfx.DrawString("2956-6 Ishikawa-machi, Hachioji,", calibri, XBrushes.Black, new XRect(x, y, 150, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, 150, 10);
+            gfx.DrawString("Tokyo 192-0032, Japan", calibri, XBrushes.Black, new XRect(x, y, 150, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, 150, 10);
+            gfx.DrawString("TEL: +81-42-707-7077", calibri, XBrushes.Black, new XRect(x, y, 150, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+
+            //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, 150, 10);
+            gfx.DrawString("FAX: +81-42-707-9044", calibri, XBrushes.Black, new XRect(x, y, 150, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight * 4;
+
+            gfx.DrawString("Best regards,", calibri, XBrushes.Black, new XRect(x, y, 150, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight * 2;
+
+            var correspondent = po?.Correspondents?.Correspondent_name ?? string.Empty;
+            var possition = po?.Correspondents?.Correspondent_position ?? string.Empty;
+            gfx.DrawString(correspondent, calibri, XBrushes.Black, new XRect(x, y, 150, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+
+            gfx.DrawString($"{possition},", calibri, XBrushes.Black, new XRect(x, y, 150, 10), XStringFormats.CenterLeft);
+
+            y += rowHeight;
+
+            gfx.DrawString("Faraday Factory Japan LLC", calibri, XBrushes.Black, new XRect(x, y, 150, 10), XStringFormats.CenterLeft);
+
+
+            // Save to memory stream
+            using (var stream = new MemoryStream())
+            {
+                document.Save(stream, false);
+                return stream.ToArray();
+            }
+        }
+
         public byte[] CreatePdfWithTable(string title, string[][] tableData)
         {
             // Create a new PDF document
