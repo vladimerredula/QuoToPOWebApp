@@ -109,6 +109,7 @@ namespace QouToPOWebApp.Controllers
 
             return File(pdfBytes, "application/pdf", "TableExample.pdf");
         }
+
         public IActionResult GeneratePdf()
         {
             string title = "Sample PDF Document";
@@ -116,6 +117,14 @@ namespace QouToPOWebApp.Controllers
             //byte[] pdfBytes = _pdf.CreatePdf(title, content);
             byte[] pdfBytes = _pdf.SamplePo();
             //byte[] pdfBytes = _pdf.CreatePo(new ViewModel.PoViewModel());
+
+            // Return the PDF file as a download
+            return File(pdfBytes, "application/pdf", "Sample.pdf");
+        }
+
+        public IActionResult GeneratePdfEng()
+        {
+            byte[] pdfBytes = _pdf.SamplePoEng();
 
             // Return the PDF file as a download
             return File(pdfBytes, "application/pdf", "Sample.pdf");
