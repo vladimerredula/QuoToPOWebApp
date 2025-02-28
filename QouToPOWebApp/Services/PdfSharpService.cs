@@ -56,6 +56,7 @@ namespace QouToPOWebApp.Services
             var po = new PoViewModel
             {
                 Po_number = "20250219/FF-001-092",
+                Quotation_number = "Q24044",
                 Quotation_date = DateTime.Parse("2025-2-19"),
                 Include_tax = true,
                 Email = "sample@faradaygroup.com",
@@ -95,34 +96,39 @@ namespace QouToPOWebApp.Services
                         Item_name = "○○○○○○　サンプル　タイプＡ",
                         Item_price = 123456,
                         Item_quantity = 10,
-                        Unit = "sets"
+                        Unit = "sets",
+                        Order = 1
                     },
                     new Models.Quotation_item 
                     {
                         Item_name = "△△△△　システム機器",
                         Item_price = 2,
                         Item_quantity = 12345,
-                        Unit = "pcs"
+                        Unit = "pcs",
+                        Order = 2
                     },
                     new Models.Quotation_item 
                     {
                         Item_name = "△△△△　システムの取付作業",
                         Item_price = 3,
                         Item_quantity = 30000,
+                        Order = 3
                     },
                     new Models.Quotation_item 
                     {
                         Item_name = "△△△△　システムの操作説明　講習会",
                         Item_price = 40,
                         Item_quantity = 400,
-                        Unit = "hours"
+                        Unit = "hours",
+                        Order = 4
                     },
                     new Models.Quotation_item 
                     {
                         Item_name = "□□□□○○○○素材　（　✖✖　を含む　）",
                         Item_price = 50,
                         Item_quantity = 5000,
-                        Unit = "kg"
+                        Unit = "kg",
+                        Order = 5
                     }
                 }
             };
@@ -130,12 +136,92 @@ namespace QouToPOWebApp.Services
             return CreatePo(po);
         }
 
-        public byte[] CreatePo(PoViewModel po)
+        public byte[] SamplePoEng()
         {
-            var fontPaths = new Dictionary<string, string>
+            var po = new PoViewModel
             {
-                { "Meiryo", Path.Combine(Directory.GetCurrentDirectory(), "AppData/Fonts", "Meiryo.ttf") },
-                { "Meiryo-bold", Path.Combine(Directory.GetCurrentDirectory(), "AppData/Fonts", "Meiryo-bold.ttf") }
+                Po_number = "20250219/FF-001-092",
+                Quotation_number = "Q24044",
+                Quotation_date = DateTime.Parse("2025-2-19"),
+                Include_tax = true,
+                Email = "sample@faradaygroup.com",
+                Po_title = "Sample title",
+                Payment_terms = new Models.Payment_term
+                {
+                    Payment_term_name = "Closed at the end of the month and paid at the end of the following month",
+                    Payment_term_name_jpn = "月末締め翌月末支払い"
+                },
+                Delivery_terms = new Models.Delivery_term
+                {
+                    Delivery_term_name = "After consultation",
+                    Delivery_term_name_jpn = "別途ご相談の上"
+                },
+                Companies = new Models.Company
+                {
+                    Address = "5-12-15 Hibarigaoka, Zama, Kanagawa 252-0003, Japan",
+                    Address_jpn = "神奈川県座間市ひばりが丘5⁻12⁻15",
+                    Postal_code = "252-0003"
+                },
+                Contact_persons = new Models.Contact_person
+                {
+                    Contact_person_name = "Luffy Taro",
+                    Contact_person_name_jpn = "△△  □□ ",
+                    Company = new Models.Company
+                    {
+                        Company_name = "Company Sample Inc.",
+                        Company_name_jpn = "株式会社サンプル　〇〇支社",
+                        Address = "1-2-3 ****, Setagaya Ward, Tokyo 123-1234, Japan",
+                        Address_jpn = "東京都世田谷区〇〇〇 1-2-3",
+                        Postal_code = "123-1234"
+                    }
+                },
+                Correspondents = new Models.Correspondent
+                {
+                    Correspondent_name = "Monkey D. Dragon",
+                    Correspondent_position = "CEO"
+                },
+                Quotation_items = new List<Models.Quotation_item>
+                {
+                    new Models.Quotation_item 
+                    {
+                        Item_name = "** Sample type A",
+                        Item_price = 123456,
+                        Item_quantity = 10,
+                        Unit = "sets",
+                        Order = 1
+                    },
+                    new Models.Quotation_item
+                    {
+                        Item_name = "System equipment",
+                        Item_price = 2,
+                        Item_quantity = 12345,
+                        Unit = "pcs",
+                        Order = 2
+                    },
+                    new Models.Quotation_item
+                    {
+                        Item_name = "System installation work",
+                        Item_price = 3,
+                        Item_quantity = 30000,
+                        Order = 3
+                    },
+                    new Models.Quotation_item
+        {
+                        Item_name = "System operation training session",
+                        Item_price = 40,
+                        Item_quantity = 400,
+                        Unit = "hours",
+                        Order = 4
+                    },
+                    new Models.Quotation_item
+            {
+                        Item_name = "**Material (including **)",
+                        Item_price = 50,
+                        Item_quantity = 5000,
+                        Unit = "kg",
+                        Order = 5
+                    }
+                }
             };
 
             // Set the global font resolver
