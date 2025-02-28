@@ -34,6 +34,11 @@ var itemTable = $('table.datatable').DataTable({
     }
 });
 
+$("textarea").on("input", function () {
+    this.style.height = "auto"; // Reset height
+    this.style.height = (this.scrollHeight) + "px"; // Set new height based on content
+});
+
 $("#Quotation_date").change(function () {
     let dateValue = $(this).val(); // Get the selected date (YYYY-MM-DD)
     let poNumber = formatDateToPoNumber(dateValue);
@@ -86,10 +91,12 @@ $("#submitItem").on("click", function () {
         $('#quantity').val(null);
         $('#price').val(null);
 
+        var itemnameDisplay = itemname.replace(/\n/g, "<br>");
+
         itemTable.row.add([
             "",
             `<div><span>${itemorder}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Order' value='${itemorder}'></div>`,
-            `<div><span>${itemname}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_name' value='${itemname}'></div>`,
+            `<div><span>${itemnameDisplay}</span><textarea hidden name='Quotation_items[${itemTable.rows().count()}].Item_name'>${itemname}</textarea></div>`,
             `<div><span>${quantity}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_quantity' value='${quantity}'></div>`,
             `<div><span>${unit}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Unit' value='${unit}'></div>`,
             `<div><span>${price.toLocaleString()}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_price' value='${price}'></div>`,
@@ -118,8 +125,12 @@ $("#saveItem").on("click", function () {
     var rowData = row.data();
 
     var itemName = $(rowData[2]);
-    itemName.find("input").attr("value", itemname);
-    itemName.find("span").text(itemname);
+    itemName.find("textarea").val(itemname);
+    itemName.find("textarea").text(itemname);
+
+    var itemnameDisplay = itemname.replace(/\n/g, "<br>");
+    itemName.find("span").html(itemnameDisplay);
+
     var itemQty = $(rowData[3]);
     itemQty.find("input").attr("value", quantity);
     itemQty.find("span").text(quantity);
@@ -178,7 +189,7 @@ $("#editItem").on("click", function () {
     var row = itemTable.row(".selected");
     var rowData = row.data();
 
-    var itemName = $(rowData[2]).find("input").val();
+    var itemName = $(rowData[2]).find("textarea").val();
     var itemQty = $(rowData[3]).find("input").val();
     var itemUnit = $(rowData[4]).find("input").val();
     var itemPrice = $(rowData[5]).find("input").val();
