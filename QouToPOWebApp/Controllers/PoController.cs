@@ -138,6 +138,7 @@ namespace QouToPOWebApp.Controllers
             ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Payment_term_ID);
             ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Delivery_term_ID);
             ViewData["contactPersonList"] = GetContactPersonList(model.Contact_person_ID);
+            ViewData["correspondentList"] = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name", model.Correspondent_ID);
 
             return View("ExtractText", model);
         }
@@ -182,10 +183,10 @@ namespace QouToPOWebApp.Controllers
                 deliveryTerm = GetDeliveryTerms(cleanedText);
             }
 
-            var model = new QuotationViewModel()
+            var model = new PoViewModel()
             {
                 Quotation_items = new List<Quotation_item>(),
-                ExtractMode = Request.Form["extractMode"]
+                Extract_mode = Request.Form["Extract_mode"]
             };
 
             model.Quotation_number = quoNumber;
@@ -204,6 +205,7 @@ namespace QouToPOWebApp.Controllers
             ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Delivery_term_ID);
             ViewData["deliveryAddressList"] = GetDeliveryAddressList(1);
             ViewData["contactPersonList"] = GetContactPersonList(model.Contact_person_ID);
+            ViewData["correspondentList"] = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name", model.Correspondent_ID);
 
             return View("ExtractText", model);
         }
@@ -572,6 +574,7 @@ namespace QouToPOWebApp.Controllers
             ViewBag.contactPersonList = GetContactPersonList();
             ViewBag.paymentTermList = new SelectList(_db.Payment_terms.ToList(), "Payment_term_ID", "Payment_term_name");
             ViewBag.deliveryTermList = new SelectList(_db.Delivery_terms.ToList(), "Delivery_term_ID", "Delivery_term_name");
+            ViewBag.correspondentList = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name");
             return View(nameof(CreateNew));
         }
 
@@ -583,6 +586,7 @@ namespace QouToPOWebApp.Controllers
                 ViewBag.contactPersonList = GetContactPersonList(po.Contact_person_ID);
                 ViewBag.paymentTermList = new SelectList(_db.Payment_terms.ToList(), "Payment_term_ID", "Payment_term_name", po.Payment_term_ID);
                 ViewBag.deliveryTermList = new SelectList(_db.Delivery_terms.ToList(), "Delivery_term_ID", "Delivery_term_name", po.Delivery_term_ID);
+                ViewBag.correspondentList = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name", po.Correspondent_ID);
                 return View(po);
             }
 
@@ -598,11 +602,12 @@ namespace QouToPOWebApp.Controllers
             po.Payment_terms = _db.Payment_terms.FirstOrDefault(p => p.Payment_term_ID == po.Payment_term_ID);
             po.Delivery_terms = _db.Delivery_terms.FirstOrDefault(d => d.Delivery_term_ID == po.Delivery_term_ID);
             po.Companies = _db.Companies.FirstOrDefault(c => c.Company_ID == po.Delivery_address_ID);
+            po.Correspondents = _db.Correspondents.FirstOrDefault(c => c.Correspondent_ID == po.Correspondent_ID);
             po.Email = User.FindFirst(ClaimTypes.Email)?.Value;
 
             var pdf = new PdfSharpService();
 
-            return pdf.CreatePo(po);
+            return po.Po_language == "en" ? pdf.CreatePoEng(po) : pdf.CreatePo(po);
         }
 
         public IActionResult DownloadPo(PoViewModel po)

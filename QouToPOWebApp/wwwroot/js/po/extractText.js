@@ -3,6 +3,7 @@ $(document).ready(function () {
     //getThumbnail();
     getPdfRender();
     taxSwitch();
+    viewCorrespondents();
 
     var contactPersonId = $("#Contact_person_ID").val();
     getContactPersonAddress(contactPersonId);
@@ -99,6 +100,21 @@ function formatDateToPoNumber(dateString) {
     let year = date.getFullYear();
     return `${year}${month}${day}/FF-000-000`; // Change this format as needed
 }
+
+function viewCorrespondents() {
+    var lang = $("#Po_language").val();
+
+    $("#Correspondent_ID").prop("disabled", lang == "jp");
+    $("#Correspondent_ID").prop("required", lang == "en");
+    $("#correspondentLabel").toggleClass("text-secondary");
+    $("#Quotation_number").prop("disabled", lang == "jp");
+    $("#Quotation_number").prop("required", lang == "en");
+    $("#quoNumberLabel").toggleClass("text-secondary");
+}
+
+$("#Po_language").on("change", function () {
+    viewCorrespondents();
+});
 
 $("#selectFileBtn").on("click", function () {
     $("#pdfFile").click(); // Trigger the hidden file input

@@ -39,11 +39,19 @@ namespace QouToPOWebApp.ViewModel
         [Required]
         public int? Delivery_address_ID { get; set; }
         public bool Include_tax { get; set; }
+
+        [Display(Name = "Correspondent")]
+        [ForeignKey("Correspondents")]
+        public int? Correspondent_ID { get; set; }
         public string? Email { get; set; }
 
         [Display(Name = "PO title")]
         [Required]
         public string? Po_title { get; set; }
+
+        [Display(Name = "PO language")]
+        [Required]
+        public string? Po_language { get; set; }
 
         public string? File_name { get; set; }
         public string? File_path { get; set; }
@@ -56,6 +64,7 @@ namespace QouToPOWebApp.ViewModel
 
         public virtual Company? Companies { get; set; }
         public virtual Contact_person? Contact_persons { get; set; }
+        public virtual Correspondent? Correspondents { get; set; }
         public virtual Payment_term? Payment_terms { get; set; }
         public virtual Delivery_term? Delivery_terms { get; set; }
     }

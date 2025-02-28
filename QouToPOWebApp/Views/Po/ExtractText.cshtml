@@ -51,7 +51,7 @@
     <div class="row g-4 mb-3">
         <div class="col-md-4 justify-content-center">
             <h4>Preview</h4>
-            <iframe class="rounded-2" id="pdfPreview" src="" filename="@Model.File_path" height="400" style="width:100%;"></iframe>
+            <iframe class="rounded-2" id="pdfPreview" src="" filename="@Model.File_path" height="495" style="width:100%;"></iframe>
         </div>
         <div class="col-md-8">
             <h4>Details</h4>
@@ -118,6 +118,21 @@
                         </div>
                         <span asp-validation-for="Delivery_term_ID" class="text-danger"></span>
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label" asp-for="Po_language"></label><span class="text-danger" title="Required">*</span>
+                        <select class="form-select" asp-for="Po_language">
+                            <option value="jp">Japanese</option>
+                            <option value="en">English</option>
+                        </select>
+                        <span asp-validation-for="Po_language" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" asp-for="Correspondent_ID" id="correspondentLabel"></label>
+                        <select class="form-select" asp-for="Correspondent_ID" data-val="true" data-val-required="The Correspondent field is required." asp-items="ViewBag.correspondentList">
+                            <option selected disabled>Choose..</option>
+                        </select>
+                        <span class="text-danger field-validation-valid" data-valmsg-for="Correspondent_ID" data-valmsg-replace="true"></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -137,8 +152,8 @@
                 </div>
             </div>
         </div>
-        <div class="row g-5 mb-3">
-            <div class="col-md">
+        <div class="row mb-3">
+            <div class="col">
                 <table class="table table-hover datatable">
                     <thead class="table-light">
                         <tr>
@@ -162,7 +177,7 @@
                             totalAmount += price;
                             <tr>
                                 <td></td>
-                                <td><div><span>@Model?.Quotation_items[i]?.Order</span><input hidden asp-for="Quotation_items[i].Order" value='@Model?.Quotation_items[i]?.Order'></div></td>
+                                <td><div><span>@Model?.Quotation_items[i]?.Order</span><input hidden asp-for="Quotation_items[i].Order" value='@(Model?.Quotation_items[i]?.Order ?? counter)'></div></td>
                                 <td><div><span>@Model?.Quotation_items[i]?.Item_name</span><input hidden asp-for="Quotation_items[i].Item_name" value='@Model?.Quotation_items[i]?.Item_name'></div></td>
                                 <td><div><span>@Model?.Quotation_items[i]?.Item_quantity</span><input hidden asp-for="Quotation_items[i].Item_quantity" value='@Model?.Quotation_items[i]?.Item_quantity'></div></td>
                                 <td><div><span>@Model?.Quotation_items[i]?.Unit</span><input hidden asp-for="Quotation_items[i].Unit" value='@Model?.Quotation_items[i]?.Unit'></div></td>
@@ -316,8 +331,8 @@
                             <div class="input-group mb-3">
                                 <span class="input-group-text" id="yenSign">¥</span>
                                 <input class="form-control" name="price" id="price" data-val="true" data-val-required="The Price field is required." required />
-                                <span class="text-danger field-validation-valid" data-valmsg-for="price" data-valmsg-replace="true"></span>
                             </div>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="price" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                 </form>
@@ -368,8 +383,8 @@
                             <div class="input-group mb-3">
                                 <span class="input-group-text" id="yenSign">¥</span>
                                 <input class="form-control" name="itemEditPrice" id="itemEditPrice" data-val="true" data-val-required="The Price field is required." required />
-                                <span class="text-danger field-validation-valid" data-valmsg-for="itemEditPrice" data-valmsg-replace="true"></span>
                             </div>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="itemEditPrice" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                 </form>

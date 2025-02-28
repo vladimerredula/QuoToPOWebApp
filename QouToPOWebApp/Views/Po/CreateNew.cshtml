@@ -36,7 +36,12 @@
             </div>
         </div>
         <div class="row mb-3">
-            <div class="col-6 mb-2">
+            <div class="col-3 mb-2">
+                <label class="form-label" asp-for="Quotation_number" id="quoNumberLabel"></label>
+                <input class="form-control" type="text" asp-for="Quotation_number" data-val="true" data-val-required="The Quotation number field is required." />
+                <span class="text-danger field-validation-valid" data-valmsg-for="Quotation_number" data-valmsg-replace="true"></span>
+            </div>
+            <div class="col-auto mb-2">
                 <label class="form-label" asp-for="Contact_person_ID"></label><span class="text-danger" title="Required">*</span>
                 <div class="input-group">
                     <select class="form-select" asp-for="Contact_person_ID" asp-items="ViewBag.contactPersonList">
@@ -46,26 +51,9 @@
                 </div>
                 <span asp-validation-for="Contact_person_ID" class="text-danger"></span>
             </div>
-            @* <div class="col-12">
-                <textarea type="text" class="form-control visually-hidden" id="contactPersonAddress" placeholder="Company address" readonly></textarea>
-            </div> *@
-            <div class="col-6 mb-2">
-                <label class="form-label" asp-for="Delivery_address_ID">Delivery Address</label><span class="text-danger" title="Required">*</span>
-                <select class="form-select" asp-for="Delivery_address_ID">
-                    <option selected disabled>Choose..</option>
-                    <option value="1">FFJ Zama</option>
-                    <option value="2">FFJ Hachioji</option>
-                    <option value="3">FFJ Hashimoto</option>
-                    <option value="4">FFJ SIC</option>
-                </select>
-                <span asp-validation-for="Delivery_address_ID" class="text-danger"></span>
-            </div>
-            @* <div class="col-12">
-                <textarea type="text" class="form-control visually-hidden" id="deliveryAddress" placeholder="Delivery address" readonly></textarea>
-            </div> *@
         </div>
-        <div class="row">
-            <div class="col mb-2">
+        <div class="row mb-3">
+            <div class="col-auto mb-2">
                 <label class="form-label" asp-for="Payment_term_ID"></label><span class="text-danger" title="Required">*</span>
                 <div class="input-group">
                     <select class="form-select" asp-for="Payment_term_ID" asp-items="ViewBag.paymentTermList">
@@ -75,7 +63,7 @@
                 </div>
                 <span asp-validation-for="Payment_term_ID" class="text-danger"></span>
             </div>
-            <div class="col mb-2">
+            <div class="col-auto mb-2">
                 <label class="form-label" asp-for="Delivery_term_ID"></label><span class="text-danger" title="Required">*</span>
                 <div class="input-group">
                     <select class="form-select" asp-for="Delivery_term_ID" asp-items="ViewBag.deliveryTermList">
@@ -84,6 +72,33 @@
                     <a href="#" class="btn btn-light border" id="customDeliveryTerm">Add</a>
                 </div>
                 <span asp-validation-for="Delivery_term_ID" class="text-danger"></span>
+            </div>
+            <div class="col-3 mb-2">
+                <label class="form-label" asp-for="Delivery_address_ID">Delivery Address</label><span class="text-danger" title="Required">*</span>
+                <select class="form-select" asp-for="Delivery_address_ID">
+                    <option value="1">FFJ Zama</option>
+                    <option value="2">FFJ Hachioji</option>
+                    <option value="3">FFJ Hashimoto</option>
+                    <option value="4">FFJ SIC</option>
+                </select>
+                <span asp-validation-for="Delivery_address_ID" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3 mb-2">
+                <label class="form-label" asp-for="Po_language"></label><span class="text-danger" title="Required">*</span>
+                <select class="form-select" asp-for="Po_language">
+                    <option value="jp">Japanese</option>
+                    <option value="en">English</option>
+                </select>
+                <span asp-validation-for="Po_language" class="text-danger"></span>
+            </div>
+            <div class="col-3 mb-2">
+                <label class="form-label" asp-for="Correspondent_ID" id="correspondentLabel"></label>
+                <select class="form-select" asp-for="Correspondent_ID" data-val="true" data-val-required="The Correspondent field is required." asp-items="ViewBag.correspondentList">
+                    <option selected disabled>Choose..</option>
+                </select>
+                <span class="text-danger field-validation-valid" data-valmsg-for="Correspondent_ID" data-valmsg-replace="true"></span>
             </div>
         </div>
     </div>
@@ -258,11 +273,11 @@
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label">Price</label><span class="text-danger" title="Required">*</span>
-                            <div class="input-group mb-3">
+                            <div class="input-group">
                                 <span class="input-group-text" id="yenSign">¥</span>
                                 <input class="form-control" name="price" id="price" data-val="true" data-val-required="The Price field is required." required />
-                                <span class="text-danger field-validation-valid" data-valmsg-for="price" data-valmsg-replace="true"></span>
                             </div>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="price" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                 </form>
@@ -310,11 +325,11 @@
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label">Price</label><span class="text-danger" title="Required">*</span>
-                            <div class="input-group mb-3">
+                            <div class="input-group">
                                 <span class="input-group-text" id="yenSign">¥</span>
                                 <input class="form-control" name="itemEditPrice" id="itemEditPrice" data-val="true" data-val-required="The Price field is required." required />
-                                <span class="text-danger field-validation-valid" data-valmsg-for="itemEditPrice" data-valmsg-replace="true"></span>
                             </div>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="itemEditPrice" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                 </form>

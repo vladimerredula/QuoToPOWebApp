@@ -1,5 +1,6 @@
 ﻿$(document).ready(function () {
     taxSwitch();
+    viewCorrespondents();
 });
 
 var itemTable = $('table.datatable').DataTable({
@@ -52,6 +53,21 @@ function formatDateToPoNumber(dateString) {
 
 $("#Include_tax").on("change", function () {
     taxSwitch();
+});
+
+function viewCorrespondents() {
+    var lang = $("#Po_language").val();
+
+    $("#Correspondent_ID").prop("disabled", lang == "jp");
+    $("#Correspondent_ID").prop("required", lang == "en");
+    $("#correspondentLabel").toggleClass("text-secondary");
+    $("#Quotation_number").prop("disabled", lang == "jp");
+    $("#Quotation_number").prop("required", lang == "en");
+    $("#quoNumberLabel").toggleClass("text-secondary");
+}
+
+$("#Po_language").on("change", function () {
+    viewCorrespondents();
 });
 
 // adding item
