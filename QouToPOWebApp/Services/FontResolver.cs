@@ -42,12 +42,18 @@ namespace QouToPOWebApp.Services
                 return new FontResolverInfo("Calibri-regular");
             if (familyName == "Calibri-bold")
                 return new FontResolverInfo("Calibri-bold");
+            if (familyName == "Calibri-bold-italic")
+                return new FontResolverInfo("Calibri-bold-italic");
             if (familyName == "Calibri-italic")
                 return new FontResolverInfo("Calibri-italic");
             if (familyName == "Times new roman-bold")
                 return new FontResolverInfo("Times new roman-bold");
             if (familyName == "Arial")
                 return new FontResolverInfo("Arial");
+            if (familyName == "Arial-bold")
+                return new FontResolverInfo("Arial-bold");
+            if (familyName == "Arial-italic")
+                return new FontResolverInfo("Arial-italic");
 
             return null; // Fallback
         }
