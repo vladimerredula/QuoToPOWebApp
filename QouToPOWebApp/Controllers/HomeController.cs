@@ -30,5 +30,13 @@ namespace QouToPOWebApp.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public IActionResult Clean()
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

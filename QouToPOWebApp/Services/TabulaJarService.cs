@@ -49,6 +49,8 @@ public class TabulaJarService
                 string error = process.StandardError.ReadToEnd();
                 throw new Exception($"Tabula JAR execution failed: {error}");
             }
+
+            process.Dispose();
         }
         catch (Exception ex)
         {

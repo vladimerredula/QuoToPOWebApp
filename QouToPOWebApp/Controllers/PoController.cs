@@ -14,16 +14,10 @@ namespace QouToPOWebApp.Controllers
     public class PoController : Controller
     {
         private readonly ApplicationDbContext _db;
-        private readonly TabulaService _tabula;
-        private readonly PdfPigService _pdfPig;
-        private readonly TabulaJarService _tabulaJar;
 
-        public PoController(ApplicationDbContext dbContext, TabulaService tabula, PdfPigService pdfPig)
+        public PoController(ApplicationDbContext dbContext)
         {
             _db = dbContext;
-            _tabula = tabula;
-            _pdfPig = pdfPig;
-            _tabulaJar = new TabulaJarService();
         }
 
         public IActionResult Index()
@@ -103,13 +97,15 @@ namespace QouToPOWebApp.Controllers
 
             if (string.IsNullOrEmpty(quoNumber))
             {
-                var text = _tabulaJar.ExtractTables(filePath, "stream");
+                var tabulaJar = new TabulaJarService();
+                var text = tabulaJar.ExtractTables(filePath, "stream");
                 quoNumber = GetQuotationNumber(text);
             }
 
             if (string.IsNullOrEmpty(quoNumber))
             {
-                var text = _tabulaJar.ExtractTables(filePath);
+                var tabulaJar = new TabulaJarService();
+                var text = tabulaJar.ExtractTables(filePath);
                 quoNumber = GetQuotationNumber(text);
             }
 
@@ -212,7 +208,9 @@ namespace QouToPOWebApp.Controllers
         public List<Quotation_item> GetQuotationItems(string filePath)
         {
             var extractionMode = Request.Form["Extract_mode"];
-            string extractedTables = _tabulaJar.ExtractTables(filePath, extractionMode);
+
+            var tabulaJar = new TabulaJarService();
+            string extractedTables = tabulaJar.ExtractTables(filePath, extractionMode);
 
             var quotationItems = new List<Quotation_item>();
             var rows = extractedTables.Split("\n");
@@ -399,11 +397,14 @@ namespace QouToPOWebApp.Controllers
 
         private List<List<string>> ExtractTables(string filePath)
         {
+            var pdfPig = new PdfPigService();
+            var tabula = new TabulaService();
+
             return new List<List<string>>
             {
-                _tabula.StreamModeExtraction(filePath),
-                _tabula.LatticeModeExtraction(filePath),
-                _pdfPig.ExtractText(filePath)
+                tabula.StreamModeExtraction(filePath),
+                tabula.LatticeModeExtraction(filePath),
+                pdfPig.ExtractText(filePath)
             };
         }
 

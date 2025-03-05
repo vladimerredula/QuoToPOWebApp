@@ -524,6 +524,8 @@ namespace QouToPOWebApp.Services
             using (var stream = new MemoryStream())
             {
                 document.Save(stream, false);
+                document.Dispose();
+
                 return stream.ToArray();
             }
         }
@@ -821,6 +823,8 @@ namespace QouToPOWebApp.Services
             using (var stream = new MemoryStream())
             {
                 document.Save(stream, false);
+                document.Dispose();
+
                 return stream.ToArray();
             }
         }

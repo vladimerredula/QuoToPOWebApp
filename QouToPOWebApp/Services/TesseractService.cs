@@ -1,8 +1,6 @@
 ﻿using System.Drawing;
 using Tesseract;
 using PdfiumViewer;
-using Microsoft.AspNetCore.Mvc;
-using static System.Net.Mime.MediaTypeNames;
 using Image = System.Drawing.Image;
 using System.Drawing.Imaging;
 
