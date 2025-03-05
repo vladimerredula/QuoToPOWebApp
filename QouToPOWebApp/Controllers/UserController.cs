@@ -96,5 +96,11 @@ namespace QouToPOWebApp.Controllers
         {
             return _db.Users.Find(GetPersonnelID());
         }
+
+        [HttpGet]
+        public IActionResult PersonnelID()
+        {
+            return Ok(GetPersonnelID());
+        }
     }
 }

@@ -61,9 +61,7 @@ $("textarea").on("input", function () {
 
 $("#Quotation_date").change(function () {
     let dateValue = $(this).val(); // Get the selected date (YYYY-MM-DD)
-    let poNumber = formatDateToPoNumber(dateValue);
-
-    $("#Po_number").val(poNumber);
+    formatDateToPoNumber(dateValue);
 });
 
 
@@ -73,7 +71,20 @@ function formatDateToPoNumber(dateString) {
     let day = date.getDate().toString().padStart(2, "0");
     let month = (date.getMonth() + 1).toString().padStart(2, "0");
     let year = date.getFullYear();
-    return `${year}${month}${day}/FF-000-000`; // Change this format as needed
+    let id = "000";
+
+    $.ajax({
+        url: "/User/PersonnelID", // Use the form's action URL
+        method: 'GET', // Use the form's method (POST/GET)
+        success: function (response) {
+            id = response.toString().padStart(3, '0');
+
+            $("#Po_number").val(`${year}${month}${day}/FF-000-${id}`);
+        },
+        error: function (xhr, status, error) {
+            console.log(error);
+        }
+    });
 }
 
 $("#Include_tax").on("change", function () {
