@@ -494,7 +494,7 @@ namespace QouToPOWebApp.Services
             // Delivery term
             gfx.DrawString("納期：", new XFont("Meiryo-bold", 10), XBrushes.Black, new XRect(36, y, 50, rowHeight), XStringFormats.CenterLeft);
             //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 86, y, 300, rowHeight);
-            var deliveryTerm = po?.Delivery_terms?.Delivery_term_name_jpn ?? po?.Delivery_terms?.Delivery_term_name ?? string.Empty;
+            var deliveryTerm = po?.Delivery_term ?? string.Empty;
             gfx.DrawString(deliveryTerm, bodyFont, XBrushes.Black, new XRect(66, y, 300, rowHeight), XStringFormats.CenterLeft);
 
             y += 18;
@@ -502,7 +502,7 @@ namespace QouToPOWebApp.Services
             // Payment term
             gfx.DrawString("決済条件：", new XFont("Meiryo-bold", 10), XBrushes.Black, new XRect(36, y, 50, rowHeight), XStringFormats.CenterLeft);
             //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 86, y, 300, rowHeight);
-            var paymentTerm = po?.Payment_terms?.Payment_term_name_jpn ?? po?.Payment_terms?.Payment_term_name ?? string.Empty;
+            var paymentTerm = po?.Payment_term ?? string.Empty;
             gfx.DrawString(paymentTerm, bodyFont, XBrushes.Black, new XRect(86, y, 300, rowHeight), XStringFormats.CenterLeft);
 
             y += 18;
@@ -742,7 +742,7 @@ namespace QouToPOWebApp.Services
             //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, 54, 10);
             gfx.DrawString("Lead Time:", calibriBold, XBrushes.Black, new XRect(x, y, 54, 10), XStringFormats.CenterLeft);
 
-            var deliveryTerm = po?.Delivery_terms?.Delivery_term_name ?? string.Empty;
+            var deliveryTerm = po?.Delivery_term ?? string.Empty;
             gfx.DrawString(deliveryTerm, calibri, XBrushes.Black, new XRect(x + 54, y, page.Width - (x * 2 + 54), 10), XStringFormats.CenterLeft);
 
             y += rowHeight;
@@ -750,7 +750,7 @@ namespace QouToPOWebApp.Services
             //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, x, y, 85, 10);
             gfx.DrawString("Term of Payment:", calibriBold, XBrushes.Black, new XRect(x, y, 85, 10), XStringFormats.CenterLeft);
 
-            var paymnetTerm = po?.Payment_terms?.Payment_term_name ?? string.Empty;
+            var paymnetTerm = po?.Payment_term ?? string.Empty;
             gfx.DrawString(paymnetTerm, calibri, XBrushes.Black, new XRect(x + 85, y, page.Width - (x * 2 + 85), 10), XStringFormats.CenterLeft);
 
             y += rowHeight * 3;
