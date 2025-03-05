@@ -19,23 +19,31 @@
     <h4>Details</h4>
     <div class="card p-3 border-0 shadow-sm mb-3">
         <div class="row mb-3">
-            <div class="col mb-2">
+            <div class="col-4 mb-2">
                 <label class="form-label" asp-for="Po_title">PO Title</label><span class="text-danger" title="Required">*</span>
                 <input class="form-control" type="text" asp-for="Po_title" required />
                 <span asp-validation-for="Po_title" class="text-danger"></span>
             </div>
-            <div class="col mb-2">
+            <div class="col-auto mb-2">
                 <label class="form-label" asp-for="Quotation_date"></label><span class="text-danger" title="Required">*</span>
                 <input class="form-control" type="date" asp-for="Quotation_date" />
                 <span asp-validation-for="Quotation_date" class="text-danger"></span>
             </div>
-            <div class="col mb-2">
+            <div class="col-auto mb-2">
                 <label class="form-label" asp-for="Po_number"></label><span class="text-danger" title="Required">*</span>
                 <input class="form-control" type="text" asp-for="Po_number" />
                 <span asp-validation-for="Po_number" class="text-danger"></span>
             </div>
         </div>
         <div class="row mb-3">
+            <div class="col-3 mb-2">
+                <label class="form-label" asp-for="Po_language"></label><span class="text-danger" title="Required">*</span>
+                <select class="form-select" asp-for="Po_language">
+                    <option value="jp">Japanese</option>
+                    <option value="en">English</option>
+                </select>
+                <span asp-validation-for="Po_language" class="text-danger"></span>
+            </div>
             <div class="col-3 mb-2">
                 <label class="form-label" asp-for="Quotation_number" id="quoNumberLabel"></label><span class="text-danger" title="Required">*</span>
                 <input class="form-control" type="text" asp-for="Quotation_number" data-val="true" data-val-required="The Quotation number field is required." />
@@ -53,25 +61,57 @@
             </div>
         </div>
         <div class="row mb-3">
-            <div class="col-auto mb-2">
-                <label class="form-label" asp-for="Payment_term_ID"></label>
+            <div class="col-4 mb-2">
+                <label class="form-label" asp-for="Payment_term"></label>
                 <div class="input-group">
-                    <select class="form-select" asp-for="Payment_term_ID" asp-items="ViewBag.paymentTermList">
-                        <option selected disabled>Choose..</option>
-                    </select>
-                    <a href="#" class="btn btn-light border" id="customPaymentTerm">Add</a>
+                    <input class="form-control" asp-for="Payment_term" />
+                    <a class="btn btn-light border dropdown-toggle" data-bs-toggle="dropdown">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <div id="paymentTermDropdown">
+                            @foreach (var paymentTerm in paymentTerms)
+                            {
+                                if (paymentTerm.Payment_term_name != null && paymentTerm.Payment_term_name != "")
+                                {
+                                <li class="en visually-hidden"><a class="dropdown-item" href="#" onclick="setTerm(this)">@paymentTerm.Payment_term_name</a></li>
+                                }
+                                if (paymentTerm.Payment_term_name_jpn != null && paymentTerm.Payment_term_name_jpn != "")
+                                {
+                                <li class="jp visually-hidden"><a class="dropdown-item" href="#" onclick="setTerm(this)">@paymentTerm.Payment_term_name_jpn</a></li>
+                                }
+                            }
+                        </div>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" id="customPaymentTerm">Register</a></li>
+                    </ul>
                 </div>
-                <span asp-validation-for="Payment_term_ID" class="text-danger"></span>
+                <span asp-validation-for="Payment_term" class="text-danger"></span>
             </div>
-            <div class="col-auto mb-2">
-                <label class="form-label" asp-for="Delivery_term_ID"></label>
+            <div class="col-4 mb-2">
+                <label class="form-label" asp-for="Delivery_term"></label>
                 <div class="input-group">
-                    <select class="form-select" asp-for="Delivery_term_ID" asp-items="ViewBag.deliveryTermList">
-                        <option selected disabled>Choose..</option>
-                    </select>
-                    <a href="#" class="btn btn-light border" id="customDeliveryTerm">Add</a>
+                    <input class="form-control" asp-for="Delivery_term" />
+                    <a class="btn btn-light border dropdown-toggle" data-bs-toggle="dropdown">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <div id="deliveryTermDropdown">
+                            @foreach (var deliveryTerm in deliveryTerms)
+                            {
+                                if (deliveryTerm.Delivery_term_name != null && deliveryTerm.Delivery_term_name != "")
+                                {
+                                    <li class="en visually-hidden"><a class="dropdown-item" href="#" onclick="setTerm(this)">@deliveryTerm.Delivery_term_name</a></li>
+                                }
+                                if (deliveryTerm.Delivery_term_name_jpn != null && deliveryTerm.Delivery_term_name_jpn != "")
+                                {
+                                    <li class="jp visually-hidden"><a class="dropdown-item" href="#" onclick="setTerm(this)">@deliveryTerm.Delivery_term_name_jpn</a></li>
+                                }
+                            }
+                        </div>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" id="customDeliveryTerm">Register</a></li>
+                    </ul>
                 </div>
-                <span asp-validation-for="Delivery_term_ID" class="text-danger"></span>
+                <span asp-validation-for="Delivery_term" class="text-danger"></span>
             </div>
             <div class="col-3 mb-2">
                 <label class="form-label" asp-for="Delivery_address_ID">Delivery Address</label><span class="text-danger" title="Required">*</span>
@@ -85,14 +125,6 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-3 mb-2">
-                <label class="form-label" asp-for="Po_language"></label><span class="text-danger" title="Required">*</span>
-                <select class="form-select" asp-for="Po_language">
-                    <option value="jp">Japanese</option>
-                    <option value="en">English</option>
-                </select>
-                <span asp-validation-for="Po_language" class="text-danger"></span>
-            </div>
             <div class="col-3 mb-2">
                 <label class="form-label" asp-for="Correspondent_ID" id="correspondentLabel"></label><span class="text-danger" title="Required">*</span>
                 <select class="form-select" asp-for="Correspondent_ID" data-val="true" data-val-required="The Correspondent field is required." asp-items="ViewBag.correspondentList">

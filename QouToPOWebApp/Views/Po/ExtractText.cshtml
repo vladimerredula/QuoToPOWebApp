@@ -3,8 +3,10 @@
 @model PoViewModel;
 
 @{
-    var sampl = Model;
     ViewData["Title"] = "Create from Quotation";
+
+    var paymentTerms = ViewBag.paymentTerms as List<Payment_term>;
+    var deliveryTerms = ViewBag.deliveryTerms as List<Delivery_term>;
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
@@ -62,20 +64,28 @@
                         <input asp-for="Po_title" class="form-control" />
                         <span asp-validation-for="Po_title" class="text-danger"></span>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <label asp-for="Quotation_date" class="form-label"></label><span class="text-danger" title="Required">*</span>
                         <input asp-for="Quotation_date" type="date" class="form-control" value="@(Model.Quotation_date.Value.ToString("yyyy-MM-dd"))"/>
                         <span asp-validation-for="Quotation_date" class="text-danger"></span>
                     </div>
-                    <div class="col-md-6">
-                        <label asp-for="Quotation_number" class="form-label" id="quoNumberLabel"></label><span class="text-danger" title="Required">*</span>
-                        <input asp-for="Quotation_number" type="text" class="form-control" value="@(Model.Quotation_number ?? string.Empty)"/>
-                        <span asp-validation-for="Quotation_number" class="text-danger"></span>
-                    </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <label asp-for="Po_number" class="form-label"></label><span class="text-danger" title="Required">*</span>
                         <input asp-for="Po_number" class="form-control" />
                         <span asp-validation-for="Po_number" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" asp-for="Po_language"></label><span class="text-danger" title="Required">*</span>
+                        <select class="form-select" asp-for="Po_language">
+                            <option value="jp">Japanese</option>
+                            <option value="en">English</option>
+                        </select>
+                        <span asp-validation-for="Po_language" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Quotation_number" class="form-label" id="quoNumberLabel"></label><span class="text-danger" title="Required">*</span>
+                        <input asp-for="Quotation_number" type="text" class="form-control" value="@(Model.Quotation_number ?? string.Empty)" />
+                        <span asp-validation-for="Quotation_number" class="text-danger"></span>
                     </div>
                     <div class="col-6">
                         <label asp-for="Contact_person_ID" class="form-label"></label><span class="text-danger" title="Required">*</span>
@@ -99,32 +109,56 @@
                         <span asp-validation-for="Delivery_address_ID" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="Payment_term_ID" class="form-label text-nowrap"></label>
+                        <label class="form-label" asp-for="Payment_term"></label>
                         <div class="input-group">
-                            <select class="form-select" asp-for="Payment_term_ID" asp-items="ViewBag.paymentTermList">
-                                <option selected disabled>Choose..</option>
-                            </select>
-                            <a href="#" class="btn btn-light border" id="customPaymentTerm">Add</a>
+                            <input class="form-control" asp-for="Payment_term" />
+                            <a class="btn btn-light border dropdown-toggle" data-bs-toggle="dropdown">
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <div class="paymentTermDropdown">
+                                    @foreach (var paymentTerm in paymentTerms)
+                                    {
+                                        if (paymentTerm.Payment_term_name != null && paymentTerm.Payment_term_name != "")
+                                        {
+                                            <li class="en visually-hidden"><a class="dropdown-item" href="#" onclick="setTerm(this)">@paymentTerm.Payment_term_name</a></li>
+                                        }
+                                        if (paymentTerm.Payment_term_name_jpn != null && paymentTerm.Payment_term_name_jpn != "")
+                                        {
+                                            <li class="jp visually-hidden"><a class="dropdown-item" href="#" onclick="setTerm(this)">@paymentTerm.Payment_term_name_jpn</a></li>
+                                        }
+                                    }
+                                </div>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="customPaymentTerm">Register</a></li>
+                            </ul>
                         </div>
-                        <span asp-validation-for="Payment_term_ID" class="text-danger"></span>
+                        <span asp-validation-for="Payment_term" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="Delivery_term_ID" class="form-label text-nowrap"></label>
+                        <label class="form-label" asp-for="Delivery_term"></label>
                         <div class="input-group">
-                            <select class="form-select" asp-for="Delivery_term_ID" asp-items="ViewBag.deliveryTermList">
-                                <option selected disabled>Choose..</option>
-                            </select>
-                            <a href="#" class="btn btn-light border" id="customDeliveryTerm">Add</a>
+                            <input class="form-control" asp-for="Delivery_term" />
+                            <a class="btn btn-light border dropdown-toggle" data-bs-toggle="dropdown">
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <div id="deliveryTermDropdown">
+                                    @foreach (var deliveryTerm in deliveryTerms)
+                                    {
+                                        if (deliveryTerm.Delivery_term_name != null && deliveryTerm.Delivery_term_name != "")
+                                        {
+                                            <li class="en visually-hidden"><a class="dropdown-item" href="#" onclick="setTerm(this)">@deliveryTerm.Delivery_term_name</a></li>
+                                        }
+                                        if (deliveryTerm.Delivery_term_name_jpn != null && deliveryTerm.Delivery_term_name_jpn != "")
+                                        {
+                                            <li class="jp visually-hidden"><a class="dropdown-item" href="#" onclick="setTerm(this)">@deliveryTerm.Delivery_term_name_jpn</a></li>
+                                        }
+                                    }
+                                </div>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="customDeliveryTerm">Register</a></li>
+                            </ul>
                         </div>
-                        <span asp-validation-for="Delivery_term_ID" class="text-danger"></span>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label" asp-for="Po_language"></label><span class="text-danger" title="Required">*</span>
-                        <select class="form-select" asp-for="Po_language">
-                            <option value="jp">Japanese</option>
-                            <option value="en">English</option>
-                        </select>
-                        <span asp-validation-for="Po_language" class="text-danger"></span>
+                        <span asp-validation-for="Delivery_term" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label" asp-for="Correspondent_ID" id="correspondentLabel"></label><span class="text-danger" title="Required">*</span>

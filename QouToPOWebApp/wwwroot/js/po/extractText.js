@@ -1,6 +1,6 @@
 ﻿
 $(document).ready(function () {
-    //getThumbnail();
+    changeLang();
     getPdfRender();
     taxSwitch();
     viewCorrespondents();
@@ -84,6 +84,20 @@ var itemTable = $('table.datatable').DataTable({
         dataSrc: 1
     }
 });
+
+$("#Po_language").on("change", function () {
+    changeLang();
+});
+
+function changeLang() {
+    if ($("#Po_language").val() == "en") {
+        $(".en").addClass("visually-hidden").removeClass("visually-hidden");
+        $(".jp").removeClass("visually-hidden").addClass("visually-hidden");
+    } else {
+        $(".en").removeClass("visually-hidden").addClass("visually-hidden");
+        $(".jp").addClass("visually-hidden").removeClass("visually-hidden");
+    }
+}
 
 $("textarea").on("input", function () {
     this.style.height = "auto"; // Reset height
@@ -559,9 +573,25 @@ function addPaymentTerm() {
                 PaymentTermNameJpn: $("#payJpnName").val()
             },
             success: function (response) {
-                var paymentTerm = $("#Payment_term_ID");
-                paymentTerm.append(new Option(response.paymentTermName, response.paymentTermId));
-                paymentTerm.val(response.paymentTermId);
+                var ptEng = response.paymentTermName;
+                var ptJpn = response.paymentTermNameJpn;
+
+                var paymentTerm = $("#paymentTermDropdown");
+                paymentTerm.append($("<li>")
+                    .addClass("en visually-hidden")
+                    .append(`<a class='dropdown-item' href='#' onclick='setTerm(this)'>${ptEng}</a>`)
+                );
+
+                paymentTerm.append($("<li>")
+                    .addClass("jp visually-hidden")
+                    .append(`<a class='dropdown-item' href='#' onclick='setTerm(this)'>${ptJpn}</a>`)
+                );
+
+                changeLang();
+
+                var lang = $("#Po_language").val();
+
+                $("#Payment_term").val(lang == "en" ? ptEng : ptJpn)
                 $("#paymentTermAddModal").modal("hide");
             },
             error: function (response) {
@@ -588,9 +618,25 @@ function addDeliveryTerm() {
                 DeliveryTermNameJpn: $("#delJpnName").val()
             },
             success: function (response) {
-                var deliveryTerm = $("#Delivery_term_ID");
-                deliveryTerm.append(new Option(response.deliveryTermName, response.deliveryTermId));
-                deliveryTerm.val(response.deliveryTermId);
+                var dtEng = response.deliveryTermName;
+                var dtJpn = response.deliveryTermNameJpn;
+
+                var deliveryTerm = $("#deliveryTermDropdown");
+                deliveryTerm.append($("<li>")
+                    .addClass("en visually-hidden")
+                    .append(`<a class='dropdown-item' href='#' onclick='setTerm(this)'>${dtEng}</a>`)
+                );
+
+                deliveryTerm.append($("<li>")
+                    .addClass("jp visually-hidden")
+                    .append(`<a class='dropdown-item' href='#' onclick='setTerm(this)'>${dtJpn}</a>`)
+                );
+
+                changeLang();
+
+                var lang = $("#Po_language").val();
+
+                $("#Delivery_term").val(lang == "en" ? dtEng : dtJpn)
                 $("#deliveryTermAddModal").modal("hide");
             },
             error: function (response) {

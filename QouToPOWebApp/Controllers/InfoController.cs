@@ -472,8 +472,8 @@ namespace QouToPOWebApp.Controllers
 
                 return Ok(new
                 {
-                    deliveryTermId = deliveryTerm.Delivery_term_ID,
-                    deliveryTermName = deliveryTerm.Delivery_term_name
+                    deliveryTermName = deliveryTerm.Delivery_term_name,
+                    deliveryTermNameJpn = deliveryTerm.Delivery_term_name_jpn
                 });
             }
             catch (Exception ex)
@@ -620,8 +620,8 @@ namespace QouToPOWebApp.Controllers
 
                 return Ok(new
                 {
-                    paymentTermId = paymentTerm.Payment_term_ID,
-                    paymentTermName = paymentTerm.Payment_term_name
+                    paymentTermName = paymentTerm.Payment_term_name,
+                    paymentTermNameJpn = paymentTerm.Payment_term_name_jpn
                 });
             }
             catch (Exception ex)

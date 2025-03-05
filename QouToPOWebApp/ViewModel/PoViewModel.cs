@@ -25,12 +25,10 @@ namespace QouToPOWebApp.ViewModel
         public int? Contact_person_ID { get; set; }
 
         [Display(Name = "Payment term")]
-        [ForeignKey("Payment_terms")]
-        public int? Payment_term_ID { get; set; }
+        public string? Payment_term { get; set; }
 
         [Display(Name = "Delivery term")]
-        [ForeignKey("Delivery_terms")]
-        public int? Delivery_term_ID { get; set; }
+        public string? Delivery_term { get; set; }
 
         [Display(Name = "Delivery address")]
         [ForeignKey("Companies")]

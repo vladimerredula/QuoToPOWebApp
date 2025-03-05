@@ -61,8 +61,8 @@ namespace QouToPOWebApp.Controllers
             var quoNumber = string.Empty;
             var quoDate = DateTime.MinValue;
             int? contactPersonID = null;
-            int? paymentTerm = null;
-            int? deliveryTerm = null;
+            var paymentTerm = new Payment_term();
+            var deliveryTerm = new Delivery_term();
             bool isTaxable = false;
 
             foreach (var tables in extractedTables)
@@ -85,12 +85,12 @@ namespace QouToPOWebApp.Controllers
                     contactPersonID = GetContactPerson(cleanedText);
                 }
 
-                if (!paymentTerm.HasValue)
+                if (paymentTerm == null)
                 {
                     paymentTerm = GetPaymentTerms(cleanedText);
                 }
 
-                if (!deliveryTerm.HasValue)
+                if (deliveryTerm == null)
                 {
                     deliveryTerm = GetDeliveryTerms(cleanedText);
                 }
@@ -123,8 +123,8 @@ namespace QouToPOWebApp.Controllers
             model.Quotation_date = quoDate;
             model.Po_number = quoDate.ToString("yyyyMMdd") + "/FF-000-000";
             model.Contact_person_ID = contactPersonID;
-            model.Payment_term_ID = paymentTerm;
-            model.Delivery_term_ID = deliveryTerm;
+            model.Payment_term = model.Po_language == "en" ? paymentTerm.Payment_term_name : paymentTerm.Payment_term_name_jpn;
+            model.Delivery_term = model.Po_language == "en" ? deliveryTerm.Delivery_term_name : deliveryTerm.Delivery_term_name_jpn;
             model.Delivery_address_ID = 1;
             model.File_path = filePath;
             model.File_name = Path.GetFileName(filePath);
@@ -135,10 +135,10 @@ namespace QouToPOWebApp.Controllers
             model.Quotation_items = GetQuotationItems(filePath);
 
             ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name", model.Pdf_type_ID);
-            ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Payment_term_ID);
-            ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Delivery_term_ID);
             ViewData["contactPersonList"] = GetContactPersonList(model.Contact_person_ID);
             ViewData["correspondentList"] = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name", model.Correspondent_ID);
+            ViewBag.paymentTerms = _db.Payment_terms.ToList();
+            ViewBag.deliveryTerms = _db.Delivery_terms.ToList();
 
             return View("ExtractText", model);
         }
@@ -150,9 +150,8 @@ namespace QouToPOWebApp.Controllers
             var quoNumber = string.Empty;
             var quoDate = DateTime.MinValue;
             int? contactPersonID = null;
-            int? paymentTerm = null;
-            int? deliveryTerm = null;
-            bool withTax = false;
+            var paymentTerm = new Payment_term();
+            var deliveryTerm = new Delivery_term();
 
             var extractedText = tess.ExtractTextFromPdf(filePath);
             //var extractedText = tess.ExtractTextFromImage("C:\\Users\\v.redula\\OneDrive - Faraday Factory Japan\\Pictures\\Screenshots\\Screenshot 2025-01-29 173521.png");
@@ -173,12 +172,12 @@ namespace QouToPOWebApp.Controllers
                 contactPersonID = GetContactPerson(cleanedText);
             }
 
-            if (!paymentTerm.HasValue)
+            if (paymentTerm == null)
             {
                 paymentTerm = GetPaymentTerms(cleanedText);
             }
 
-            if (!deliveryTerm.HasValue)
+            if (deliveryTerm == null)
             {
                 deliveryTerm = GetDeliveryTerms(cleanedText);
             }
@@ -192,8 +191,8 @@ namespace QouToPOWebApp.Controllers
             model.Quotation_number = quoNumber;
             model.Quotation_date = quoDate;
             model.Contact_person_ID = contactPersonID;
-            model.Payment_term_ID = paymentTerm;
-            model.Delivery_term_ID = deliveryTerm;
+            model.Payment_term = model.Po_language == "en" ? paymentTerm.Payment_term_name : paymentTerm.Payment_term_name_jpn;
+            model.Delivery_term = model.Po_language == "en" ? deliveryTerm.Delivery_term_name : deliveryTerm.Delivery_term_name_jpn;
             model.File_path = filePath;
             model.File_name = Path.GetFileName(filePath);
             model.Include_tax = IsTaxable(cleanedText);
@@ -201,11 +200,11 @@ namespace QouToPOWebApp.Controllers
             model.Quotation_items = GetQuotationItems(filePath);
 
             ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name", model.Pdf_type_ID);
-            ViewData["paymentTermList"] = new SelectList(_db.Payment_terms, "Payment_term_ID", "Payment_term_name", model.Payment_term_ID);
-            ViewData["deliveryTermList"] = new SelectList(_db.Delivery_terms, "Delivery_term_ID", "Delivery_term_name", model.Delivery_term_ID);
             ViewData["deliveryAddressList"] = GetDeliveryAddressList(1);
             ViewData["contactPersonList"] = GetContactPersonList(model.Contact_person_ID);
             ViewData["correspondentList"] = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name", model.Correspondent_ID);
+            ViewBag.paymentTerms = _db.Payment_terms.ToList();
+            ViewBag.deliveryTerms = _db.Delivery_terms.ToList();
 
             return View("ExtractText", model);
         }
@@ -501,7 +500,7 @@ namespace QouToPOWebApp.Controllers
             return new SelectList(contactPersonList, "Contact_person_ID", "Supplier_name", selected);
         }
 
-        public int? GetPaymentTerms(string text)
+        public Payment_term GetPaymentTerms(string text)
         {
             var paymentTerms = _db.Payment_terms.ToList();
 
@@ -518,7 +517,7 @@ namespace QouToPOWebApp.Controllers
                 {
                     if (text.Contains(CleanText(keyword)))
                     {
-                        return paymentTerm.Payment_term_ID;
+                        return paymentTerm;
                     }
                 }
             }
@@ -526,7 +525,7 @@ namespace QouToPOWebApp.Controllers
             return null;
         }
 
-        public int? GetDeliveryTerms(string text)
+        public Delivery_term GetDeliveryTerms(string text)
         {
             var deliveryTerms = _db.Delivery_terms.ToList();
 
@@ -543,7 +542,7 @@ namespace QouToPOWebApp.Controllers
                 {
                     if (text.Contains(CleanText(keyword)))
                     {
-                        return deliveryTerm.Delivery_term_ID;
+                        return deliveryTerm;
                     }
                 }
             }
@@ -572,9 +571,9 @@ namespace QouToPOWebApp.Controllers
         {
             ViewBag.deliveryAddressList = GetDeliveryAddressList();
             ViewBag.contactPersonList = GetContactPersonList();
-            ViewBag.paymentTermList = new SelectList(_db.Payment_terms.ToList(), "Payment_term_ID", "Payment_term_name");
-            ViewBag.deliveryTermList = new SelectList(_db.Delivery_terms.ToList(), "Delivery_term_ID", "Delivery_term_name");
             ViewBag.correspondentList = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name");
+            ViewBag.paymentTerms = _db.Payment_terms.ToList();
+            ViewBag.deliveryTerms = _db.Delivery_terms.ToList();
             return View(nameof(CreateNew));
         }
 
@@ -584,9 +583,9 @@ namespace QouToPOWebApp.Controllers
             {
                 ViewBag.deliveryAddressList = GetDeliveryAddressList(po.Delivery_address_ID);
                 ViewBag.contactPersonList = GetContactPersonList(po.Contact_person_ID);
-                ViewBag.paymentTermList = new SelectList(_db.Payment_terms.ToList(), "Payment_term_ID", "Payment_term_name", po.Payment_term_ID);
-                ViewBag.deliveryTermList = new SelectList(_db.Delivery_terms.ToList(), "Delivery_term_ID", "Delivery_term_name", po.Delivery_term_ID);
                 ViewBag.correspondentList = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name", po.Correspondent_ID);
+                ViewBag.paymentTerms = _db.Payment_terms.ToList();
+                ViewBag.deliveryTerms = _db.Delivery_terms.ToList();
                 return View(po);
             }
 
@@ -598,16 +597,6 @@ namespace QouToPOWebApp.Controllers
             po.Contact_persons = _db.Contact_persons
                 .Include(s => s.Company)
                 .FirstOrDefault(s => s.Contact_person_ID == po.Contact_person_ID);
-
-            if (po.Payment_term_ID.HasValue)
-            {
-                po.Payment_terms = _db.Payment_terms.FirstOrDefault(p => p.Payment_term_ID == po.Payment_term_ID);
-            }
-
-            if (po.Delivery_term_ID.HasValue)
-            {
-                po.Delivery_terms = _db.Delivery_terms.FirstOrDefault(d => d.Delivery_term_ID == po.Delivery_term_ID);
-            }
 
             po.Companies = _db.Companies.FirstOrDefault(c => c.Company_ID == po.Delivery_address_ID);
             po.Correspondents = _db.Correspondents.FirstOrDefault(c => c.Correspondent_ID == po.Correspondent_ID);
