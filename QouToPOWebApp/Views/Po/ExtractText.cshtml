@@ -211,7 +211,7 @@
                             totalAmount += price;
                             <tr>
                                 <td></td>
-                                <td><div><span>@Model?.Quotation_items[i]?.Order</span><input hidden asp-for="Quotation_items[i].Order" value='@(Model?.Quotation_items[i]?.Order ?? counter)'></div></td>
+                                <td><div><span>@(Model?.Quotation_items[i]?.Order ?? counter)</span><input hidden asp-for="Quotation_items[i].Order" value='@(Model?.Quotation_items[i]?.Order ?? counter)'></div></td>
                                 <td><div><span>@Model?.Quotation_items[i]?.Item_name</span><textarea hidden asp-for="Quotation_items[i].Item_name">@Model?.Quotation_items[i]?.Item_name</textarea></div></td>
                                 <td><div><span>@Model?.Quotation_items[i]?.Item_quantity</span><input hidden asp-for="Quotation_items[i].Item_quantity" value='@Model?.Quotation_items[i]?.Item_quantity'></div></td>
                                 <td><div><span>@Model?.Quotation_items[i]?.Unit</span><input hidden asp-for="Quotation_items[i].Unit" value='@Model?.Quotation_items[i]?.Unit'></div></td>
