@@ -24,6 +24,13 @@ $(this).keypress(function () {
 $(this).on('touchstart touchmove', function () {
     idleTime = 0; // Reset idle time on touch start or touch move
 });
+$("textarea").each(function () {
+    this.style.height = "auto";
+    this.style.height = (this.scrollHeight) + "px";
+}).on("input", function () {
+    this.style.height = "auto";
+    this.style.height = (this.scrollHeight) + "px";
+});
 
 $(document).ready(function () {
     // Show the toast after 2 seconds
