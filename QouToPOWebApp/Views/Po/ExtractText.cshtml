@@ -1,4 +1,5 @@
 ﻿@using QouToPOWebApp.ViewModel
+@using QouToPOWebApp.Models.InfoModels
 
 @model PoViewModel;
 
@@ -65,9 +66,9 @@
                         <span asp-validation-for="Po_title" class="text-danger"></span>
                     </div>
                     <div class="col-md-3">
-                        <label asp-for="Quotation_date" class="form-label"></label><span class="text-danger" title="Required">*</span>
-                        <input asp-for="Quotation_date" type="date" class="form-control" value="@(Model.Quotation_date.Value.ToString("yyyy-MM-dd"))"/>
-                        <span asp-validation-for="Quotation_date" class="text-danger"></span>
+                        <label asp-for="Po_date" class="form-label"></label><span class="text-danger" title="Required">*</span>
+                        <input asp-for="Po_date" type="date" class="form-control" value="@(Model.Po_date.Value.ToString("yyyy-MM-dd"))" />
+                        <span asp-validation-for="Po_date" class="text-danger"></span>
                     </div>
                     <div class="col-md-3">
                         <label asp-for="Po_number" class="form-label"></label><span class="text-danger" title="Required">*</span>
@@ -205,17 +206,17 @@
                             var totalAmount = 0.0;
                             var counter = 1;
                         }
-                        @for (var i = 0; i < Model?.Quotation_items?.Count(); i++)
+                        @for (var i = 0; i < Model?.Po_items?.Count(); i++)
                         {
-                            var price = (Model?.Quotation_items[i]?.Item_quantity ?? 0) * (Model?.Quotation_items[i]?.Item_price ?? 0);
+                            var price = (Model?.Po_items[i]?.Item_quantity ?? 0) * (Model?.Po_items[i]?.Item_price ?? 0);
                             totalAmount += price;
                             <tr>
                                 <td></td>
-                                <td><div><span>@(Model?.Quotation_items[i]?.Order ?? counter)</span><input hidden asp-for="Quotation_items[i].Order" value='@(Model?.Quotation_items[i]?.Order ?? counter)'></div></td>
-                                <td><div><span>@Model?.Quotation_items[i]?.Item_name</span><textarea hidden asp-for="Quotation_items[i].Item_name">@Model?.Quotation_items[i]?.Item_name</textarea></div></td>
-                                <td><div><span>@Model?.Quotation_items[i]?.Item_quantity</span><input hidden asp-for="Quotation_items[i].Item_quantity" value='@Model?.Quotation_items[i]?.Item_quantity'></div></td>
-                                <td><div><span>@Model?.Quotation_items[i]?.Unit</span><input hidden asp-for="Quotation_items[i].Unit" value='@Model?.Quotation_items[i]?.Unit'></div></td>
-                                <td><div><span>@Model?.Quotation_items[i]?.Item_price?.ToString("N0")</span><input hidden asp-for="Quotation_items[i].Item_price" value='@Model?.Quotation_items[i]?.Item_price'></div></td>
+                                <td><div><span>@(Model?.Po_items[i]?.Order ?? counter)</span><input hidden asp-for="Po_items[i].Order" value='@(Model?.Po_items[i]?.Order ?? counter)'></div></td>
+                                <td><div><span>@Model?.Po_items[i]?.Item_name</span><textarea hidden asp-for="Po_items[i].Item_name">@Model?.Po_items[i]?.Item_name</textarea></div></td>
+                                <td><div><span>@Model?.Po_items[i]?.Item_quantity</span><input hidden asp-for="Po_items[i].Item_quantity" value='@Model?.Po_items[i]?.Item_quantity'></div></td>
+                                <td><div><span>@Model?.Po_items[i]?.Unit</span><input hidden asp-for="Po_items[i].Unit" value='@Model?.Po_items[i]?.Unit'></div></td>
+                                <td><div><span>@Model?.Po_items[i]?.Item_price?.ToString("N0")</span><input hidden asp-for="Po_items[i].Item_price" value='@Model?.Po_items[i]?.Item_price'></div></td>
                                 <td><div><span class='itemPrice'>@price.ToString("N0")</span></div></td>
                             </tr>
 

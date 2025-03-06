@@ -3,6 +3,7 @@
 *@
 
 @using QouToPOWebApp.ViewModel
+@using QouToPOWebApp.Models.InfoModels
 
 @model PoViewModel
 
@@ -25,9 +26,9 @@
                 <span asp-validation-for="Po_title" class="text-danger"></span>
             </div>
             <div class="col-auto mb-2">
-                <label class="form-label" asp-for="Quotation_date"></label><span class="text-danger" title="Required">*</span>
-                <input class="form-control" type="date" asp-for="Quotation_date" />
-                <span asp-validation-for="Quotation_date" class="text-danger"></span>
+                <label class="form-label" asp-for="Po_date"></label><span class="text-danger" title="Required">*</span>
+                <input class="form-control" type="date" asp-for="Po_date" />
+                <span asp-validation-for="Po_date" class="text-danger"></span>
             </div>
             <div class="col-auto mb-2">
                 <label class="form-label" asp-for="Po_number"></label><span class="text-danger" title="Required">*</span>

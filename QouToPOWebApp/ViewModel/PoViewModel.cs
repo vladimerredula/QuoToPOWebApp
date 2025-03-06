@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using QouToPOWebApp.Models;
+using QouToPOWebApp.Models.InfoModels;
+using QouToPOWebApp.Models.PoModels;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -17,7 +18,7 @@ namespace QouToPOWebApp.ViewModel
 
         [Display(Name = "Date")]
         [Required]
-        public DateTime? Quotation_date { get; set; }
+        public DateTime? Po_date { get; set; }
 
         [Display(Name = "Company")]
         [ForeignKey("Contact_persons")]
@@ -55,7 +56,7 @@ namespace QouToPOWebApp.ViewModel
         public int? Pdf_type_ID { get; set; }
 
         public string? Extract_mode { get; set; }
-        public List<Quotation_item>? Quotation_items { get; set; }
+        public List<Po_item>? Po_items { get; set; }
 
         public virtual Company? Companies { get; set; }
         public virtual Contact_person? Contact_persons { get; set; }

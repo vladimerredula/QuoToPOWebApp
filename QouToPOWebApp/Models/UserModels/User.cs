@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace QouToPOWebApp.Models
+namespace QouToPOWebApp.Models.UserModels
 {
     public class User
     {

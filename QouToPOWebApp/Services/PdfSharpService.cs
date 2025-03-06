@@ -2,6 +2,7 @@
 using PdfSharp.Drawing.Layout;
 using PdfSharp.Fonts;
 using PdfSharp.Pdf;
+using QouToPOWebApp.Models.PoModels;
 using QouToPOWebApp.ViewModel;
 using System.Globalization;
 
@@ -57,30 +58,30 @@ namespace QouToPOWebApp.Services
             {
                 Po_number = "20250219/FF-001-092",
                 Quotation_number = "Q24044",
-                Quotation_date = DateTime.Parse("2025-2-19"),
+                Po_date = DateTime.Parse("2025-2-19"),
                 Include_tax = true,
                 Email = "sample@faradaygroup.com",
                 Po_title = "Sample title",
-                Payment_terms = new Models.Payment_term
+                Payment_terms = new Models.InfoModels.Payment_term
                 {
                     Payment_term_name = "Closed at the end of the month and paid at the end of the following month",
                     Payment_term_name_jpn = "月末締め翌月末支払い"
                 },
-                Delivery_terms = new Models.Delivery_term
+                Delivery_terms = new Models.InfoModels.Delivery_term
                 {
                     Delivery_term_name = "After consultation",
                     Delivery_term_name_jpn = "別途ご相談の上"
                 },
-                Companies = new Models.Company
+                Companies = new Models.InfoModels.Company
                 {
                     Address = "Zama factory, 5-12-15 Hibarigaoka, Zama, Kanagawa, 252-0003",
                     Address_jpn = "座間工場 〒252-0003 神奈川県座間市ひばりが丘5⁻12⁻15"
                 },
-                Contact_persons = new Models.Contact_person
+                Contact_persons = new Models.InfoModels.Contact_person
                 {
                     Contact_person_name = "△△  □□",
                     Contact_person_name_jpn = "△△  □□ ",
-                    Company = new Models.Company
+                    Company = new Models.InfoModels.Company
                     {
                         Company_name = "Company Sample Inc.",
                         Company_name_jpn = "株式会社サンプル　〇〇支社",
@@ -89,9 +90,9 @@ namespace QouToPOWebApp.Services
                         Postal_code = "123-1234"
                     }
                 },
-                Quotation_items = new List<Models.Quotation_item>
+                Po_items = new List<Models.PoModels.Po_item>
                 {
-                    new Models.Quotation_item 
+                    new Models.PoModels.Po_item 
                     {
                         Item_name = "○○○○○○　サンプル　タイプＡ\nline1",
                         Item_price = 123456,
@@ -99,7 +100,7 @@ namespace QouToPOWebApp.Services
                         Unit = "sets",
                         Order = 1
                     },
-                    new Models.Quotation_item 
+                    new Models.PoModels.Po_item
                     {
                         Item_name = "△△△△　システム機器\nline1\nline2\nline3",
                         Item_price = 2,
@@ -107,14 +108,14 @@ namespace QouToPOWebApp.Services
                         Unit = "pcs",
                         Order = 2
                     },
-                    new Models.Quotation_item 
+                    new Models.PoModels.Po_item
                     {
                         Item_name = "△△△△　システムの取付作業\nline1\nline2",
                         Item_price = 3,
                         Item_quantity = 30000,
                         Order = 3
                     },
-                    new Models.Quotation_item 
+                    new Models.PoModels.Po_item
                     {
                         Item_name = "△△△△　システムの操作説明　講習会\nline1\nline2",
                         Item_price = 40,
@@ -122,7 +123,7 @@ namespace QouToPOWebApp.Services
                         Unit = "hours",
                         Order = 4
                     },
-                    new Models.Quotation_item 
+                    new Models.PoModels.Po_item
                     {
                         Item_name = "□□□□○○○○素材　（　✖✖　を含む　）",
                         Item_price = 50,
@@ -142,31 +143,31 @@ namespace QouToPOWebApp.Services
             {
                 Po_number = "20250219/FF-001-092",
                 Quotation_number = "Q24044",
-                Quotation_date = DateTime.Parse("2025-2-19"),
+                Po_date = DateTime.Parse("2025-2-19"),
                 Include_tax = true,
                 Email = "sample@faradaygroup.com",
                 Po_title = "Sample title",
-                Payment_terms = new Models.Payment_term
+                Payment_terms = new Models.InfoModels.Payment_term
                 {
                     Payment_term_name = "Closed at the end of the month and paid at the end of the following month",
                     Payment_term_name_jpn = "月末締め翌月末支払い"
                 },
-                Delivery_terms = new Models.Delivery_term
+                Delivery_terms = new Models.InfoModels.Delivery_term
                 {
                     Delivery_term_name = "After consultation",
                     Delivery_term_name_jpn = "別途ご相談の上"
                 },
-                Companies = new Models.Company
+                Companies = new Models.InfoModels.Company
                 {
                     Address = "5-12-15 Hibarigaoka, Zama, Kanagawa 252-0003, Japan",
                     Address_jpn = "神奈川県座間市ひばりが丘5⁻12⁻15",
                     Postal_code = "252-0003"
                 },
-                Contact_persons = new Models.Contact_person
+                Contact_persons = new Models.InfoModels.Contact_person
                 {
                     Contact_person_name = "Luffy Taro",
                     Contact_person_name_jpn = "△△  □□ ",
-                    Company = new Models.Company
+                    Company = new Models.InfoModels.Company
                     {
                         Company_name = "Company Sample Inc.",
                         Company_name_jpn = "株式会社サンプル　〇〇支社",
@@ -175,14 +176,14 @@ namespace QouToPOWebApp.Services
                         Postal_code = "123-1234"
                     }
                 },
-                Correspondents = new Models.Correspondent
+                Correspondents = new Models.InfoModels.Correspondent
                 {
                     Correspondent_name = "Monkey D. Dragon",
                     Correspondent_position = "CEO"
                 },
-                Quotation_items = new List<Models.Quotation_item>
+                Po_items = new List<Models.PoModels.Po_item>
                 {
-                    new Models.Quotation_item 
+                    new Models.PoModels.Po_item
                     {
                         Item_name = "** Sample type A",
                         Item_price = 123456,
@@ -190,7 +191,7 @@ namespace QouToPOWebApp.Services
                         Unit = "sets",
                         Order = 1
                     },
-                    new Models.Quotation_item
+                    new Models.PoModels.Po_item
                     {
                         Item_name = "System equipment",
                         Item_price = 2,
@@ -198,14 +199,14 @@ namespace QouToPOWebApp.Services
                         Unit = "pcs",
                         Order = 2
                     },
-                    new Models.Quotation_item
+                    new Models.PoModels.Po_item
                     {
                         Item_name = "System installation work",
                         Item_price = 3,
                         Item_quantity = 30000,
                         Order = 3
                     },
-                    new Models.Quotation_item
+                    new Models.PoModels.Po_item
                     {
                         Item_name = "System operation training session",
                         Item_price = 40,
@@ -213,7 +214,7 @@ namespace QouToPOWebApp.Services
                         Unit = "hours",
                         Order = 4
                     },
-                    new Models.Quotation_item
+                    new Models.PoModels.Po_item
                     {
                         Item_name = "**Material (including **)",
                         Item_price = 50,
@@ -287,9 +288,9 @@ namespace QouToPOWebApp.Services
             //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, x, y, 50, rowHeight);
             gfx.DrawString("発注日付：", bodyFont, XBrushes.Black, new XRect(x, y, 50, rowHeight), XStringFormats.Center);
 
-            // Quotation date
+            // Po date
             //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 100, y, 100, rowHeight);
-            gfx.DrawString(po?.Quotation_date?.ToString("yyyy年MM月dd日") ?? string.Empty, bodyFont, XBrushes.Black, new XRect(100, y, 100, rowHeight), XStringFormats.CenterLeft);
+            gfx.DrawString(po?.Po_date?.ToString("yyyy年MM月dd日") ?? string.Empty, bodyFont, XBrushes.Black, new XRect(100, y, 100, rowHeight), XStringFormats.CenterLeft);
 
             y += 30;
 
@@ -400,9 +401,9 @@ namespace QouToPOWebApp.Services
 
             var y1 = y;
 
-            if (po?.Quotation_items?.Count() > 0)
+            if (po?.Po_items?.Count() > 0)
             {
-                foreach (var item in po?.Quotation_items?.OrderBy(q => q.Order))
+                foreach (var item in po?.Po_items?.OrderBy(q => q.Order))
                 {
                     var y2 = y1;
                     var currentRowHeight = 12;
@@ -436,7 +437,7 @@ namespace QouToPOWebApp.Services
 
             y = y1;
 
-            var itemCount = po.Quotation_items != null ? po.Quotation_items.Count() : 0;
+            var itemCount = po.Po_items != null ? po.Po_items.Count() : 0;
             // Draw table rows
             for (int row = itemCount; row < 9; row++)
             {
@@ -597,7 +598,7 @@ namespace QouToPOWebApp.Services
             gfx.DrawLine(new XPen(XColors.Black, 3), 37, y, page.Width - 42, y);
             gfx.DrawLine(new XPen(XColors.Black, 1), 238, y + 3, page.Width - 42, y + 3);
 
-            var date = (bool)(po?.Quotation_date.HasValue) ? po?.Quotation_date.Value.ToString("MMMM d, yyyy") : DateTime.Now.ToString("MMMM d, yyyy");
+            var date = (bool)(po?.Po_date.HasValue) ? po?.Po_date.Value.ToString("MMMM d, yyyy") : DateTime.Now.ToString("MMMM d, yyyy");
             //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, 37, y+5, page.Width - 80, 10);
             gfx.DrawString(date, calibri, XBrushes.Black, new XRect(37, y + 5, page.Width - 80, 10), XStringFormats.CenterRight);
 
@@ -685,9 +686,9 @@ namespace QouToPOWebApp.Services
 
             var y1 = y + 3;
 
-            if (po?.Quotation_items?.Count() > 0)
+            if (po?.Po_items?.Count() > 0)
             {
-                foreach (var item in po?.Quotation_items?.OrderBy(q => q.Order))
+                foreach (var item in po?.Po_items?.OrderBy(q => q.Order))
                 {
                     gfx.DrawString(item?.Order?.ToString(), calibri, XBrushes.Black, new XRect(x, y1, column1, rowHeight), XStringFormats.CenterLeft);
 

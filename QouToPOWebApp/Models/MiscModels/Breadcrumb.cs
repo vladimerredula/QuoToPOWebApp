@@ -1,4 +1,4 @@
-﻿namespace QouToPOWebApp.Models
+﻿namespace QouToPOWebApp.Models.MiscModels
 {
     public class Breadcrumb
     {

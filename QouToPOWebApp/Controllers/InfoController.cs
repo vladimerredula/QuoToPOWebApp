@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using QouToPOWebApp.Models;
+using QouToPOWebApp.Models.InfoModels;
 
 namespace QouToPOWebApp.Controllers
 {

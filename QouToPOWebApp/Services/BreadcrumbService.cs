@@ -4,7 +4,7 @@
     using Microsoft.AspNetCore.Routing;
     using System.Collections.Generic;
     using System.Linq;
-    using QouToPOWebApp.Models;
+    using QouToPOWebApp.Models.MiscModels;
 
     public interface IBreadcrumbService
     {

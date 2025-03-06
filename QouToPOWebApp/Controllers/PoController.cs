@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using QouToPOWebApp.Models;
+using QouToPOWebApp.Models.InfoModels;
+using QouToPOWebApp.Models.PoModels;
 using QouToPOWebApp.Services;
 using QouToPOWebApp.ViewModel;
 using System.Security.Claims;
@@ -111,12 +112,12 @@ namespace QouToPOWebApp.Controllers
 
             var model = new PoViewModel()
             {
-                Quotation_items = new List<Quotation_item>(),
+                Po_items = new List<Po_item>(),
                 Extract_mode = Request.Form["Extract_mode"]
             };
 
             model.Quotation_number = quoNumber;
-            model.Quotation_date = quoDate;
+            model.Po_date = quoDate;
             model.Po_number = quoDate.ToString("yyyyMMdd") + "/FF-000-000";
             model.Contact_person_ID = contactPersonID;
             model.Payment_term = model.Po_language == "en" ? paymentTerm.Payment_term_name : paymentTerm.Payment_term_name_jpn;
@@ -128,7 +129,7 @@ namespace QouToPOWebApp.Controllers
             model.Pdf_type_ID = int.Parse(Request.Form["Pdf_type_ID"]);
             model.Extract_mode = Request.Form["Extract_mode"];
 
-            model.Quotation_items = GetQuotationItems(filePath);
+            model.Po_items = GetPoItems(filePath);
 
             ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name", model.Pdf_type_ID);
             ViewData["contactPersonList"] = GetContactPersonList(model.Contact_person_ID);
@@ -180,12 +181,12 @@ namespace QouToPOWebApp.Controllers
 
             var model = new PoViewModel()
             {
-                Quotation_items = new List<Quotation_item>(),
+                Po_items = new List<Po_item>(),
                 Extract_mode = Request.Form["Extract_mode"]
             };
 
             model.Quotation_number = quoNumber;
-            model.Quotation_date = quoDate;
+            model.Po_date = quoDate;
             model.Contact_person_ID = contactPersonID;
             model.Payment_term = model.Po_language == "en" ? paymentTerm.Payment_term_name : paymentTerm.Payment_term_name_jpn;
             model.Delivery_term = model.Po_language == "en" ? deliveryTerm.Delivery_term_name : deliveryTerm.Delivery_term_name_jpn;
@@ -193,7 +194,7 @@ namespace QouToPOWebApp.Controllers
             model.File_name = Path.GetFileName(filePath);
             model.Include_tax = IsTaxable(cleanedText);
 
-            model.Quotation_items = GetQuotationItems(filePath);
+            model.Po_items = GetPoItems(filePath);
 
             ViewData["pdfTypeList"] = new SelectList(_db.Pdf_types, "Pdf_type_ID", "Pdf_type_name", model.Pdf_type_ID);
             ViewData["deliveryAddressList"] = GetDeliveryAddressList(1);
@@ -205,14 +206,14 @@ namespace QouToPOWebApp.Controllers
             return View("ExtractText", model);
         }
 
-        public List<Quotation_item> GetQuotationItems(string filePath)
+        public List<Po_item> GetPoItems(string filePath)
         {
             var extractionMode = Request.Form["Extract_mode"];
 
             var tabulaJar = new TabulaJarService();
             string extractedTables = tabulaJar.ExtractTables(filePath, extractionMode);
 
-            var quotationItems = new List<Quotation_item>();
+            var poItems = new List<Po_item>();
             var rows = extractedTables.Split("\n");
 
             var headerKeyWords = new List<(List<string> headerNames, int itemIndex)> {
@@ -258,7 +259,7 @@ namespace QouToPOWebApp.Controllers
 
                 if (itemMarker)
                 {
-                    var quotationItem = new Quotation_item();
+                    var poItem = new Po_item();
 
                     var sample = Regex.Replace(row, @"[\r\n\t]", "");
 
@@ -279,32 +280,32 @@ namespace QouToPOWebApp.Controllers
 
                     if (result.Length > 2)
                     {
-                        quotationItem.Item_name = result[itemname.itemIndex];
+                        poItem.Item_name = result[itemname.itemIndex];
 
                         if (itemquantity.itemIndex != itemunit.itemIndex)
                         {
-                            quotationItem.Unit = result[itemunit.itemIndex];
+                            poItem.Unit = result[itemunit.itemIndex];
                         }
 
                         int quantity;
                         if (int.TryParse(Regex.Replace(result[itemquantity.itemIndex], @"[^0-9.]", ""), out quantity))
                         {
-                            quotationItem.Item_quantity = quantity;
+                            poItem.Item_quantity = quantity;
                         }
 
                         float price;
                         if (float.TryParse(Regex.Replace(result[itemprice.itemIndex], @"[^0-9.]", ""), out price) && result.Length > 2)
                         {
-                            quotationItem.Item_price = price;
+                            poItem.Item_price = price;
                         }
                     }
 
-                    quotationItems.Add(quotationItem);
+                    poItems.Add(poItem);
                 }
 
             }
 
-            return quotationItems;
+            return poItems;
         }
 
         public bool IsTaxable(string text)

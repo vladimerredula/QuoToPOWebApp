@@ -71,7 +71,7 @@ $("#Po_language").on("change", function () {
     changeLang();
 });
 
-$("#Quotation_date").change(function () {
+$("#Po_date").change(function () {
     let dateValue = $(this).val(); // Get the selected date (YYYY-MM-DD)
     formatDateToPoNumber(dateValue);
 });
@@ -261,11 +261,11 @@ function addTableRow(order, item, totalprice) {
 
     itemTable.row.add([
         "",
-        createCell(order, `Quotation_items[${itemIndex}].Order`),
-        createCellWithTextarea(itemnameDisplay, item.name, `Quotation_items[${itemIndex}].Item_name`),
-        createCell(item.quantity, `Quotation_items[${itemIndex}].Item_quantity`),
-        createCell(item.unit, `Quotation_items[${itemIndex}].Unit`),
-        createCell(item.price.toLocaleString(), `Quotation_items[${itemIndex}].Item_price`, item.price),
+        createCell(order, `Po_items[${itemIndex}].Order`),
+        createCellWithTextarea(itemnameDisplay, item.name, `Po_items[${itemIndex}].Item_name`),
+        createCell(item.quantity, `Po_items[${itemIndex}].Item_quantity`),
+        createCell(item.unit, `Po_items[${itemIndex}].Unit`),
+        createCell(item.price.toLocaleString(), `Po_items[${itemIndex}].Item_price`, item.price),
         `<span class='itemPrice'>${totalprice.toLocaleString()}</span>`
     ]).draw();
 }
@@ -317,7 +317,7 @@ function reorderTable() {
     function updateCell(data, rowIndex, colIndex, inputType, inputName, spanUpdate = false) {
         var element = $(data[colIndex]);
 
-        element.find(inputType).attr("name", `Quotation_items[${rowIndex}].${inputName}`);
+        element.find(inputType).attr("name", `Po_items[${rowIndex}].${inputName}`);
 
         if (spanUpdate) {
             element.find("span").text(rowIndex + 1);  // For Order column

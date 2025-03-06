@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace QouToPOWebApp.Models
+namespace QouToPOWebApp.Models.InfoModels
 {
     public class Company
     {

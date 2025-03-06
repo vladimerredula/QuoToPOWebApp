@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QouToPOWebApp.Models;
+using QouToPOWebApp.Models.UserModels;
 using System.Security.Claims;
 
 namespace QouToPOWebApp.Controllers

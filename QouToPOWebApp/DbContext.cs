@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using QouToPOWebApp.Models;
+using QouToPOWebApp.Models.InfoModels;
+using QouToPOWebApp.Models.PoModels;
+using QouToPOWebApp.Models.UserModels;
 
 namespace QouToPOWebApp
 {
@@ -11,10 +13,8 @@ namespace QouToPOWebApp
 
         public DbSet<Company> Companies { get; set; }
         public DbSet<Contact_person> Contact_persons { get; set; }
-        public DbSet<Quotation> Quotations { get; set; }
-        public DbSet<Quotation_item> quotation_items { get; set; }
+        public DbSet<Po_item> Po_items { get; set; }
         public DbSet<Po> Pos { get; set; }
-        public DbSet<Po_type> Pos_types { get; set; }
         public DbSet<Delivery_term> Delivery_terms { get; set; }
         public DbSet<Payment_term> Payment_terms { get; set; }
         public DbSet<Pdf_type> Pdf_types { get; set; }
