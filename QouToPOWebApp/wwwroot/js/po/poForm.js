@@ -58,7 +58,9 @@ $("#submitItem").on("click", function () {
 });
 
 $("#saveItem").on("click", function () {
-    updateItem();
+    if ($("#itemEditForm").valid()) {
+        updateItem();
+    }
 });
 
 $("#Include_tax").on("change", function () {
@@ -517,6 +519,7 @@ function addDeliveryTerm() {
         $("#delJpnName").val(null);
     }
 }
+
 function handleAjaxError(xhr, status, error) {
     console.error('AJAX Error:', status, error);
 }

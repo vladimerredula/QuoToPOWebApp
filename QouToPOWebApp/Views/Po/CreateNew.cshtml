@@ -82,7 +82,7 @@
                             }
                         </div>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" id="customPaymentTerm">Register</a></li>
+                        <li><a class="dropdown-item" href="#" id="customPaymentTerm"><i class="bi bi-plus-circle-dotted"></i> Register</a></li>
                     </ul>
                 </div>
                 <span asp-validation-for="Payment_term" class="text-danger"></span>
@@ -108,7 +108,7 @@
                             }
                         </div>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" id="customDeliveryTerm">Register</a></li>
+                        <li><a class="dropdown-item" href="#" id="customDeliveryTerm"><i class="bi bi-plus-circle-dotted"></i> Register</a></li>
                     </ul>
                 </div>
                 <span asp-validation-for="Delivery_term" class="text-danger"></span>
@@ -206,7 +206,7 @@
 <div class="modal fade" id="contactPersonModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header border-0">
                 <h1 class="modal-title fs-5" id="contactPersonModalLabel">New company</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -258,14 +258,15 @@
                             <input class="form-control" name="Contact_person" id="Contact_person" data-val="true" data-val-required="The Contact person field is required." required />
                             <span class="text-danger field-validation-valid" data-valmsg-for="Contact_person" data-valmsg-replace="true"></span>
                         </div>
-                        <div class="col-12 mb-3">
+                        <div class="col-12">
                             <input class="form-control" name="Contact_person_jpn" id="Contact_person_jpn" placeholder="Contact person name in Japanese"/>
                         </div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <a class="btn btn-primary" href="#" onclick="addCustomContactPerson()">Save</a>
+            <div class="modal-footer border-0">
+                <a class="btn btn-link" href="#" data-bs-dismiss="modal">Cancel</a>
+                <a class="btn btn-primary px-4" href="#" onclick="addCustomContactPerson()">Save</a>
             </div>
         </div>
     </div>
@@ -275,7 +276,7 @@
 <div class="modal fade" id="itemModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header border-0">
                 <h1 class="modal-title fs-5" id="itemModalLabel">Add item</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -304,7 +305,7 @@
                                 <option value="m" />
                             </datalist>
                         </div>
-                        <div class="col-6 mb-3">
+                        <div class="col-6">
                             <label class="form-label">Price</label><span class="text-danger" title="Required">*</span>
                             <div class="input-group">
                                 <span class="input-group-text" id="yenSign">¥</span>
@@ -315,8 +316,9 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <a class="btn btn-primary" href="#" id="submitItem">Add</a>
+            <div class="modal-footer border-0">
+                <a class="btn btn-link" href="#" data-bs-dismiss="modal" onclick="clearItemForm()">Cancel</a>
+                <a class="btn btn-primary px-4" href="#" id="submitItem">Save</a>
             </div>
         </div>
     </div>
@@ -326,7 +328,7 @@
 <div class="modal fade" id="itemEditModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header border-0">
                 <h1 class="modal-title fs-5" id="itemEditModalLabel">Edit item</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -341,7 +343,7 @@
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label">Quantity</label><span class="text-danger" title="Required">*</span>
-                            <input class="form-control" type="number" name="itemEditQuatity" id="itemEditQuantity" data-val="true" data-val-required="The Quantity field is required." required />
+                            <input class="form-control" type="number" name="itemEditQuantity" id="itemEditQuantity" data-val="true" data-val-required="The Quantity field is required." required />
                             <span class="text-danger field-validation-valid" data-valmsg-for="itemEditQuantity" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-6 mb-3">
@@ -356,7 +358,7 @@
                                 <option value="m" />
                             </datalist>
                         </div>
-                        <div class="col-6 mb-3">
+                        <div class="col-6">
                             <label class="form-label">Price</label><span class="text-danger" title="Required">*</span>
                             <div class="input-group">
                                 <span class="input-group-text" id="yenSign">¥</span>
@@ -367,8 +369,9 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <a class="btn btn-warning" href="#" id="saveItem">Save</a>
+            <div class="modal-footer border-0">
+                <a class="btn btn-link" href="#" data-bs-dismiss="modal" onclick="clearEditForm()">Cancel</a>
+                <a class="btn btn-warning text-white px-4" href="#" id="saveItem">Save</a>
             </div>
         </div>
     </div>
@@ -378,7 +381,7 @@
 <div class="modal fade" id="paymentTermAddModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header border-0">
                 <h1 class="modal-title fs-5" id="paymentTermAddModalLabel">Add payment term</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -390,15 +393,16 @@
                             <input class="form-control" name="payTermName" id="payTermName" data-val="true" data-val-required="The Payment term name field is required." required />
                             <span class="text-danger field-validation-valid" data-valmsg-for="payTermName" data-valmsg-replace="true"></span>
                         </div>
-                        <div class="col-12 mb-3">
+                        <div class="col-12">
                             <label class="form-label">Japanese translation</label>
                             <input class="form-control" id="payJpnName" />
                         </div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <a class="btn btn-primary" href="#" id="savePayTerm" onclick="addPaymentTerm()">Save</a>
+            <div class="modal-footer border-0">
+                <a class="btn btn-link" href="#" data-bs-dismiss="modal">Cancel</a>
+                <a class="btn btn-primary px-4" href="#" id="savePayTerm" onclick="addPaymentTerm()">Save</a>
             </div>
         </div>
     </div>
@@ -408,7 +412,7 @@
 <div class="modal fade" id="deliveryTermAddModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header border-0">
                 <h1 class="modal-title fs-5" id="deliveryTermAddModalLabel">Add delivery term</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -420,15 +424,16 @@
                             <input class="form-control" name="delTermName" id="delTermName" data-val="true" data-val-required="The Delivery term name field is required." required />
                             <span class="text-danger field-validation-valid" data-valmsg-for="delTermName" data-valmsg-replace="true"></span>
                         </div>
-                        <div class="col-12 mb-3">
+                        <div class="col-12">
                             <label class="form-label">Japanese translation</label>
                             <input class="form-control" id="delJpnName" />
                         </div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <a class="btn btn-primary" href="#" id="saveDelTerm" onclick="addDeliveryTerm()">Save</a>
+            <div class="modal-footer border-0">
+                <a class="btn btn-link" href="#" data-bs-dismiss="modal">Cancel</a>
+                <a class="btn btn-primary px-4" href="#" id="saveDelTerm" onclick="addDeliveryTerm()">Save</a>
             </div>
         </div>
     </div>
@@ -438,7 +443,7 @@
 <div class="modal fade" id="pdfPreviewModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header border-0">
                 <h1 class="modal-title fs-5" id="pdfPreviewModalLabel">Preview</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
