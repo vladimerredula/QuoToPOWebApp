@@ -38,6 +38,7 @@ $("#Po_language").on("change", function () {
     changeLang();
 });
 
+
 function changeLang() {
     var lang = $("#Po_language").val();
     var isEnglish = (lang === "en");
@@ -144,7 +145,7 @@ $("#submitItem").on("click", function () {
             `<div><span>${quantity}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_quantity' value='${quantity}'></div>`,
             `<div><span>${unit}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Unit' value='${unit}'></div>`,
             `<div><span>${price.toLocaleString()}</span><input hidden name='Quotation_items[${itemTable.rows().count()}].Item_price' value='${price}'></div>`,
-            `<span class='itemPrice'>${totalprice.toLocaleString() }</span>`
+            `<span class='itemPrice'>${totalprice.toLocaleString()}</span>`
         ]).draw();
         calculateTotal();
     }
@@ -263,7 +264,7 @@ function reorderTable() {
         if (spanUpdate) {
             element.find("span").text(rowIndex + 1);  // For Order column
         }
-        
+
         data[colIndex] = element.prop("outerHTML");
     }
 
@@ -289,7 +290,7 @@ function reorderTable() {
     });
 }
 
-$("#pdfPreview").on("click", function () {
+$("#poPreview").on("click", function () {
     var form = $("#poForm");
     if (form.valid()) {
         reorderTable();

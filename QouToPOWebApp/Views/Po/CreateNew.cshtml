@@ -20,7 +20,7 @@
     <div class="card p-3 border-0 shadow-sm mb-3">
         <div class="row mb-3">
             <div class="col-4 mb-2">
-                <label class="form-label" asp-for="Po_title">PO Title</label><span class="text-danger" title="Required">*</span>
+                <label class="form-label" asp-for="Po_title">PO Title</label><span id="poTitleRequired" class="text-danger visually-hidden" title="Required">*</span>
                 <input class="form-control" type="text" asp-for="Po_title" required />
                 <span asp-validation-for="Po_title" class="text-danger"></span>
             </div>
@@ -45,7 +45,7 @@
                 <span asp-validation-for="Po_language" class="text-danger"></span>
             </div>
             <div class="col-3 mb-2">
-                <label class="form-label" asp-for="Quotation_number" id="quoNumberLabel"></label><span class="text-danger" title="Required">*</span>
+                <label class="form-label" asp-for="Quotation_number" id="quoNumberLabel"></label><span id="quotationNumberRequired" class="text-danger visually-hidden" title="Required">*</span>
                 <input class="form-control" type="text" asp-for="Quotation_number" data-val="true" data-val-required="The Quotation number field is required." />
                 <span class="text-danger field-validation-valid" data-valmsg-for="Quotation_number" data-valmsg-replace="true"></span>
             </div>
@@ -126,7 +126,7 @@
         </div>
         <div class="row">
             <div class="col-3 mb-2">
-                <label class="form-label" asp-for="Correspondent_ID" id="correspondentLabel"></label><span class="text-danger" title="Required">*</span>
+                <label class="form-label" asp-for="Correspondent_ID" id="correspondentLabel"></label><span id="correspondentRequired" class="text-danger visually-hidden" title="Required">*</span>
                 <select class="form-select" asp-for="Correspondent_ID" data-val="true" data-val-required="The Correspondent field is required." asp-items="ViewBag.correspondentList">
                     <option selected disabled>Choose..</option>
                 </select>
@@ -194,7 +194,7 @@
     </div>
     <div class="row justify-content-end">
         <div class="col-auto">
-            <a class="btn btn-lg btn-light border" href="#" id="pdfPreview">Preview</a>
+            <a class="btn btn-lg btn-light border" href="#" id="poPreview">Preview</a>
         </div>
         <div class="col-auto">
             <a class="btn btn-lg btn-info text-white shadow" href="#" id="generatePo">Generate PO</a>
@@ -453,5 +453,5 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    <script src="/js/po/createNew.js"></script>
+    <script src="/js/po/poForm.js"></script>
 }
