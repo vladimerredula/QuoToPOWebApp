@@ -56,7 +56,7 @@
                     <select class="form-select" asp-for="Contact_person_ID" asp-items="ViewBag.contactPersonList">
                         <option selected disabled>Choose..</option>
                     </select>
-                    <a href="#" class="btn btn-light border" id="customContactPerson">Add</a>
+                    <a href="javascript:void(0)" class="btn btn-light border" id="customContactPerson">Add</a>
                 </div>
                 <span asp-validation-for="Contact_person_ID" class="text-danger"></span>
             </div>
@@ -74,16 +74,16 @@
                             {
                                 if (paymentTerm.Payment_term_name != null && paymentTerm.Payment_term_name != "")
                                 {
-                                <li class="en visually-hidden"><a class="dropdown-item" href="#" onclick="setTerm(this)">@paymentTerm.Payment_term_name</a></li>
+                                <li class="en visually-hidden"><a class="dropdown-item" href="javascript:void(0)" onclick="setTerm(this)">@paymentTerm.Payment_term_name</a></li>
                                 }
                                 if (paymentTerm.Payment_term_name_jpn != null && paymentTerm.Payment_term_name_jpn != "")
                                 {
-                                <li class="jp visually-hidden"><a class="dropdown-item" href="#" onclick="setTerm(this)">@paymentTerm.Payment_term_name_jpn</a></li>
+                                <li class="jp visually-hidden"><a class="dropdown-item" href="javascript:void(0)" onclick="setTerm(this)">@paymentTerm.Payment_term_name_jpn</a></li>
                                 }
                             }
                         </div>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" id="customPaymentTerm"><i class="bi bi-plus-circle-dotted"></i> Register</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0)" id="customPaymentTerm"><i class="bi bi-plus-circle-dotted"></i> Register</a></li>
                     </ul>
                 </div>
                 <span asp-validation-for="Payment_term" class="text-danger"></span>
@@ -100,16 +100,16 @@
                             {
                                 if (deliveryTerm.Delivery_term_name != null && deliveryTerm.Delivery_term_name != "")
                                 {
-                                    <li class="en visually-hidden"><a class="dropdown-item" href="#" onclick="setTerm(this)">@deliveryTerm.Delivery_term_name</a></li>
+                                    <li class="en visually-hidden"><a class="dropdown-item" href="javascript:void(0)" onclick="setTerm(this)">@deliveryTerm.Delivery_term_name</a></li>
                                 }
                                 if (deliveryTerm.Delivery_term_name_jpn != null && deliveryTerm.Delivery_term_name_jpn != "")
                                 {
-                                    <li class="jp visually-hidden"><a class="dropdown-item" href="#" onclick="setTerm(this)">@deliveryTerm.Delivery_term_name_jpn</a></li>
+                                    <li class="jp visually-hidden"><a class="dropdown-item" href="javascript:void(0)" onclick="setTerm(this)">@deliveryTerm.Delivery_term_name_jpn</a></li>
                                 }
                             }
                         </div>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" id="customDeliveryTerm"><i class="bi bi-plus-circle-dotted"></i> Register</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0)" id="customDeliveryTerm"><i class="bi bi-plus-circle-dotted"></i> Register</a></li>
                     </ul>
                 </div>
                 <span asp-validation-for="Delivery_term" class="text-danger"></span>
@@ -139,9 +139,9 @@
     <div class="card p-3 border-0 shadow-sm mb-4">
         <div class="row justify-content-between">
             <div class="col-auto">
-                <a class="btn btn-light border" href="#" id="addItem">Add</a>&nbsp;
-                <a class="btn btn-light border disabled" href="#" id="editItem">Edit</a>&nbsp;
-                <a class="btn btn-light border disabled" href="#" id="removeItem">Remove</a>
+                <a class="btn btn-light border" href="javascript:void(0)" id="addItem">Add</a>&nbsp;
+                <a class="btn btn-light border disabled" href="javascript:void(0)" id="editItem">Edit</a>&nbsp;
+                <a class="btn btn-light border disabled" href="javascript:void(0)" id="removeItem">Remove</a>
             </div>
             <div class="col-auto align-self-end">
                 <div class="form-check form-switch">
@@ -195,10 +195,10 @@
     </div>
     <div class="row justify-content-end">
         <div class="col-auto">
-            <a class="btn btn-lg btn-light border" href="#" id="poPreview">Preview</a>
+            <a class="btn btn-lg btn-light border" href="javascript:void(0)" id="poPreview">Preview</a>
         </div>
         <div class="col-auto">
-            <a class="btn btn-lg btn-info text-white shadow" href="#" id="generatePo">Generate PO</a>
+            <a class="btn btn-lg btn-info text-white shadow" href="javascript:void(0)" id="generatePo">Generate PO</a>
         </div>
     </div>
 </form>
@@ -266,8 +266,8 @@
                 </form>
             </div>
             <div class="modal-footer border-0">
-                <a class="btn btn-link" href="#" data-bs-dismiss="modal">Cancel</a>
-                <a class="btn btn-primary px-4" href="#" onclick="addCustomContactPerson()">Save</a>
+                <a class="btn btn-link" href="javascript:void(0)" data-bs-dismiss="modal">Cancel</a>
+                <a class="btn btn-primary px-4" href="javascript:void(0)" onclick="addCustomContactPerson()">Save</a>
             </div>
         </div>
     </div>
@@ -318,8 +318,8 @@
                 </form>
             </div>
             <div class="modal-footer border-0">
-                <a class="btn btn-link" href="#" data-bs-dismiss="modal" onclick="clearItemForm()">Cancel</a>
-                <a class="btn btn-primary px-4" href="#" id="submitItem">Save</a>
+                <a class="btn btn-link" href="javascript:void(0)" data-bs-dismiss="modal" onclick="clearItemForm()">Cancel</a>
+                <a class="btn btn-primary px-4" href="javascript:void(0)" id="submitItem">Save</a>
             </div>
         </div>
     </div>
@@ -371,8 +371,8 @@
                 </form>
             </div>
             <div class="modal-footer border-0">
-                <a class="btn btn-link" href="#" data-bs-dismiss="modal" onclick="clearEditForm()">Cancel</a>
-                <a class="btn btn-warning text-white px-4" href="#" id="saveItem">Save</a>
+                <a class="btn btn-link" href="javascript:void(0)" data-bs-dismiss="modal" onclick="clearEditForm()">Cancel</a>
+                <a class="btn btn-warning text-white px-4" href="javascript:void(0)" id="saveItem">Save</a>
             </div>
         </div>
     </div>
@@ -402,8 +402,8 @@
                 </form>
             </div>
             <div class="modal-footer border-0">
-                <a class="btn btn-link" href="#" data-bs-dismiss="modal">Cancel</a>
-                <a class="btn btn-primary px-4" href="#" id="savePayTerm" onclick="addPaymentTerm()">Save</a>
+                <a class="btn btn-link" href="javascript:void(0)" data-bs-dismiss="modal">Cancel</a>
+                <a class="btn btn-primary px-4" href="javascript:void(0)" id="savePayTerm" onclick="addPaymentTerm()">Save</a>
             </div>
         </div>
     </div>
@@ -433,8 +433,8 @@
                 </form>
             </div>
             <div class="modal-footer border-0">
-                <a class="btn btn-link" href="#" data-bs-dismiss="modal">Cancel</a>
-                <a class="btn btn-primary px-4" href="#" id="saveDelTerm" onclick="addDeliveryTerm()">Save</a>
+                <a class="btn btn-link" href="javascript:void(0)" data-bs-dismiss="modal">Cancel</a>
+                <a class="btn btn-primary px-4" href="javascript:void(0)" id="saveDelTerm" onclick="addDeliveryTerm()">Save</a>
             </div>
         </div>
     </div>

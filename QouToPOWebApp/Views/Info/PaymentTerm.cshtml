@@ -43,8 +43,8 @@
                         @Html.DisplayFor(modelItem => item.Key_words)
                     </td>
                     <td>
-                        <a href="#" onclick="editPaymentTerm(@item.Payment_term_ID)">Edit</a> |
-                        <a href="#" onclick="deletePaymentTerm(@item.Payment_term_ID)">Delete</a>
+                        <a href="javascript:void(0)" onclick="editPaymentTerm(@item.Payment_term_ID)">Edit</a> |
+                        <a href="javascript:void(0)" onclick="deletePaymentTerm(@item.Payment_term_ID)">Delete</a>
                     </td>
                 </tr>
             }
@@ -81,8 +81,8 @@
                 </div>
                 <div class="modal-footer border-0">
                     <div class="form-group">
-                        <a class="btn btn-link" href="#" data-bs-dismiss="modal">Cancel</a>
-                        <a href="#" class="btn btn-primary" id="modalButton"></a>
+                        <a class="btn btn-link" href="javascript:void(0)" data-bs-dismiss="modal">Cancel</a>
+                        <a href="javascript:void(0)" class="btn btn-primary" id="modalButton"></a>
                     </div>
                 </div>
             </form>
@@ -119,7 +119,7 @@
             <div class="modal-footer border-0">
                 <form asp-action="DeletePaymentTerm">
                     <input type="hidden" name="id" id="deleteID" />
-                    <a class="btn btn-link" href="#" data-bs-dismiss="modal">Cancel</a>
+                    <a class="btn btn-link" href="javascript:void(0)" data-bs-dismiss="modal">Cancel</a>
                     <input type="submit" value="Delete" class="btn btn-danger" />
                 </form>
             </div>
