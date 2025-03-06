@@ -611,7 +611,7 @@ namespace QouToPOWebApp.Controllers
         public IActionResult DownloadPo(PoViewModel po)
         {
             // Return the PDF file as a download
-            return File(GeneratePo(po), "application/pdf", $"{po.Po_title}.pdf");
+            return File(GeneratePo(po), "application/pdf", $"{po.Po_title ?? po.Po_number}.pdf");
         }
 
         [HttpPost]

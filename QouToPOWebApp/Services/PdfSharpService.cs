@@ -386,14 +386,19 @@ namespace QouToPOWebApp.Services
 
             // PO title
             var title = po?.Po_title ?? string.Empty;
-            gfx.DrawString(title, bodyFont, XBrushes.Black, new XRect(42, y, column1, tableRowHeight), XStringFormats.CenterLeft);
-            gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36, y, column1, tableRowHeight);
-            gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1, y, column2, tableRowHeight);
-            gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1 + column2, y, column3, tableRowHeight);
-            gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1 + column2 + column3, y, column4, tableRowHeight);
+
+            if (title != string.Empty)
+            {
+                gfx.DrawString(title, new XFont("Meiryo-bold", 10), XBrushes.Black, new XRect(42, y, column1, tableRowHeight), XStringFormats.CenterLeft);
+                gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36, y, column1, tableRowHeight);
+                gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1, y, column2, tableRowHeight);
+                gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1 + column2, y, column3, tableRowHeight);
+                gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1 + column2 + column3, y, column4, tableRowHeight);
+
+                y += tableRowHeight;
+            }
 
             var y1 = y;
-            y1 += tableRowHeight;
 
             if (po?.Quotation_items?.Count() > 0)
             {

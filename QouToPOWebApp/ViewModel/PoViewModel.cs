@@ -42,7 +42,6 @@ namespace QouToPOWebApp.ViewModel
         public string? Email { get; set; }
 
         [Display(Name = "PO title")]
-        [Required]
         public string? Po_title { get; set; }
 
         [Display(Name = "PO language")]
