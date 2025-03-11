@@ -22,24 +22,24 @@
         <div class="row mb-3">
             <div class="col-4 mb-2">
                 <label class="form-label" asp-for="Po_title">PO Title</label><span id="poTitleRequired" class="text-danger visually-hidden" title="Required">*</span>
-                <input class="form-control" type="text" asp-for="Po_title" required />
+                <input class="form-control forDraft" type="text" asp-for="Po_title" required />
                 <span asp-validation-for="Po_title" class="text-danger"></span>
             </div>
             <div class="col-auto mb-2">
                 <label class="form-label" asp-for="Po_date"></label><span class="text-danger" title="Required">*</span>
-                <input class="form-control" type="date" asp-for="Po_date" />
+                <input class="form-control forDraft" type="date" asp-for="Po_date" />
                 <span asp-validation-for="Po_date" class="text-danger"></span>
             </div>
             <div class="col-auto mb-2">
                 <label class="form-label" asp-for="Po_number"></label><span class="text-danger" title="Required">*</span>
-                <input class="form-control" type="text" asp-for="Po_number" />
+                <input class="form-control forDraft" type="text" asp-for="Po_number" />
                 <span asp-validation-for="Po_number" class="text-danger"></span>
             </div>
         </div>
         <div class="row mb-3">
             <div class="col-3 mb-2">
                 <label class="form-label" asp-for="Po_language"></label><span class="text-danger" title="Required">*</span>
-                <select class="form-select" asp-for="Po_language">
+                <select class="form-select forDraft" asp-for="Po_language">
                     <option value="jp">Japanese</option>
                     <option value="en">English</option>
                 </select>
@@ -47,13 +47,13 @@
             </div>
             <div class="col-3 mb-2">
                 <label class="form-label" asp-for="Quotation_number" id="quoNumberLabel"></label><span id="quotationNumberRequired" class="text-danger visually-hidden" title="Required">*</span>
-                <input class="form-control" type="text" asp-for="Quotation_number" data-val="true" data-val-required="The Quotation number field is required." />
+                <input class="form-control forDraft" type="text" asp-for="Quotation_number" data-val="true" data-val-required="The Quotation number field is required." />
                 <span class="text-danger field-validation-valid" data-valmsg-for="Quotation_number" data-valmsg-replace="true"></span>
             </div>
             <div class="col-auto mb-2">
                 <label class="form-label" asp-for="Contact_person_ID"></label><span class="text-danger" title="Required">*</span>
                 <div class="input-group">
-                    <select class="form-select" asp-for="Contact_person_ID" asp-items="ViewBag.contactPersonList">
+                    <select class="form-select forDraft" asp-for="Contact_person_ID" asp-items="ViewBag.contactPersonList">
                         <option selected disabled>Choose..</option>
                     </select>
                     <a href="javascript:void(0)" class="btn btn-light border" id="customContactPerson">Add</a>
@@ -65,7 +65,7 @@
             <div class="col-4 mb-2">
                 <label class="form-label" asp-for="Payment_term"></label>
                 <div class="input-group">
-                    <input class="form-control" asp-for="Payment_term" />
+                    <input class="form-control forDraft" asp-for="Payment_term" />
                     <a class="btn btn-light border dropdown-toggle" data-bs-toggle="dropdown">
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
@@ -91,7 +91,7 @@
             <div class="col-4 mb-2">
                 <label class="form-label" asp-for="Delivery_term"></label>
                 <div class="input-group">
-                    <input class="form-control" asp-for="Delivery_term" />
+                <input class="form-control forDraft" asp-for="Delivery_term" />
                     <a class="btn btn-light border dropdown-toggle" data-bs-toggle="dropdown">
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
@@ -116,7 +116,7 @@
             </div>
             <div class="col-3 mb-2">
                 <label class="form-label" asp-for="Delivery_address_ID">Delivery Address</label><span class="text-danger" title="Required">*</span>
-                <select class="form-select" asp-for="Delivery_address_ID">
+                <select class="form-select forDraft" asp-for="Delivery_address_ID">
                     <option value="1">FFJ Zama</option>
                     <option value="2">FFJ Hachioji</option>
                     <option value="3">FFJ Hashimoto</option>
@@ -128,7 +128,7 @@
         <div class="row">
             <div class="col-3 mb-2">
                 <label class="form-label" asp-for="Correspondent_ID" id="correspondentLabel"></label><span id="correspondentRequired" class="text-danger visually-hidden" title="Required">*</span>
-                <select class="form-select" asp-for="Correspondent_ID" data-val="true" data-val-required="The Correspondent field is required." asp-items="ViewBag.correspondentList">
+                <select class="form-select forDraft" asp-for="Correspondent_ID" data-val="true" data-val-required="The Correspondent field is required." asp-items="ViewBag.correspondentList">
                     <option selected disabled>Choose..</option>
                 </select>
                 <span class="text-danger field-validation-valid" data-valmsg-for="Correspondent_ID" data-valmsg-replace="true"></span>
@@ -145,7 +145,7 @@
             </div>
             <div class="col-auto align-self-end">
                 <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" asp-for="Include_tax">
+                    <input class="form-check-input forDraft" type="checkbox" role="switch" asp-for="Include_tax">
                     <label class="form-check-label" asp-for="Include_tax">Include 10% tax</label>
                 </div>
             </div>
@@ -199,6 +199,7 @@
         </div>
         <div class="col-auto">
             <a class="btn btn-lg btn-info text-white shadow" href="javascript:void(0)" id="generatePo">Generate PO</a>
+            @* <a class="btn btn-lg btn-info text-white shadow px-5" href="javascript:void(0)" id="generatePo">Next</a> *@
         </div>
     </div>
 </form>

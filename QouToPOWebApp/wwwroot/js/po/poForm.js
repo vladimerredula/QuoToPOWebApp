@@ -1,6 +1,59 @@
 ﻿$(document).ready(function () {
-    changeLang();
-    taxSwitch();
+    // Get PO draft
+    $.get('/Po/GetPoDraft', function (response) {
+        if (response.hasDraft) {
+            if (confirm("You have an unsaved PO draft. Do you want to load it?")) {
+                let poData = JSON.parse(response.draftData);
+                Object.keys(poData).forEach(key => {
+                    if (key == "Po_items") {
+                        let poItems = poData[key];
+
+                        if (poItems != null) {
+                            poItems.forEach(poItem => {
+                                let item = {
+                                    name: poItem.Item_name,
+                                    quantity: poItem.Item_quantity,
+                                    unit: poItem.Unit,
+                                    price: poItem.Item_price
+                                };
+
+                                var itemorder = poItem.Order;
+                                var totalprice = poItem.Item_quantity * poItem.Item_price;
+
+                                addTableRow(itemorder, item, totalprice);
+                            });
+                        }
+                    } else if (key == "Include_tax") {
+                        $(`[name=${key}]`).prop("checked", poData[key]);
+                    } else {
+                        let value = poData[key];
+
+                        if (key == "Po_date" && value != null) {
+                            let date = formatDate(value);
+                            value = `${date.year}-${date.month}-${date.day}`;
+                        }
+
+                        $(`[name=${key}]`).val(value); // Restore values to form inputs
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: '/Po/RemovePoDraft',
+                    type: 'POST',
+                    data: {
+                        id: response.draftId,
+                    },
+                    success: function (e) {
+                        console.log(e.message);
+                    },
+                    error: handleAjaxError
+                });
+            }
+        }
+
+        changeLang();
+        taxSwitch();
+    });
 });
 
 var itemTable = $('table.datatable').DataTable({
@@ -36,6 +89,13 @@ var itemTable = $('table.datatable').DataTable({
 
 
 /// Event Handlers
+$(document).on("input", "input.forDraft", function () {
+    saveDraft();
+});
+
+$(document).on("change", "select.forDraft", function () {
+    saveDraft();
+});
 
 itemTable.on('row-reorder', function (e, details, edit) {
     console.log("Rows reordered!");
@@ -100,6 +160,7 @@ $("#removeItem").on("click", function () {
     $('#editItem').addClass('disabled');
     $('#removeItem').addClass('disabled');
 
+    saveDraft();
     calculateTotal();
 });
 
@@ -142,6 +203,20 @@ $("#poPreview").on("click", function () {
 });
 
 // Functions
+function saveDraft() {
+    reorderTable();
+    let poData = $("#poForm").serializeArray(); // Get all form inputs
+
+    $.ajax({
+        url: '/Po/SavePoDraft',
+        type: 'POST',
+        data: poData,
+        success: function (response) {
+            console.log(response.message);
+        }
+    });
+}
+
 function setTerm(term) {
     var selected = $(term).text();
     $(term).closest('.input-group').find('input').first().val(selected);
@@ -219,6 +294,8 @@ function addItem() {
     $("#itemModal").modal("hide");
 
     addTableRow(itemorder, item, totalprice);
+
+    saveDraft();
     calculateTotal();
 }
 
@@ -356,6 +433,8 @@ function reorderTable() {
         this.data(data);
         rowIndex++;
     });
+
+    console.log("Table reordered!");
 }
 
 function previewPo(formData) {

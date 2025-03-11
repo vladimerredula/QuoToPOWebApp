@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using QouToPOWebApp.Models.InfoModels;
 using QouToPOWebApp.Models.PoModels;
 using QouToPOWebApp.Services;
@@ -118,7 +119,7 @@ namespace QouToPOWebApp.Controllers
 
             model.Quotation_number = quoNumber;
             model.Po_date = quoDate;
-            model.Po_number = quoDate.ToString("yyyyMMdd") + "/FF-000-000";
+            model.Po_number = quoDate.ToString("yyyyMMdd") + "/FF-000-" + GetPersonnelID().ToString("D3");
             model.Contact_person_ID = contactPersonID;
             model.Payment_term = model.Po_language == "en" ? paymentTerm.Payment_term_name : paymentTerm.Payment_term_name_jpn;
             model.Delivery_term = model.Po_language == "en" ? deliveryTerm.Delivery_term_name : deliveryTerm.Delivery_term_name_jpn;
@@ -579,22 +580,33 @@ namespace QouToPOWebApp.Controllers
             return View(nameof(CreateNew));
         }
 
-        public IActionResult CreateNew(PoViewModel po)
+        public async Task<IActionResult> CreateNew(PoViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.deliveryAddressList = GetDeliveryAddressList(po.Delivery_address_ID);
-                ViewBag.contactPersonList = GetContactPersonList(po.Contact_person_ID);
-                ViewBag.correspondentList = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name", po.Correspondent_ID);
+                ViewBag.deliveryAddressList = GetDeliveryAddressList(model.Delivery_address_ID);
+                ViewBag.contactPersonList = GetContactPersonList(model.Contact_person_ID);
+                ViewBag.correspondentList = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name", model.Correspondent_ID);
                 ViewBag.paymentTerms = _db.Payment_terms.ToList();
                 ViewBag.deliveryTerms = _db.Delivery_terms.ToList();
-                return View(po);
+                return View(model);
             }
 
-            return DownloadPo(po);
+            await SavePoDraft(model);
+
+            // Temporary
+            var draft = _db.Po_drafts.FirstOrDefault(d => d.User_ID == GetPersonnelID() && !d.Is_completed);
+            if (draft != null)
+            {
+                _db.Po_drafts.Remove(draft);
+                await _db.SaveChangesAsync();
         }
 
-        public byte[] GeneratePo(PoViewModel po)
+            //return View(nameof(AddAttachments));
+            return DownloadPo(model);
+        }
+
+        public byte[] GeneratePo(PoViewModel po, bool saveToFile = false)
         {
             po.Contact_persons = _db.Contact_persons
                 .Include(s => s.Company)
@@ -613,6 +625,88 @@ namespace QouToPOWebApp.Controllers
         {
             // Return the PDF file as a download
             return File(GeneratePo(po), "application/pdf", $"{po.Po_number}.pdf");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SavePoDraft(PoViewModel po)
+        {
+            var userId = GetPersonnelID(); // Fetch logged-in user ID
+
+            if (po == null)
+                return BadRequest("No data received.");
+
+            var poJson = JsonConvert.SerializeObject(po);
+
+            var existingDraft = await _db.Po_drafts.FirstOrDefaultAsync(d => d.User_ID == userId && !d.Is_completed);
+
+            if (existingDraft != null)
+            {
+                existingDraft.Po_data_json = poJson;
+                existingDraft.Last_saved = DateTime.UtcNow;
+            }
+            else
+            {
+                var newDraft = new Po_draft
+                {
+                    User_ID = userId,
+                    Po_data_json = poJson,
+                    Last_saved = DateTime.UtcNow
+                };
+                await _db.Po_drafts.AddAsync(newDraft);
+            }
+
+            await _db.SaveChangesAsync();
+            return Ok(new { message = "Draft saved." });
+        }
+
+
+        public int GetPersonnelID()
+        {
+            var personnelId = int.Parse(User.FindFirstValue("Personnelid") ?? "0");
+
+            return personnelId;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPoDraft()
+        {
+            var userId = GetPersonnelID();
+            var draft = await _db.Po_drafts
+                .Where(d => d.User_ID == userId && !d.Is_completed)
+                .OrderByDescending(d => d.Last_saved)
+                .FirstOrDefaultAsync();
+
+            if (draft != null)
+                return Ok(new
+                {
+                    hasDraft = true,
+                    draftId = draft.Draft_ID,
+                    draftData = draft.Po_data_json
+                });
+
+            return Ok(new { hasDraft = false });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemovePoDraft(int id)
+        {
+            var draft = await _db.Po_drafts.FindAsync(id);
+            if (draft == null)
+            {
+                return NotFound(new { message = "No draft found." });
+            }
+
+            try
+            {
+                _db.Po_drafts.Remove(draft);
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to delete Po Draft: {id} - {ex}");
+            }
+
+            return Ok(new { message = "PO draft has been removed." });
         }
 
         [HttpPost]

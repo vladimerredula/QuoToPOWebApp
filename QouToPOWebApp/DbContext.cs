@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QouToPOWebApp.Models.InfoModels;
+using QouToPOWebApp.Models.MiscModels;
 using QouToPOWebApp.Models.PoModels;
 using QouToPOWebApp.Models.UserModels;
 
@@ -20,5 +21,6 @@ namespace QouToPOWebApp
         public DbSet<Pdf_type> Pdf_types { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Correspondent> Correspondents { get; set; }
+        public DbSet<Po_draft> Po_drafts { get; set; }
     }
 }
