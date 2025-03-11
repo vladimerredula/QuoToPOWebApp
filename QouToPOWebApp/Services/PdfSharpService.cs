@@ -217,7 +217,7 @@ namespace QouToPOWebApp.Services
             return document;
         }
 
-        public byte[] CreatePo(PoViewModel po)
+        public byte[]? CreatePo(PoViewModel po, bool saveToFile = false)
         {
             // Create a new PDF document
             var document = NewDocument();
@@ -256,7 +256,8 @@ namespace QouToPOWebApp.Services
 
             // PO number
             //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 100, y, 100, rowHeight);
-            gfx.DrawString(po?.Po_number ?? string.Empty, bodyFont, XBrushes.Black, new XRect(100, y, 100, rowHeight), XStringFormats.CenterLeft);
+            var poNumber = po?.Po_number ?? string.Empty;
+            gfx.DrawString(poNumber, bodyFont, XBrushes.Black, new XRect(100, y, 100, rowHeight), XStringFormats.CenterLeft);
 
             // FFJ logo
             string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "AppData/Images", "FFJ_LOGO.jpg");
@@ -270,7 +271,8 @@ namespace QouToPOWebApp.Services
 
             // Po date
             //gfx.DrawRectangle(XPens.Black, XBrushes.LightGray, 100, y, 100, rowHeight);
-            gfx.DrawString(po?.Po_date?.ToString("yyyy年MM月dd日") ?? string.Empty, bodyFont, XBrushes.Black, new XRect(100, y, 100, rowHeight), XStringFormats.CenterLeft);
+            var poDate = po?.Po_date?.ToString("yyyy年MM月dd日") ?? string.Empty;
+            gfx.DrawString(poDate, bodyFont, XBrushes.Black, new XRect(100, y, 100, rowHeight), XStringFormats.CenterLeft);
 
             y += 30;
 
@@ -388,6 +390,7 @@ namespace QouToPOWebApp.Services
                     var y2 = y1;
                     var currentRowHeight = 12;
 
+                    // Remove un-needed characters
                     var itemName = item?.Item_name?.Replace("\r", "").Split("\n");
                     foreach (var lineName in itemName)
                     {
@@ -399,10 +402,12 @@ namespace QouToPOWebApp.Services
                     //gfx.DrawString(item.Item_name, bodyFont, XBrushes.Black, new XRect(42, y1, column1, tableRowHeight), XStringFormats.CenterLeft);
                     gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36, y1, column1, currentRowHeight);
 
-                    gfx.DrawString(item?.Item_quantity?.ToString() + (item?.Unit != null ? " "+item.Unit : ""), bodyFont, XBrushes.Black, new XRect(36 + column1, y1, column2, currentRowHeight), XStringFormats.Center);
+                    var itemQuantity = item?.Item_quantity?.ToString() + (item?.Unit != null ? " " + item.Unit : "");
+                    gfx.DrawString(itemQuantity, bodyFont, XBrushes.Black, new XRect(36 + column1, y1, column2, currentRowHeight), XStringFormats.Center);
                     gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1, y1, column2, currentRowHeight);
 
-                    gfx.DrawString(item?.Item_price?.ToString("N0", new CultureInfo("ja-JP")), bodyFont, XBrushes.Black, new XRect(32 + column1 + column2, y1, column3, currentRowHeight), XStringFormats.CenterRight);
+                    var itemPrice = item?.Item_price?.ToString("N0", new CultureInfo("ja-JP"));
+                    gfx.DrawString(itemPrice, bodyFont, XBrushes.Black, new XRect(32 + column1 + column2, y1, column3, currentRowHeight), XStringFormats.CenterRight);
                     gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1 + column2, y1, column3, currentRowHeight);
 
                     float totalprice = (float)(item.Item_price * item.Item_quantity);
@@ -506,17 +511,31 @@ namespace QouToPOWebApp.Services
             gfx.DrawLine(customDashedPen, 36, y, page.Width - 36, y);
             gfx.DrawLine(new XPen(ClayCreek, 2), 36, y + 5, page.Width - 36, y + 5);
 
-            // Save to memory stream
-            using (var stream = new MemoryStream())
-            {
-                document.Save(stream, false);
-                document.Dispose();
 
-                return stream.ToArray();
+            if (saveToFile)
+            {
+                var date = DateTime.Now;
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "AppData/Files/", $"{date.ToString("yyyy/MMM/d")}/{po.Po_number}.pdf");
+                
+                // Save the document to file
+                document.Save(path);
+                document.Close();
+
+                return null;
+            } else
+            {
+                // Save to memory stream
+                using (var stream = new MemoryStream())
+                {
+                    document.Save(stream, false);
+                    document.Dispose();
+
+                    return stream.ToArray();
+                }
             }
         }
 
-        public byte[] CreatePoEng(PoViewModel po)
+        public byte[] CreatePoEng(PoViewModel po, bool saveToFile = false)
         {
             // Create a new PDF document
             var document = NewDocument();
@@ -578,9 +597,9 @@ namespace QouToPOWebApp.Services
             gfx.DrawLine(new XPen(XColors.Black, 3), 37, y, page.Width - 42, y);
             gfx.DrawLine(new XPen(XColors.Black, 1), 238, y + 3, page.Width - 42, y + 3);
 
-            var date = (bool)(po?.Po_date.HasValue) ? po?.Po_date.Value.ToString("MMMM d, yyyy") : DateTime.Now.ToString("MMMM d, yyyy");
+            var poDate = (bool)(po?.Po_date.HasValue) ? po?.Po_date.Value.ToString("MMMM d, yyyy") : DateTime.Now.ToString("MMMM d, yyyy");
             //gfx.DrawRectangle(XPens.Black, XBrushes.Gray, 37, y+5, page.Width - 80, 10);
-            gfx.DrawString(date, calibri, XBrushes.Black, new XRect(37, y + 5, page.Width - 80, 10), XStringFormats.CenterRight);
+            gfx.DrawString(poDate, calibri, XBrushes.Black, new XRect(37, y + 5, page.Width - 80, 10), XStringFormats.CenterRight);
 
             y += 29;
 
@@ -804,14 +823,27 @@ namespace QouToPOWebApp.Services
 
             gfx.DrawString("Faraday Factory Japan LLC", calibri, XBrushes.Black, new XRect(x, y, 150, 10), XStringFormats.CenterLeft);
 
-
-            // Save to memory stream
-            using (var stream = new MemoryStream())
+            if (saveToFile)
             {
-                document.Save(stream, false);
-                document.Dispose();
+                var date = DateTime.Now;
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "AppData/Files/", $"{date.ToString("yyyy/MMM/d")}/{po.Po_number}.pdf");
 
-                return stream.ToArray();
+                // Save the document to file
+                document.Save(path);
+                document.Close();
+
+                return null;
+            }
+            else
+            {
+                // Save to memory stream
+                using (var stream = new MemoryStream())
+                {
+                    document.Save(stream, false);
+                    document.Dispose();
+
+                    return stream.ToArray();
+                }
             }
         }
 
