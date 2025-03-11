@@ -37,6 +37,12 @@ var itemTable = $('table.datatable').DataTable({
 
 /// Event Handlers
 
+itemTable.on('row-reorder', function (e, details, edit) {
+    console.log("Rows reordered!");
+
+    reorderTable();
+});
+
 // Enable button when a row is selected
 itemTable.on('select.dt', function () {
     $('#editItem').removeClass('disabled');
@@ -318,6 +324,10 @@ function reorderTable() {
         var element = $(data[colIndex]);
 
         element.find(inputType).attr("name", `Po_items[${rowIndex}].${inputName}`);
+
+        if (inputName === "Order") {
+            element.find("input").val(rowIndex + 1);
+        }
 
         if (spanUpdate) {
             element.find("span").text(rowIndex + 1);  // For Order column
