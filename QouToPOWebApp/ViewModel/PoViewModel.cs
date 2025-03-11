@@ -61,7 +61,5 @@ namespace QouToPOWebApp.ViewModel
         public virtual Company? Companies { get; set; }
         public virtual Contact_person? Contact_persons { get; set; }
         public virtual Correspondent? Correspondents { get; set; }
-        public virtual Payment_term? Payment_terms { get; set; }
-        public virtual Delivery_term? Delivery_terms { get; set; }
     }
 }

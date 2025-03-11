@@ -62,16 +62,6 @@ namespace QouToPOWebApp.Services
                 Include_tax = true,
                 Email = "sample@faradaygroup.com",
                 Po_title = "Sample title",
-                Payment_terms = new Models.InfoModels.Payment_term
-                {
-                    Payment_term_name = "Closed at the end of the month and paid at the end of the following month",
-                    Payment_term_name_jpn = "月末締め翌月末支払い"
-                },
-                Delivery_terms = new Models.InfoModels.Delivery_term
-                {
-                    Delivery_term_name = "After consultation",
-                    Delivery_term_name_jpn = "別途ご相談の上"
-                },
                 Companies = new Models.InfoModels.Company
                 {
                     Address = "Zama factory, 5-12-15 Hibarigaoka, Zama, Kanagawa, 252-0003",
@@ -147,16 +137,6 @@ namespace QouToPOWebApp.Services
                 Include_tax = true,
                 Email = "sample@faradaygroup.com",
                 Po_title = "Sample title",
-                Payment_terms = new Models.InfoModels.Payment_term
-                {
-                    Payment_term_name = "Closed at the end of the month and paid at the end of the following month",
-                    Payment_term_name_jpn = "月末締め翌月末支払い"
-                },
-                Delivery_terms = new Models.InfoModels.Delivery_term
-                {
-                    Delivery_term_name = "After consultation",
-                    Delivery_term_name_jpn = "別途ご相談の上"
-                },
                 Companies = new Models.InfoModels.Company
                 {
                     Address = "5-12-15 Hibarigaoka, Zama, Kanagawa 252-0003, Japan",
