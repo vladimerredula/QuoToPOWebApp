@@ -8,7 +8,6 @@ namespace QouToPOWebApp.Models.InfoModels
         [Key]
         public int Contact_person_ID { get; set; }
 
-        [ForeignKey(nameof(Company))]
         [Display(Name = "Company")]
         [Required]
         public int? Company_ID { get; set; }
@@ -22,6 +21,7 @@ namespace QouToPOWebApp.Models.InfoModels
         [Display(Name = "Key Words")]
         public string? Key_words { get; set; }
 
+        [ForeignKey("Company_ID")]
         public virtual Company? Company { get; set; }
     }
 }

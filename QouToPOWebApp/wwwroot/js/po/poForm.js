@@ -372,8 +372,8 @@ function updateTableRow(item, totalprice) {
 function createCell(displayText, inputName, inputValue = displayText) {
     return `
         <div>
-            <span>${displayText}</span>
-            <input hidden name='${inputName}' value='${inputValue}'>
+            <span>${displayText ?? ""}</span>
+            <input hidden name='${inputName}' value='${inputValue ?? ""}'>
         </div>`;
 }
 

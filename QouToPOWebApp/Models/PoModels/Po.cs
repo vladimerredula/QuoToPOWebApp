@@ -8,6 +8,7 @@ namespace QouToPOWebApp.Models.PoModels
     {
         [Key]
         public int Po_ID { get; set; }
+
         [Display(Name = "PO number")]
         [Required]
         public string? Po_number { get; set; }
@@ -20,7 +21,6 @@ namespace QouToPOWebApp.Models.PoModels
         public DateTime? Po_date { get; set; }
 
         [Display(Name = "Company")]
-        [ForeignKey("Contact_persons")]
         [Required]
         public int? Contact_person_ID { get; set; }
 
@@ -31,15 +31,12 @@ namespace QouToPOWebApp.Models.PoModels
         public string? Delivery_term { get; set; }
 
         [Display(Name = "Delivery address")]
-        [ForeignKey("Companies")]
         [Required]
         public int? Delivery_address_ID { get; set; }
         public bool Include_tax { get; set; }
 
         [Display(Name = "Correspondent")]
-        [ForeignKey("Correspondents")]
         public int? Correspondent_ID { get; set; }
-        public string? Email { get; set; }
 
         [Display(Name = "PO title")]
         public string? Po_title { get; set; }
@@ -50,15 +47,15 @@ namespace QouToPOWebApp.Models.PoModels
 
         public string? File_name { get; set; }
         public string? File_path { get; set; }
+        public int? File_group_ID { get; set; }
 
-        [ForeignKey("Pdf_types")]
-        public int? Pdf_type_ID { get; set; }
-
-        public string? Extract_mode { get; set; }
-        public List<Po_item>? Po_items { get; set; }
-
+        [ForeignKey("Delivery_address_ID")]
         public virtual Company? Companies { get; set; }
+
+        [ForeignKey("Contact_person_ID")]
         public virtual Contact_person? Contact_persons { get; set; }
+
+        [ForeignKey("Correspondent_ID")]
         public virtual Correspondent? Correspondents { get; set; }
     }
 }

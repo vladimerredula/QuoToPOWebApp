@@ -635,6 +635,21 @@ namespace QouToPOWebApp.Controllers
             if (po == null)
                 return BadRequest("No data received.");
 
+            po.File_name = DateTime.Now.ToString("yyyyMMdd");
+
+            if (po.Contact_person_ID != null)
+            {
+                var cp = await _db.Contact_persons
+                    .Include(c => c.Company)
+                    .Where(c => c.Contact_person_ID == po.Contact_person_ID)
+                    .FirstOrDefaultAsync();
+
+                po.File_name += $" {(cp?.Company?.Company_name ?? po?.Po_number)}.pdf";
+            } else
+            {
+                po.File_name += $" {po.Po_number}.pdf";
+            }
+
             var poJson = JsonConvert.SerializeObject(po);
 
             var existingDraft = await _db.Po_drafts.FirstOrDefaultAsync(d => d.User_ID == userId && !d.Is_completed);
