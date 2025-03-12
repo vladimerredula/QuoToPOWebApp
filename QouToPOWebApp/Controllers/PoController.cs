@@ -24,7 +24,7 @@ namespace QouToPOWebApp.Controllers
 
         public IActionResult Index()
         {
-            return RedirectToAction(nameof(CreateNewPo));
+            return RedirectToAction(nameof(New));
         }
 
         public IActionResult FromQuotation()
@@ -38,7 +38,7 @@ namespace QouToPOWebApp.Controllers
         {
             if (filePath == null || filePath.Length == 0)
             {
-                return RedirectToAction(nameof(CreateNewPo));
+                return RedirectToAction(nameof(New));
             }
 
             switch (pdfType)
@@ -570,41 +570,16 @@ namespace QouToPOWebApp.Controllers
             return text.Replace("_", "").Replace(" ", "");
         }
 
-        public IActionResult CreateNewPo()
+        public IActionResult New()
         {
             ViewBag.deliveryAddressList = GetDeliveryAddressList();
             ViewBag.contactPersonList = GetContactPersonList();
             ViewBag.correspondentList = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name");
             ViewBag.paymentTerms = _db.Payment_terms.ToList();
             ViewBag.deliveryTerms = _db.Delivery_terms.ToList();
-            return View(nameof(CreateNew));
-        }
 
-        public async Task<IActionResult> CreateNew(PoViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                ViewBag.deliveryAddressList = GetDeliveryAddressList(model.Delivery_address_ID);
-                ViewBag.contactPersonList = GetContactPersonList(model.Contact_person_ID);
-                ViewBag.correspondentList = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name", model.Correspondent_ID);
-                ViewBag.paymentTerms = _db.Payment_terms.ToList();
-                ViewBag.deliveryTerms = _db.Delivery_terms.ToList();
-                return View(model);
+            return View();
             }
-
-            await SavePoDraft(model);
-
-            // Temporary
-            var draft = _db.Po_drafts.FirstOrDefault(d => d.User_ID == GetPersonnelID() && !d.Is_completed);
-            if (draft != null)
-            {
-                _db.Po_drafts.Remove(draft);
-                await _db.SaveChangesAsync();
-        }
-
-            //return View(nameof(AddAttachments));
-            return DownloadPo(model);
-        }
 
         public byte[] GeneratePo(PoViewModel po, bool saveToFile = false)
         {

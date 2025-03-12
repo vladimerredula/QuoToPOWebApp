@@ -16,7 +16,7 @@
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
-<form asp-action="CreateNew" id="poForm">
+<form asp-action="AddAttachments" id="poForm">
     <h4>Details</h4>
     <div class="card p-3 border-0 shadow-sm mb-3">
         <div class="row mb-3">
@@ -198,8 +198,8 @@
             <a class="btn btn-lg btn-light border" href="javascript:void(0)" id="poPreview">Preview</a>
         </div>
         <div class="col-auto">
-            <a class="btn btn-lg btn-info text-white shadow" href="javascript:void(0)" id="generatePo">Generate PO</a>
-            @* <a class="btn btn-lg btn-info text-white shadow px-5" href="javascript:void(0)" id="generatePo">Next</a> *@
+            @* <a class="btn btn-lg btn-info text-white shadow" href="javascript:void(0)" id="generatePo">Generate PO</a> *@
+            <a class="btn btn-lg btn-info text-white shadow px-5" href="javascript:void(0)" id="generatePo">Next</a>
         </div>
     </div>
 </form>
