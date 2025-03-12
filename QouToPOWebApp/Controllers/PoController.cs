@@ -581,7 +581,7 @@ namespace QouToPOWebApp.Controllers
             ViewBag.deliveryTerms = _db.Delivery_terms.ToList();
 
             return View();
-            }
+        }
 
         public byte[] GeneratePo(PoViewModel po, bool saveToFile = false)
         {
@@ -595,7 +595,7 @@ namespace QouToPOWebApp.Controllers
 
             var pdf = new PdfSharpService();
 
-            return po.Po_language == "en" ? pdf.CreatePoEng(po) : pdf.CreatePo(po);
+            return po.Po_language == "en" ? pdf.CreatePoEng(po, saveToFile) : pdf.CreatePo(po, saveToFile);
         }
 
         public IActionResult DownloadPo(PoViewModel po)

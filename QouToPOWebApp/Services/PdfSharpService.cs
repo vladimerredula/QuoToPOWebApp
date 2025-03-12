@@ -514,11 +514,11 @@ namespace QouToPOWebApp.Services
 
             if (saveToFile)
             {
-                var date = DateTime.Now;
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "AppData/Files/", $"{date.ToString("yyyy/MMM/d")}/{po.Po_number}.pdf");
+                //var date = DateTime.Now;
+                //var path = Path.Combine(Directory.GetCurrentDirectory(), "AppData/Files/", $"{date.ToString("yyyy/MMM/d")}/{po.Po_number}.pdf");
                 
                 // Save the document to file
-                document.Save(path);
+                document.Save(po.File_path);
                 document.Close();
 
                 return null;
@@ -697,7 +697,7 @@ namespace QouToPOWebApp.Services
                     var itemName = item?.Item_name?.Replace("\r", "").Split("\n");
                     foreach (var lineName in itemName)
                     {
-                        gfx.DrawString(lineName, calibri, XBrushes.Black, new XRect(x + column1, y2, column2, 10), XStringFormats.CenterLeft);
+                        gfx.DrawString(lineName, calibri, XBrushes.Black, new XRect(x + column1, y2, column2, rowHeight), XStringFormats.CenterLeft);
                         y2 += rowHeight;
                         currentRowHeight += rowHeight;
                     }
@@ -825,11 +825,11 @@ namespace QouToPOWebApp.Services
 
             if (saveToFile)
             {
-                var date = DateTime.Now;
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "AppData/Files/", $"{date.ToString("yyyy/MMM/d")}/{po.Po_number}.pdf");
+                //var date = DateTime.Now;
+                //var path = Path.Combine(Directory.GetCurrentDirectory(), "AppData/Files/", $"{date.ToString("yyyy/MMM/d")}/{po.Po_number}.pdf");
 
                 // Save the document to file
-                document.Save(path);
+                document.Save(po.File_path);
                 document.Close();
 
                 return null;
