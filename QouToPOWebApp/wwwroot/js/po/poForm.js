@@ -87,14 +87,22 @@ var itemTable = $('table.datatable').DataTable({
     }
 });
 
+let typingTimer;
+const delay = 5000; // 5 seconds delay
 
 /// Event Handlers
 $(document).on("input", "input.forDraft", function () {
-    saveDraft();
+    clearTimeout(typingTimer); // Reset timer
+    typingTimer = setTimeout(() => {
+        saveDraft();
+    }, delay);
 });
 
 $(document).on("change", "select.forDraft", function () {
-    saveDraft();
+    clearTimeout(typingTimer); // Reset timer
+    typingTimer = setTimeout(() => {
+        saveDraft();
+    }, delay);
 });
 
 itemTable.on('row-reorder', function (e, details, edit) {
@@ -434,7 +442,9 @@ function reorderTable() {
         rowIndex++;
     });
 
-    console.log("Table reordered!");
+    if (rowIndex > 0) {
+        console.log("Table reordered!");
+    }
 }
 
 function previewPo(formData) {
