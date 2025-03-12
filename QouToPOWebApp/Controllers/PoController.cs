@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using QouToPOWebApp.Models.InfoModels;
+using QouToPOWebApp.Models.MiscModels;
 using QouToPOWebApp.Models.PoModels;
 using QouToPOWebApp.Services;
 using QouToPOWebApp.ViewModel;
@@ -707,6 +709,143 @@ namespace QouToPOWebApp.Controllers
             string dataUrl = "data:application/pdf;base64," + base64Pdf;
 
             return Json(new { PdfDataUrl = dataUrl });
+        }
+
+        public async Task<IActionResult> AddAttachments(PoViewModel model)
+        {
+            await SavePoDraft(model);
+
+            var userId = GetPersonnelID();
+
+            // Removed unused attachments in temp files
+            var attachments = await _db.Attachments
+                    .Where(a => a.User_ID == userId && a.Status == "pending")
+                    .ToListAsync();
+
+            if (attachments.Any())
+            {
+                foreach (var attachment in attachments)
+                {
+                    // Delete files from temp folder
+                    if (System.IO.File.Exists(attachment.File_path))
+                        System.IO.File.Delete(attachment.File_path);
+
+                    // Remove in DB
+                    _db.Attachments.Remove(attachment);
+                }
+
+                await _db.SaveChangesAsync();
+            }
+
+            return View();
+        }
+
+        public async Task<IActionResult> Saved()
+        {
+            try
+            {
+                // Get PO draft
+                var userId = GetPersonnelID();
+                var draft = await _db.Po_drafts
+                    .Where(d => d.User_ID == userId && !d.Is_completed)
+                    .OrderByDescending(d => d.Last_saved)
+                    .FirstOrDefaultAsync();
+
+                if (draft != null)
+                {
+                    // Get the number of saved Po within today
+                    var savedPoCount = _db.File_groups
+                        .Where(f => f.Date_created.Date == DateTime.Now.Date)
+                        .Count();
+
+                    var fileGroupDir = Path.Combine(Directory.GetCurrentDirectory(), "AppData/PO", DateTime.Now.ToString("yyyy/MM/d"), $"{savedPoCount + 1}");
+
+                    // Ensure the File group directory exists
+                    if (!Directory.Exists(fileGroupDir))
+                    {
+                        Directory.CreateDirectory(fileGroupDir);
+                    }
+
+                    var fileGroup = new File_group
+                    {
+                        Date_created = DateTime.Now,
+                        User_ID = userId,
+                        Directory_path = fileGroupDir
+                    };
+
+                    _db.File_groups.Add(fileGroup);
+                    await _db.SaveChangesAsync();
+
+                    var poDataJson = JObject.Parse(draft.Po_data_json);
+
+                    // Convert PO data JSON to PO model
+                    // and PO view model for PO generation
+                    var po = poDataJson.ToObject<Po>();
+                    var poView = poDataJson.ToObject<PoViewModel>();
+                    poView.File_path = Path.Combine(fileGroup.Directory_path, poView.File_name);
+                    GeneratePo(poView, true);
+
+                    po.File_group_ID = fileGroup.File_group_ID;
+                    po.File_path = Path.Combine(fileGroup.Directory_path, po.File_name);
+
+                    _db.Pos.Add(po);
+                    await _db.SaveChangesAsync();
+
+                    if (poDataJson["Po_items"] != null)
+                    {
+                        var poItems = poDataJson["Po_items"].ToObject<List<Po_item>>();
+
+                        foreach (var poItem in poItems)
+                        {
+                            poItem.Po_ID = po.Po_ID;
+                            _db.Po_items.Add(poItem);
+                        }
+
+                        await _db.SaveChangesAsync();
+                    }
+
+                    // Get Attachments
+                    var attachments = await _db.Attachments
+                        .Where(a => a.User_ID == userId && a.Status == "pending")
+                        .ToListAsync();
+
+                    if (attachments.Any())
+                    {
+                        foreach (var attachment in attachments)
+                        {
+                            var newFilePath = Path.Combine(fileGroup.Directory_path, attachment.File_name);
+
+                            // Check if attachment file exists
+                            if (System.IO.File.Exists(attachment.File_path))
+                            {
+                                // Copy the attachment file from temp folder to the file group folder
+                                System.IO.File.Copy(attachment.File_path, newFilePath);
+
+                                // Delete files from temp folder
+                                System.IO.File.Delete(attachment.File_path);
+                            }
+
+                            attachment.File_path = newFilePath;
+                            attachment.File_group_ID = fileGroup.File_group_ID;
+                            attachment.Status = "saved";
+
+                            _db.Update(attachment);
+                        }
+
+                        await _db.SaveChangesAsync();
+                    }
+
+                    _db.Po_drafts.Remove(draft);
+                    await _db.SaveChangesAsync();
+                }
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
     }
 }

@@ -1,0 +1,75 @@
+﻿
+@{
+    ViewData["Title"] = "Attachments";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="card p-3 border-0 shadow-sm mb-3">
+    <div class="row">
+        <div class="col-12 col-md-6 col-lg-5 mb-3 mb-md-0">
+            <input type="file" id="quoFile" multiple accept=".pdf" hidden>
+            <div id="dropZone1" class="h-100 border border-dashed rounded-3 bg-light-subtle py-5 d-flex align-items-center justify-content-center" style="border-style:dashed !important; min-height: 200px;">
+                <div class="text-center my-5">
+                    <p class="fw-semibold text-secondary mb-1">Drag and drop Quotation files here</p>
+                    <p class="mb-1 text-secondary">- or -</p>
+                    <a href="#" class="btn btn-primary selectFileBtn" type="button">Choose File</a>
+                </div>
+            </div>
+        </div>
+        <div class="col" id="quoFiles">
+            <h4>Quotation files</h4>
+        </div>
+    </div>
+</div>
+
+<div class="card p-3 border-0 shadow-sm mb-3">
+    <div class="row">
+        <div class="col-12 col-md-6 col-lg-5 mb-3 mb-md-0">
+            <input type="file" id="drawFile" hidden>
+            <div id="dropZone2" class="h-100 border border-dashed rounded-3 bg-light-subtle py-5 d-flex align-items-center justify-content-center" style="border-style:dashed !important; min-height: 200px;">
+                <div class="text-center my-5">
+                    <p class="fw-semibold text-secondary mb-1">Drag and drop Drawing files here</p>
+                    <p class="mb-1 text-secondary">- or -</p>
+                    <a href="#" class="btn btn-primary selectFileBtn" type="button">Choose File</a>
+                </div>
+            </div>
+        </div>
+        <div class="col" id="drawFiles">
+            <h4>Drawing files</h4>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-end">
+    <div class="col-auto">
+        <a class="btn btn-lg btn-light border" href="javascript:void(0)"><i class="bi bi-arrow-left"></i> Go back</a>
+    </div>
+    <div class="col-auto">
+        <form asp-action="Saved">
+            <button type="submit" class="btn btn-lg btn-info text-white px-5 shadow">Save</button>
+        </form>
+    </div>
+</div>
+
+<!-- Pdf preview Modal -->
+<div class="modal fade" id="pdfPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h1 class="modal-title fs-5" id="pdfPreviewModalLabel">Preview</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <iframe id="pdfFrame" src="" width="100%" height="900px"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="/js/po/attachment.js"></script>
+}

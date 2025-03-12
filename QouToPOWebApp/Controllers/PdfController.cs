@@ -1,18 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QouToPOWebApp.Models.MiscModels;
 using QouToPOWebApp.Services;
+using System.Security.Claims;
 
 namespace QouToPOWebApp.Controllers
 {
     [Authorize]
     public class PdfController : Controller
     {
-        private readonly PdfiumViewerService _pdfViewer;
+        private readonly ApplicationDbContext _db;
         private readonly PdfSharpService _pdf;
-
-        public PdfController(PdfiumViewerService pdfViewer)
+        
+        public PdfController(ApplicationDbContext db)
         {
-            _pdfViewer = pdfViewer;
+            _db = db;
             _pdf = new PdfSharpService();
         }
 
@@ -49,7 +51,7 @@ namespace QouToPOWebApp.Controllers
             }
         }
 
-        [HttpPost]
+        /*[HttpPost]
         public IActionResult GenerateThumbnail(string filePath, int pageIndex = 0)
         {
             if (string.IsNullOrWhiteSpace(filePath))
@@ -75,7 +77,7 @@ namespace QouToPOWebApp.Controllers
                 pageIndex = pageIndex,
                 totalPages = totalPages
             });
-        }
+        }*/
 
         [HttpPost]
         public IActionResult GetPdfData(string filePath)
@@ -153,6 +155,85 @@ namespace QouToPOWebApp.Controllers
 
             // Return the PDF file as a download
             return File(pdfBytes, "application/pdf", "Sample.png");
+        }
+
+        [HttpPost]
+        public IActionResult UploadQuotation(IFormFile quoFile)
+        {
+            if (quoFile == null || quoFile.Length == 0)
+            {
+                return Json(new { success = false, message = "No file selected" });
+            }
+
+            try
+            {
+                var tempDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+
+                // Ensure the Temp directory exists
+                if (!Directory.Exists(tempDir))
+                {
+                    Directory.CreateDirectory(tempDir);
+                }
+
+                var personnelId = GetPersonnelID();
+
+                string filePath = Path.Combine(tempDir, quoFile.FileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    quoFile.CopyTo(stream);
+                }
+
+                // Ensure file exists before saving to Attachment
+                if (System.IO.File.Exists(filePath))
+                {
+                    var file = new Attachment
+                    {
+                        User_ID = GetPersonnelID(),
+                        File_name = quoFile.FileName,
+                        File_path = filePath,
+                        Attachment_type = "quotation",
+                        Date_uploaded = DateTime.Now,
+                        Status = "pending"
+                    };
+
+                    _db.Attachments.Add(file);
+                    _db.SaveChanges();
+                }
+
+                return Json(new { 
+                    success = true, 
+                    message = "File uploaded successfully.",
+                    fileName = quoFile.FileName,
+                    filePath = $"/uploads/{quoFile.FileName}"
+                });
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine("Error uploading pdf file: " + ex.Message);
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetQuoFile(string fileName)
+        {
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "AppData/Temp", fileName);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound("File not found.");
+            }
+
+
+            return File(System.IO.File.OpenRead(filePath), "application/pdf");
+        }
+
+        public int GetPersonnelID()
+        {
+            var personnelId = int.Parse(User.FindFirstValue("Personnelid") ?? "0");
+
+            return personnelId;
         }
     }
 }

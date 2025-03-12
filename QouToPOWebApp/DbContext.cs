@@ -11,6 +11,7 @@ namespace QouToPOWebApp
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
+        public DbSet<Attachment> Attachments { get; set; }
 
         public DbSet<Company> Companies { get; set; }
         public DbSet<Contact_person> Contact_persons { get; set; }
@@ -22,5 +23,6 @@ namespace QouToPOWebApp
         public DbSet<User> Users { get; set; }
         public DbSet<Correspondent> Correspondents { get; set; }
         public DbSet<Po_draft> Po_drafts { get; set; }
+        public DbSet<File_group> File_groups { get; set; }
     }
 }
