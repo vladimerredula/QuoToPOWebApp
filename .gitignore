@@ -365,4 +365,4 @@ FodyWeavers.xsd
 
 # Project uploads
 **/uploads/*
-AppData/PO/*
+QouToPOWebApp/AppData/PO/*
