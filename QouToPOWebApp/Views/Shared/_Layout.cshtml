@@ -36,22 +36,12 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item dropdown">
-                            <button class="nav-link dropdown-toggle" id="poDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                POs
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="poDropdown">
-                                <li>
-                                    <a asp-controller="Po" asp-action="New" class="dropdown-item">Create new</a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Po" asp-action="FromQuotation" class="dropdown-item">Create from Quotation file</a>
-                                </li>
-                            </ul>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Po" asp-action="Index" asp-route-path="@DateTime.Now.ToString("yyyy\\\\MMMM")" >POs</a>
                         </li>
                         <li class="nav-item dropdown">
                             <button class="nav-link dropdown-toggle" id="infoDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                Entries
+                                Info
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="infoDropdown">
                                 <li>

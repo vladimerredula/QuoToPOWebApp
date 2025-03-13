@@ -25,9 +25,35 @@ namespace QouToPOWebApp.Controllers
             _db = dbContext;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string path = "")
         {
-            return RedirectToAction(nameof(New));
+            string fullPath = Path.Combine(_poPath, path);
+
+            if (!Directory.Exists(fullPath))
+                return NotFound("Directory not found!");
+
+            var directories = Directory.GetDirectories(fullPath).Select(d => new DirectoryInfo(d));
+            var files = Directory.GetFiles(fullPath).Select(f => new FileInfo(f));
+
+            ViewBag.CurrentPath = path;
+            ViewBag.Paths = GenerateBreadcrumbs(path);
+
+            return View(directories.Concat<object>(files));
+        }
+
+        private List<(string Name, string Path)> GenerateBreadcrumbs(string path)
+        {
+            var breadcrumbs = new List<(string Name, string Path)> { ("PO", "") };
+            if (string.IsNullOrEmpty(path)) return breadcrumbs;
+
+            string[] parts = path.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+            string cumulativePath = "";
+            foreach (var part in parts)
+            {
+                cumulativePath = Path.Combine(cumulativePath, part);
+                breadcrumbs.Add((part, cumulativePath));
+            }
+            return breadcrumbs;
         }
 
         public IActionResult FromQuotation()
@@ -92,7 +118,7 @@ namespace QouToPOWebApp.Controllers
                 paymentTerm ??= GetPaymentTerms(cleanedText);
 
                 deliveryTerm ??= GetDeliveryTerms(cleanedText);
-                }
+            }
 
             if (string.IsNullOrEmpty(quoNumber))
             {

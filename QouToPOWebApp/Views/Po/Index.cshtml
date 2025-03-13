@@ -1,0 +1,87 @@
+﻿@model IEnumerable<object>
+
+@{
+    ViewData["Title"] = "PO";
+    string currentPath = ViewBag.CurrentPath as string ?? "";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="dropdown dropend mb-4">
+    <button class="btn btn-primary shadow dropdown-toggle px-3" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Create
+    </button>
+    <ul class="dropdown-menu">
+        <li><a asp-controller="Po" asp-action="New" class="dropdown-item">New PO</a></li>
+        <li><a asp-controller="Po" asp-action="FromQuotation" class="dropdown-item">From Quotation file</a></li>
+    </ul>
+</div>
+
+<div class="card p-3 border-0 shadow-sm">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            @foreach (var crumb in ViewBag.Paths)
+            {
+                <li class="breadcrumb-item">
+                    <a class="text-decoration-none" href="@Url.Action("Index", new { path = crumb.Item2 })">@crumb.Item1</a>
+                </li>
+            }
+        </ol>
+    </nav>
+    <!-- Files and Folders Table -->
+    <table class="table datatable table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Date created</th>
+                <th>Size</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                if (item is System.IO.DirectoryInfo dir)
+                {
+                    <tr onclick="window.location='@Url.Action("Index", new { path = System.IO.Path.Combine(currentPath, dir.Name) })'" style="cursor:pointer;">
+                        <td><i class="bi bi-folder"></i> @dir.Name</td>
+                        <td>Folder</td>
+                        <td>@dir.CreationTime</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                }
+                else if (item is System.IO.FileInfo file)
+                {
+                    <tr>
+                        <td><i class="bi bi-file-earmark-richtext"></i> @file.Name</td>
+                        <td>File</td>
+                        <td>@file.CreationTime</td>
+                        <td>@(file.Length / 1024) KB</td>
+                        <td></td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $("table.datatable").DataTable({
+            columnDefs: [
+                { targets: 0, className: "text-start" } // Bootstrap class for left alignment
+            ],
+            responsive: true,
+            fixedHeader: true
+        });
+
+        $(document).ready(function () {
+        });
+    </script>
+}
