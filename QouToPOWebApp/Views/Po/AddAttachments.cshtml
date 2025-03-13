@@ -1,6 +1,7 @@
-﻿
+﻿@model QouToPOWebApp.ViewModel.PoViewModel
+
 @{
-    ViewData["Title"] = "Attachments";
+    ViewData["Title"] = "Add files";
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
@@ -42,7 +43,29 @@
 </div>
 <div class="row justify-content-end">
     <div class="col-auto">
-        <a class="btn btn-lg btn-light border" href="javascript:void(0)"><i class="bi bi-arrow-left"></i> Go back</a>
+        <form asp-action="New" method="post">
+            <input asp-for="Po_title" hidden />
+            <input asp-for="Po_date" type="date" hidden />
+            <input asp-for="Po_number" hidden />
+            <input asp-for="Po_language" hidden />
+            <input asp-for="Quotation_number" hidden />
+            <input asp-for="Contact_person_ID" hidden />
+            <input asp-for="Payment_term" hidden />
+            <input asp-for="Delivery_term" hidden />
+            <input asp-for="Delivery_address_ID" hidden />
+            <input asp-for="Correspondent_ID" hidden />
+            <input asp-for="Include_tax" hidden />
+
+            @for (int i = 0; i < Model?.Po_items?.Count; i++)
+            {
+                <textarea asp-for="Po_items[i].Item_name" hidden>@Model.Po_items[i].Item_name</textarea>
+                <input asp-for="Po_items[i].Item_quantity" hidden />
+                <input asp-for="Po_items[i].Unit" hidden />
+                <input asp-for="Po_items[i].Item_price" hidden />
+            }
+
+            <button class="btn btn-lg btn-link text-decoration-none" type="submit"><i class="bi bi-arrow-left"></i> Go back</button>
+        </form>
     </div>
     <div class="col-auto">
         <form asp-action="Save">

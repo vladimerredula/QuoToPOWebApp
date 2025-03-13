@@ -22,12 +22,11 @@ body {
     background-color: #f2f3f4;
 }
 
-btn:focus, a:focus, input:focus, select:focus, textarea:focus {
+button:focus, a:focus, input:focus, select:focus, textarea:focus {
 /*    outline: none !important;*/
     box-shadow: none !important;
 }
 
 textarea {
     overflow-y: hidden;
-    resize: none;
 }

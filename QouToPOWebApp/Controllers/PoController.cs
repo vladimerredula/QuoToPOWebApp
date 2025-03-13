@@ -395,12 +395,7 @@ namespace QouToPOWebApp.Controllers
 
         public List<string> StringToTable(string text)
         {
-            List<string> table = new();
-
-            foreach (var row in text.Split("\n"))
-            {
-                table.Add(row);
-            }
+            List<string> table = [.. text.Split("\n")];
 
             return table;
         }
@@ -590,6 +585,7 @@ namespace QouToPOWebApp.Controllers
             return text.Replace("_", "").Replace(" ", "");
         }
 
+        [HttpGet]
         public IActionResult New()
         {
             ViewBag.deliveryAddressList = GetDeliveryAddressList();
@@ -599,6 +595,18 @@ namespace QouToPOWebApp.Controllers
             ViewBag.deliveryTerms = _db.Delivery_terms.ToList();
 
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult New(PoViewModel po)
+        {
+            ViewBag.deliveryAddressList = GetDeliveryAddressList();
+            ViewBag.contactPersonList = GetContactPersonList();
+            ViewBag.correspondentList = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name", po?.Correspondent_ID);
+            ViewBag.paymentTerms = _db.Payment_terms.ToList();
+            ViewBag.deliveryTerms = _db.Delivery_terms.ToList();
+
+            return View(po);
         }
 
         public byte[]? GeneratePo(PoViewModel po, bool saveToFile = false)
@@ -754,7 +762,7 @@ namespace QouToPOWebApp.Controllers
                 await _db.SaveChangesAsync();
             }
 
-            return View();
+            return View(model);
         }
 
         public async Task<IActionResult> Save()

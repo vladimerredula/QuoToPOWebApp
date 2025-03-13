@@ -1,59 +1,6 @@
 ﻿$(document).ready(function () {
-    // Get PO draft
-    $.get('/Po/GetPoDraft', function (response) {
-        if (response.hasDraft) {
-            if (confirm("You have an unsaved PO draft. Do you want to load it?")) {
-                let poData = JSON.parse(response.draftData);
-                Object.keys(poData).forEach(key => {
-                    if (key == "Po_items") {
-                        let poItems = poData[key];
-
-                        if (poItems != null) {
-                            poItems.forEach(poItem => {
-                                let item = {
-                                    name: poItem.Item_name,
-                                    quantity: poItem.Item_quantity,
-                                    unit: poItem.Unit,
-                                    price: poItem.Item_price
-                                };
-
-                                var itemorder = poItem.Order;
-                                var totalprice = poItem.Item_quantity * poItem.Item_price;
-
-                                addTableRow(itemorder, item, totalprice);
-                            });
-                        }
-                    } else if (key == "Include_tax") {
-                        $(`[name=${key}]`).prop("checked", poData[key]);
-                    } else {
-                        let value = poData[key];
-
-                        if (key == "Po_date" && value != null) {
-                            let date = formatDate(value);
-                            value = `${date.year}-${date.month}-${date.day}`;
-                        }
-
-                        $(`[name=${key}]`).val(value); // Restore values to form inputs
-                    }
-                });
-            } else {
-                $.ajax({
-                    url: '/Po/RemovePoDraft',
-                    type: 'POST',
-                    data: {
-                        id: response.draftId,
-                    },
-                    success: function (e) {
-                        console.log(e.message);
-                    },
-                    error: handleAjaxError
-                });
-            }
-        }
-
-        changeLang();
-        taxSwitch();
-    });
+    changeLang();
+    taxSwitch();
 });
 
 var itemTable = $('table.datatable').DataTable({
@@ -78,7 +25,8 @@ var itemTable = $('table.datatable').DataTable({
             targets: [0, 1],
             width: "50px"
         },
-        { orderable: false, targets: '_all' }
+        { orderable: false, targets: '_all' },
+        { targets: 2, className: "text-start" } // Bootstrap class for left alignment
     ],
     order: [[1, 'asc']],
     rowReorder: {
@@ -88,7 +36,7 @@ var itemTable = $('table.datatable').DataTable({
 });
 
 let typingTimer;
-const delay = 5000; // 5 seconds delay
+const delay = 3000; // 3 seconds delay
 
 /// Event Handlers
 $(document).on("input", "input.forDraft", function () {

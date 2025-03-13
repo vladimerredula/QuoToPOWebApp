@@ -9,7 +9,6 @@
 
 @{
     ViewData["Title"] = "Create PO";
-
     var paymentTerms = ViewBag.paymentTerms as List<Payment_term>;
     var deliveryTerms = ViewBag.deliveryTerms as List<Delivery_term>;
 }
@@ -27,7 +26,7 @@
             </div>
             <div class="col-auto mb-2">
                 <label class="form-label" asp-for="Po_date"></label><span class="text-danger" title="Required">*</span>
-                <input class="form-control forDraft" type="date" asp-for="Po_date" />
+                <input class="form-control forDraft" type="date" asp-for="Po_date" value="@(Model?.Po_date != null ? Model.Po_date.Value.ToString("yyyy-MM-dd") : "")" />
                 <span asp-validation-for="Po_date" class="text-danger"></span>
             </div>
             <div class="col-auto mb-2">
@@ -165,6 +164,26 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @{
+                            var totalAmount = 0.0;
+                            var counter = 1;
+                        }
+                        @for (var i = 0; i < Model?.Po_items?.Count(); i++)
+                        {
+                            var price = (Model?.Po_items[i]?.Item_quantity ?? 0) * (Model?.Po_items[i]?.Item_price ?? 0);
+                            totalAmount += price;
+                            <tr>
+                                <td></td>
+                                <td><div><span>@(Model?.Po_items[i]?.Order ?? counter)</span><input hidden asp-for="Po_items[i].Order" value='@(Model?.Po_items[i]?.Order ?? counter)'></div></td>
+                                <td><div><span>@Html.Raw(Model?.Po_items[i]?.Item_name.Replace("\r\n", "<br>"))</span><textarea hidden asp-for="Po_items[i].Item_name">@Model?.Po_items[i]?.Item_name</textarea></div></td>
+                                <td><div><span>@Model?.Po_items[i]?.Item_quantity</span><input hidden asp-for="Po_items[i].Item_quantity" value='@Model?.Po_items[i]?.Item_quantity'></div></td>
+                                <td><div><span>@Model?.Po_items[i]?.Unit</span><input hidden asp-for="Po_items[i].Unit" value='@Model?.Po_items[i]?.Unit'></div></td>
+                                <td><div><span>@Model?.Po_items[i]?.Item_price?.ToString("N0")</span><input hidden asp-for="Po_items[i].Item_price" value='@Model?.Po_items[i]?.Item_price'></div></td>
+                                <td><div><span class='itemPrice'>@price.ToString("N0")</span></div></td>
+                            </tr>
+
+                            counter++;
+                        }
                     </tbody>
                 </table>
             </div>
@@ -461,5 +480,65 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
+    <script>
+        $(document).ready(function () {
+            var model = @Html.Raw(Json.Serialize(Model));
+
+            if (model === null) {
+                // Get PO draft
+                $.get('/Po/GetPoDraft', function (response) {
+                    if (response.hasDraft) {
+                        if (confirm("You have an unsaved PO draft. Do you want to load it?")) {
+                            let poData = JSON.parse(response.draftData);
+                            Object.keys(poData).forEach(key => {
+                                if (key == "Po_items") {
+                                    let poItems = poData[key];
+
+                                    if (poItems != null) {
+                                        poItems.forEach(poItem => {
+                                            let item = {
+                                                name: poItem.Item_name,
+                                                quantity: poItem.Item_quantity,
+                                                unit: poItem.Unit,
+                                                price: poItem.Item_price
+                                            };
+
+                                            var itemorder = poItem.Order;
+                                            var totalprice = poItem.Item_quantity * poItem.Item_price;
+
+                                            addTableRow(itemorder, item, totalprice);
+                                        });
+                                    }
+                                } else if (key == "Include_tax") {
+                                    $(`[name=${key}]`).prop("checked", poData[key]);
+                                } else {
+                                    let value = poData[key];
+
+                                    if (key == "Po_date" && value != null) {
+                                        let date = formatDate(value);
+                                        value = `${date.year}-${date.month}-${date.day}`;
+                                    }
+
+                                    $(`[name=${key}]`).val(value); // Restore values to form inputs
+                                }
+                            });
+                        } else {
+                            $.ajax({
+                                url: '/Po/RemovePoDraft',
+                                type: 'POST',
+                                data: {
+                                    id: response.draftId,
+                                },
+                                success: function (e) {
+                                    console.log(e.message);
+                                },
+                                error: handleAjaxError
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    </script>
     <script src="/js/po/poForm.js"></script>
 }
