@@ -94,18 +94,18 @@ namespace QouToPOWebApp.Controllers
             {
                 image = currentImage,
                 fileName = Path.GetFileName(filePath),
-                filePath = filePath
+                filePath
             });
         }
 
         public IActionResult GenerateTablePdf()
         {
-            string[][] tableData = new string[][]
-            {
-            new string[] { "Header 1", "Header 2", "Header 3" },
-            new string[] { "Row 1 Col 1", "Row 1 Col 2", "Row 1 Col 3" },
-            new string[] { "Row 2 Col 1", "Row 2 Col 2", "Row 2 Col 3" },
-            };
+            string[][] tableData =
+            [
+                ["Header 1", "Header 2", "Header 3"],
+                ["Row 1 Col 1", "Row 1 Col 2", "Row 1 Col 3"],
+                ["Row 2 Col 1", "Row 2 Col 2", "Row 2 Col 3"],
+            ];
 
             byte[] pdfBytes = _pdf.CreatePdfWithTable("Table Example", tableData);
 
@@ -114,11 +114,7 @@ namespace QouToPOWebApp.Controllers
 
         public IActionResult GeneratePdf()
         {
-            string title = "Sample PDF Document";
-            string content = "This is a sample PDF generated using PDFsharp 6.1 in ASP.NET Core MVC.";
-            //byte[] pdfBytes = _pdf.CreatePdf(title, content);
             byte[] pdfBytes = _pdf.SamplePo();
-            //byte[] pdfBytes = _pdf.CreatePo(new ViewModel.PoViewModel());
 
             // Return the PDF file as a download
             return File(pdfBytes, "application/pdf", "Sample.pdf");
@@ -134,10 +130,6 @@ namespace QouToPOWebApp.Controllers
 
         public IActionResult Sample()
         {
-            var file = "C:\\Users\\v.redula\\source\\repos\\QuoToPOWebApp\\QouToPOWebApp\\wwwroot\\uploads\\20240426 Q+PO AMS Korea MgO pellet.pdf";
-            var file2 = "C:\\Users\\v.redula\\source\\repos\\QuoToPOWebApp\\QouToPOWebApp\\wwwroot\\uploads\\20241010 Toshima Ag recycle Q No.24100926SO05.pdf";
-            var file3 = "C:\\Users\\v.redula\\source\\repos\\QuoToPOWebApp\\QouToPOWebApp\\wwwroot\\uploads\\NSK製 U-6904-H-20S8FDZZ GVSL 300個 2024-k056 (1).pdf";
-            var file4 = "C:\\Users\\v.redula\\source\\repos\\QuoToPOWebApp\\QouToPOWebApp\\wwwroot\\uploads\\20240422 PO ASE Net.pdf";
             var file5 = "\\\\192.168.161.10\\Personal\\0062.Vladimer Redula\\Weekly reports\\2025\\Week4.pdf";
             var pig = new PdfPigService();
             byte[] pdfBytes = pig.SampleExtraction(file5, 1);

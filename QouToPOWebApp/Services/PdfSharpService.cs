@@ -535,7 +535,7 @@ namespace QouToPOWebApp.Services
             }
         }
 
-        public byte[] CreatePoEng(PoViewModel po, bool saveToFile = false)
+        public byte[]? CreatePoEng(PoViewModel po, bool saveToFile = false)
         {
             // Create a new PDF document
             var document = NewDocument();
@@ -847,7 +847,7 @@ namespace QouToPOWebApp.Services
             }
         }
 
-        public byte[] CreatePdfWithTable(string title, string[][] tableData)
+        public byte[]? CreatePdfWithTable(string title, string[][] tableData)
         {
             // Create a new PDF document
             var document = new PdfDocument();

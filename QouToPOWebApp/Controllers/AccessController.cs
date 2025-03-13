@@ -56,8 +56,8 @@ namespace QouToPOWebApp.Controllers
                     return View(model);
                 }
 
-                List<Claim> claims = new List<Claim>()
-                {
+                List<Claim> claims =
+                [
                     // Here we store user login information of the user that we can retrieve later
                     //new Claim(ClaimTypes.Role, userdetails.Privilege_ID.ToString()),
                     new Claim(ClaimTypes.Name, userdetails.Username),
@@ -65,12 +65,12 @@ namespace QouToPOWebApp.Controllers
                     new Claim(ClaimTypes.Surname, userdetails.Last_name),
                     new Claim(ClaimTypes.Email, userdetails.Email),
                     new Claim("Personnelid", userdetails.Personnel_ID.ToString())
-                };
+                ];
 
-                ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims,
+                ClaimsIdentity claimsIdentity = new(claims,
                     CookieAuthenticationDefaults.AuthenticationScheme);
 
-                AuthenticationProperties properties = new AuthenticationProperties()
+                AuthenticationProperties properties = new()
                 {
                     AllowRefresh = true,
                     IsPersistent = model.KeepLoggedIn
@@ -87,7 +87,6 @@ namespace QouToPOWebApp.Controllers
 
         public async Task<IActionResult> LogOut()
         {
-            ClaimsPrincipal claimUser = HttpContext.User;
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             HttpContext.Session.Clear();

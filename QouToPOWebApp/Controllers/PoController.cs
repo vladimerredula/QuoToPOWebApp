@@ -18,6 +18,7 @@ namespace QouToPOWebApp.Controllers
     public class PoController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly string _poPath = Path.Combine(Directory.GetCurrentDirectory(), "AppData/PO");
 
         public PoController(ApplicationDbContext dbContext)
         {
@@ -83,21 +84,15 @@ namespace QouToPOWebApp.Controllers
                     contactPersonID = GetContactPerson(cleanedText);
                 }
 
-                if (paymentTerm == null)
-                {
-                    paymentTerm = GetPaymentTerms(cleanedText);
-                }
-
-                if (deliveryTerm == null)
-                {
-                    deliveryTerm = GetDeliveryTerms(cleanedText);
-                }
-
                 if (!isTaxable)
                 {
                     isTaxable = IsTaxable(cleanedText);
                 }
-            }
+
+                paymentTerm ??= GetPaymentTerms(cleanedText);
+
+                deliveryTerm ??= GetDeliveryTerms(cleanedText);
+                }
 
             if (string.IsNullOrEmpty(quoNumber))
             {
@@ -123,8 +118,8 @@ namespace QouToPOWebApp.Controllers
             model.Po_date = quoDate;
             model.Po_number = quoDate.ToString("yyyyMMdd") + "/FF-000-" + GetPersonnelID().ToString("D3");
             model.Contact_person_ID = contactPersonID;
-            model.Payment_term = model.Po_language == "en" ? paymentTerm.Payment_term_name : paymentTerm.Payment_term_name_jpn;
-            model.Delivery_term = model.Po_language == "en" ? deliveryTerm.Delivery_term_name : deliveryTerm.Delivery_term_name_jpn;
+            model.Payment_term = model.Po_language == "en" ? paymentTerm?.Payment_term_name : paymentTerm?.Payment_term_name_jpn;
+            model.Delivery_term = model.Po_language == "en" ? deliveryTerm?.Delivery_term_name : deliveryTerm?.Delivery_term_name_jpn;
             model.Delivery_address_ID = 1;
             model.File_path = filePath;
             model.File_name = Path.GetFileName(filePath);
@@ -191,8 +186,8 @@ namespace QouToPOWebApp.Controllers
             model.Quotation_number = quoNumber;
             model.Po_date = quoDate;
             model.Contact_person_ID = contactPersonID;
-            model.Payment_term = model.Po_language == "en" ? paymentTerm.Payment_term_name : paymentTerm.Payment_term_name_jpn;
-            model.Delivery_term = model.Po_language == "en" ? deliveryTerm.Delivery_term_name : deliveryTerm.Delivery_term_name_jpn;
+            model.Payment_term = model.Po_language == "en" ? paymentTerm?.Payment_term_name : paymentTerm?.Payment_term_name_jpn;
+            model.Delivery_term = model.Po_language == "en" ? deliveryTerm?.Delivery_term_name : deliveryTerm?.Delivery_term_name_jpn;
             model.File_path = filePath;
             model.File_name = Path.GetFileName(filePath);
             model.Include_tax = IsTaxable(cleanedText);
@@ -235,7 +230,7 @@ namespace QouToPOWebApp.Controllers
 
                     var headers = row.Split(",");
 
-                    for (int i = 0; i < headers.Count(); i++)
+                    for (int i = 0; i < headers.Length; i++)
                     {
                         var keyWord = Regex.Replace(headers[i], @"[\r\n\t,""]", "").Replace(" ","");
                         for (int j = 0; j < headerKeyWords.Count(); j++)
@@ -290,14 +285,12 @@ namespace QouToPOWebApp.Controllers
                             poItem.Unit = result[itemunit.itemIndex];
                         }
 
-                        int quantity;
-                        if (int.TryParse(Regex.Replace(result[itemquantity.itemIndex], @"[^0-9.]", ""), out quantity))
+                        if (int.TryParse(Regex.Replace(result[itemquantity.itemIndex], @"[^0-9.]", ""), out int quantity))
                         {
                             poItem.Item_quantity = quantity;
                         }
 
-                        float price;
-                        if (float.TryParse(Regex.Replace(result[itemprice.itemIndex], @"[^0-9.]", ""), out price) && result.Length > 2)
+                        if (float.TryParse(Regex.Replace(result[itemprice.itemIndex], @"[^0-9.]", ""), out float price) && result.Length > 2)
                         {
                             poItem.Item_price = price;
                         }
@@ -315,12 +308,12 @@ namespace QouToPOWebApp.Controllers
         {
             text = CleanText(text);
 
-            List<string> keyWords = new List<string> {
+            List<string> keyWords = [
                 "消費税:",
                 "消費税",
                 "10%",
                 "税込"
-            };
+            ];
 
             foreach (var keyword in keyWords)
             {
@@ -338,7 +331,7 @@ namespace QouToPOWebApp.Controllers
             text = CleanText(text);
             var quoNumber = string.Empty;
 
-            List<string> keyWords = new List<string> {
+            List<string> keyWords = [
                 "見積書番号:",
                 "見積書番号",
                 "伝票番号:",
@@ -349,7 +342,7 @@ namespace QouToPOWebApp.Controllers
                 "Ref:",
                 "Ref",
                 "No:"
-            };
+            ];
 
             foreach (var keyWord in keyWords)
             {
@@ -365,8 +358,7 @@ namespace QouToPOWebApp.Controllers
                     if (endIndex != -1)
                     {
                         quoNumber = text.Substring(startIndex, endIndex - startIndex).Trim();
-                        quoNumber.Replace("\"", "");
-                        quoNumber.Replace(",", "");
+                        quoNumber.Replace("\"", "").Replace(",", "");
                         break;
                     }
                 }
@@ -377,7 +369,7 @@ namespace QouToPOWebApp.Controllers
 
         public List<string> StringToTable(string text)
         {
-            List<string> table = new List<string>();
+            List<string> table = new();
 
             foreach (var row in text.Split("\n"))
             {
@@ -399,17 +391,17 @@ namespace QouToPOWebApp.Controllers
             return analyzedText;
         }
 
-        private List<List<string>> ExtractTables(string filePath)
+        private static List<List<string>> ExtractTables(string filePath)
         {
             var pdfPig = new PdfPigService();
             var tabula = new TabulaService();
 
-            return new List<List<string>>
-            {
+            return
+            [
                 tabula.StreamModeExtraction(filePath),
                 tabula.LatticeModeExtraction(filePath),
                 pdfPig.ExtractText(filePath)
-            };
+            ];
         }
 
         public DateTime ParseQuotationDate(string text)
@@ -505,7 +497,7 @@ namespace QouToPOWebApp.Controllers
             return new SelectList(contactPersonList, "Contact_person_ID", "Supplier_name", selected);
         }
 
-        public Payment_term GetPaymentTerms(string text)
+        public Payment_term? GetPaymentTerms(string text)
         {
             var paymentTerms = _db.Payment_terms.ToList();
 
@@ -530,7 +522,7 @@ namespace QouToPOWebApp.Controllers
             return null;
         }
 
-        public Delivery_term GetDeliveryTerms(string text)
+        public Delivery_term? GetDeliveryTerms(string text)
         {
             var deliveryTerms = _db.Delivery_terms.ToList();
 
@@ -583,7 +575,7 @@ namespace QouToPOWebApp.Controllers
             return View();
         }
 
-        public byte[] GeneratePo(PoViewModel po, bool saveToFile = false)
+        public byte[]? GeneratePo(PoViewModel po, bool saveToFile = false)
         {
             po.Contact_persons = _db.Contact_persons
                 .Include(s => s.Company)
@@ -650,7 +642,6 @@ namespace QouToPOWebApp.Controllers
             await _db.SaveChangesAsync();
             return Ok(new { message = "Draft saved." });
         }
-
 
         public int GetPersonnelID()
         {
@@ -722,7 +713,7 @@ namespace QouToPOWebApp.Controllers
                     .Where(a => a.User_ID == userId && a.Status == "pending")
                     .ToListAsync();
 
-            if (attachments.Any())
+            if (attachments.Count > 0)
             {
                 foreach (var attachment in attachments)
                 {
@@ -740,12 +731,13 @@ namespace QouToPOWebApp.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Saved()
+        public async Task<IActionResult> Save()
         {
             try
             {
-                // Get PO draft
                 var userId = GetPersonnelID();
+
+                // Get PO draft
                 var draft = await _db.Po_drafts
                     .Where(d => d.User_ID == userId && !d.Is_completed)
                     .OrderByDescending(d => d.Last_saved)
@@ -758,7 +750,7 @@ namespace QouToPOWebApp.Controllers
                         .Where(f => f.Date_created.Date == DateTime.Now.Date)
                         .Count();
 
-                    var fileGroupDir = Path.Combine(Directory.GetCurrentDirectory(), "AppData/PO", DateTime.Now.ToString("yyyy/MM/d"), $"{savedPoCount + 1}");
+                    var fileGroupDir = Path.Combine(_poPath, DateTime.Now.ToString("yyyy/MMMM/d"), $"{savedPoCount + 1}");
 
                     // Ensure the File group directory exists
                     if (!Directory.Exists(fileGroupDir))
@@ -800,8 +792,6 @@ namespace QouToPOWebApp.Controllers
                             poItem.Po_ID = po.Po_ID;
                             _db.Po_items.Add(poItem);
                         }
-
-                        await _db.SaveChangesAsync();
                     }
 
                     // Get Attachments
@@ -809,7 +799,7 @@ namespace QouToPOWebApp.Controllers
                         .Where(a => a.User_ID == userId && a.Status == "pending")
                         .ToListAsync();
 
-                    if (attachments.Any())
+                    if (attachments.Count != 0)
                     {
                         foreach (var attachment in attachments)
                         {
@@ -839,13 +829,18 @@ namespace QouToPOWebApp.Controllers
                     await _db.SaveChangesAsync();
                 }
 
-                return View();
+                return RedirectToAction(nameof(Saved));
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine(ex);
                 throw;
             }
+        }
+
+        public IActionResult Saved()
+        {
+            return View();
         }
     }
 }

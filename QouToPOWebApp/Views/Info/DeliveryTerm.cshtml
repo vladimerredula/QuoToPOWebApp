@@ -132,11 +132,12 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
+        $("table.datatable").DataTable({
+            responsive: true,
+            fixedHeader: true
+        });
+
         $(document).ready(function () {
-            $("table.datatable").DataTable({
-                responsive: true,
-                fixedHeader: true
-            });
         });
 
         function addDeliveryTerm() {

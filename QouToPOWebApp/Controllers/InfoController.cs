@@ -184,6 +184,7 @@ namespace QouToPOWebApp.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Failed to save custom Company. " + ex.Message);
                 return Json(new
                 {
                     message = "Failed to save custom Company. Please try again"
@@ -478,6 +479,7 @@ namespace QouToPOWebApp.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Failed to save custom delivery term. " + ex.Message);
                 return Json(new
                 {
                     message = "Failed to save custom delivery term. Please try again"
@@ -626,6 +628,7 @@ namespace QouToPOWebApp.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Failed to save custom payment term. " + ex);
                 return Json(new
                 {
                     message = "Failed to save custom payment term. Please try again"
