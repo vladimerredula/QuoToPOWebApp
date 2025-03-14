@@ -1,6 +1,5 @@
 ﻿$(document).ready(function () {
     initializeEventHandlers("#dropZone1", "#quoFile");
-    initializeEventHandlers("#dropZone2", "#drawFile");
 });
 
 $("#save").on("click", function () {
@@ -39,23 +38,13 @@ function handleFileDrop(event, fileInput, dropZone) {
     if (files.length > 0) {
         const file = files[0];
 
-        if (isValidPdfFile(file)) {
-            fileInput[0].files = files; // Assign files to input
-            fileInput.change();
-            //getPdfRender(fileInput); // Modify this function to handle multiple inputs if needed
-        } else {
-            alert("Please upload a valid PDF file.");
-        }
+        fileInput[0].files = files; // Assign files to input
+        fileInput.change();
     }
 }
 
 function isValidPdfFile(file) {
     return file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-}
-
-// Example placeholder function - modify as needed
-function getPdfRender(fileInput) {
-    console.log("Rendering PDF for:", fileInput.attr('id'));
 }
 
 $("#quoFile").on("change", function () {
@@ -70,16 +59,13 @@ $("#quoFile").on("change", function () {
 });
 
 async function uploadFile(file) {
-    if (!isValidPdfFile(file)) {
-        alert("Invalid file type: " + file.name);
-        return;
-    }
 
     var formData = new FormData();
     formData.append("quoFile", file);
 
     var alert = $("<div>")
         .addClass("alert alert-light alert-dismissible")
+        .attr("id", file.name);
 
     var filename = $("<strong>").text(file.name);
 
@@ -96,7 +82,7 @@ async function uploadFile(file) {
     await delay(1000);
 
     $.ajax({
-        url: "/Pdf/UploadQuotation",
+        url: "/Pdf/UploadFile",
         type: "POST",
         data: formData,
         contentType: false,
@@ -109,13 +95,14 @@ async function uploadFile(file) {
                 filename.remove();
 
                 alert.addClass("shadow-sm");
-                alert.prepend(`<i class="bi bi-check-lg text-success"></i> <a href="#" class="alert-link text-decoration-none" onclick=previewQuotation(this) data-filepath="${response.filePath}">${file.name}</a>`);
+                alert.prepend(`<i class="bi bi-check-lg text-success"></i> <a href="#" class="alert-link text-decoration-none" onclick=previewFile(this) data-filepath="${response.filePath}">${file.name}</a>`);
+                alert.attr("data-id", response.fileId);
             } else {
                 loading.remove();
                 alert.removeClass("alert-light").addClass("alert-danger").append(" - Failed to upload.");
             }
 
-            alert.append(`<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`);
+            alert.append(`<button type="button" class="btn-close dismissAlert" aria-label="Close"></button>`);
         },
         error: function (response) {
             console.log(response);
@@ -123,15 +110,35 @@ async function uploadFile(file) {
     });
 }
 
-$(".alert-link").on("click", function () {
-    //var filePath = this.data("filepath");
-    console.log(yes);
+$(".dismissAlert").on("click", function (event) {
+    event.preventDefault(); // Prevent immediate dismissal
+    var alert = $(this).closest(".alert");
+    if (alert.data("id") != "") {
+        if (confirm("Are you sure you want to dismiss this alert?")) {
+            removeFile(alert.data("id"));
+            alert.alert("close");
+        }
+    }
 });
 
-function previewQuotation(thisLink) {
+function previewFile(thisLink) {
     var e = $(thisLink);
-    $('#pdfFrame').attr("src", `${e.data("filepath")}#toolbar=0&view=Fit&navpanes=0`);
-    $("#pdfPreviewModal").modal("show");
+    $('#fileFrame').attr("src", `${e.data("filepath")}#toolbar=0&view=Fit&navpanes=0`);
+    $("#filePreviewModal").modal("show");
+}
+
+function removeFile(fileId) {
+    $.ajax({
+        url: "/Pdf/RemoveFile",
+        type: "POST",
+        data: { fileId : fileId },
+        success: function (response) {
+            console.log(response.message);
+        },
+        error: function (response) {
+            console.log(response);
+        }
+    });
 }
 
 function delay(ms) {

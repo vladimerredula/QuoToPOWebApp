@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
 using QouToPOWebApp.Models.MiscModels;
 using QouToPOWebApp.Services;
 using System.Security.Claims;
@@ -11,6 +13,7 @@ namespace QouToPOWebApp.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly PdfSharpService _pdf;
+        private readonly string _tempDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
         
         public PdfController(ApplicationDbContext db)
         {
@@ -150,7 +153,7 @@ namespace QouToPOWebApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult UploadQuotation(IFormFile quoFile)
+        public IActionResult UploadFile(IFormFile quoFile)
         {
             if (quoFile == null || quoFile.Length == 0)
             {
@@ -159,17 +162,15 @@ namespace QouToPOWebApp.Controllers
 
             try
             {
-                var tempDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
-
                 // Ensure the Temp directory exists
-                if (!Directory.Exists(tempDir))
+                if (!Directory.Exists(_tempDir))
                 {
-                    Directory.CreateDirectory(tempDir);
+                    Directory.CreateDirectory(_tempDir);
                 }
 
                 var personnelId = GetPersonnelID();
 
-                string filePath = Path.Combine(tempDir, quoFile.FileName);
+                string filePath = Path.Combine(_tempDir, quoFile.FileName);
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
@@ -184,41 +185,69 @@ namespace QouToPOWebApp.Controllers
                         User_ID = GetPersonnelID(),
                         File_name = quoFile.FileName,
                         File_path = filePath,
-                        Attachment_type = "quotation",
                         Date_uploaded = DateTime.Now,
                         Status = "pending"
                     };
 
                     _db.Attachments.Add(file);
                     _db.SaveChanges();
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "File uploaded successfully.",
+                        fileName = quoFile.FileName,
+                        filePath = $"/uploads/{quoFile.FileName}",
+                        fileId = file.Attachment_ID
+                    });
                 }
 
-                return Json(new { 
-                    success = true, 
-                    message = "File uploaded successfully.",
-                    fileName = quoFile.FileName,
-                    filePath = $"/uploads/{quoFile.FileName}"
-                });
+                return Json(new { success = false, message = "Unable to upload file." });
             }
             catch (System.Exception ex)
             {
-                Console.WriteLine("Error uploading pdf file: " + ex.Message);
+                Console.WriteLine("Error uploading file: " + ex.Message);
                 return Json(new { success = false, message = ex.Message });
             }
         }
 
-        [HttpGet]
-        public IActionResult GetQuoFile(string fileName)
+        [HttpPost]
+        public IActionResult GetFile(string filePath)
         {
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "AppData/Temp", fileName);
-
             if (!System.IO.File.Exists(filePath))
             {
                 return NotFound("File not found.");
             }
 
+            var provider = new FileExtensionContentTypeProvider();
+            if (!provider.TryGetContentType(filePath, out string contentType))
+            {
+                contentType = "application/octet-stream"; // Default binary type if unknown
+            }
 
-            return File(System.IO.File.OpenRead(filePath), "application/pdf");
+            return File(System.IO.File.OpenRead(filePath), contentType, Path.GetFileName(filePath));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveFile(int fileId)
+        {
+            var userId = GetPersonnelID();
+
+            var file = await _db.Attachments
+                    .Where(a => a.User_ID == userId && a.Status == "pending" && a.Attachment_ID == fileId)
+                    .FirstOrDefaultAsync();
+
+            if (file != null)
+            {
+                if (System.IO.File.Exists(file.File_path))
+                    System.IO.File.Delete(file.File_path);
+
+                _db.Attachments.Remove(file); // Remove in DB
+
+                await _db.SaveChangesAsync();
+            }
+
+            return Ok(new { message = "File successfully removed."});
         }
 
         public int GetPersonnelID()

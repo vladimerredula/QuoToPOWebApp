@@ -1,89 +1,89 @@
 ﻿@model QouToPOWebApp.ViewModel.PoViewModel
 
 @{
-    ViewData["Title"] = "Add files";
+    ViewData["Title"] = "Create PO";
+    var attachments = ViewBag.Attachments as List<QouToPOWebApp.Models.MiscModels.Attachment>;
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
-
-<div class="card p-3 border-0 shadow-sm mb-3">
-    <div class="row">
-        <div class="col-12 col-md-6 col-lg-5 mb-3 mb-md-0">
-            <input type="file" id="quoFile" multiple accept=".pdf" hidden>
-            <div id="dropZone1" class="h-100 border border-dashed rounded-3 bg-light-subtle py-5 d-flex align-items-center justify-content-center" style="border-style:dashed !important; min-height: 200px;">
-                <div class="text-center my-5">
-                    <p class="fw-semibold text-secondary mb-1">Drag and drop Quotation files here</p>
-                    <p class="mb-1 text-secondary">- or -</p>
-                    <a href="#" class="btn btn-primary selectFileBtn" type="button">Choose File</a>
+<div class="row justify-content-center">
+    <div class="col">
+        <h4>Add files</h4>
+        <div class="card p-3 border-0 shadow-sm mb-3">
+            <div class="row mb-3">
+                <div class="col">
+                    <input type="file" id="quoFile" multiple hidden>
+                    <div id="dropZone1" class="h-100 border border-dashed rounded-3 bg-light-subtle py-5 d-flex align-items-center justify-content-center" style="border-style:dashed !important; min-height: 200px;">
+                        <div class="text-center my-2">
+                            <p class="fw-semibold text-secondary mb-1">Drag and drop files here</p>
+                            <p class="mb-1 text-secondary">- or -</p>
+                            <a href="#" class="btn btn-primary shadow selectFileBtn" type="button">Choose File</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="col" id="quoFiles">
+                    @if (attachments != null)
+                    {
+                        foreach (var file in attachments)
+                        {
+                            <div class="alert alert-light alert-dismissible shadow-sm" data-id="@file.Attachment_ID">
+                                <i class="bi bi-check-lg text-success"></i>
+                                <a href="#" class="alert-link text-decoration-none" onclick=previewFile(this) data-filepath="/uploads/@file.File_name">@file.File_name</a>
+                                <button type="button" class="btn-close dismissAler" aria-label="Close"></button>
+                            </div>
+                        }
+                    }
                 </div>
             </div>
         </div>
-        <div class="col" id="quoFiles">
-            <h4>Quotation files</h4>
-        </div>
-    </div>
-</div>
 
-<div class="card p-3 border-0 shadow-sm mb-3">
-    <div class="row">
-        <div class="col-12 col-md-6 col-lg-5 mb-3 mb-md-0">
-            <input type="file" id="drawFile" hidden>
-            <div id="dropZone2" class="h-100 border border-dashed rounded-3 bg-light-subtle py-5 d-flex align-items-center justify-content-center" style="border-style:dashed !important; min-height: 200px;">
-                <div class="text-center my-5">
-                    <p class="fw-semibold text-secondary mb-1">Drag and drop Drawing files here</p>
-                    <p class="mb-1 text-secondary">- or -</p>
-                    <a href="#" class="btn btn-primary selectFileBtn" type="button">Choose File</a>
-                </div>
+        <div class="row justify-content-end">
+            <div class="col-auto">
+                <form asp-action="New" method="post">
+                    <input asp-for="Po_title" hidden />
+                    <input asp-for="Po_date" type="date" hidden />
+                    <input asp-for="Po_number" hidden />
+                    <input asp-for="Po_language" hidden />
+                    <input asp-for="Quotation_number" hidden />
+                    <input asp-for="Contact_person_ID" hidden />
+                    <input asp-for="Payment_term" hidden />
+                    <input asp-for="Delivery_term" hidden />
+                    <input asp-for="Delivery_address_ID" hidden />
+                    <input asp-for="Correspondent_ID" hidden />
+                    <input asp-for="Include_tax" hidden />
+
+                    @for (int i = 0; i < Model?.Po_items?.Count; i++)
+                    {
+                        <textarea asp-for="Po_items[i].Item_name" hidden>@Model.Po_items[i].Item_name</textarea>
+                        <input asp-for="Po_items[i].Item_quantity" hidden />
+                        <input asp-for="Po_items[i].Unit" hidden />
+                        <input asp-for="Po_items[i].Item_price" hidden />
+                    }
+
+                    <button class="btn btn-lg btn-link text-decoration-none" type="submit"><i class="bi bi-arrow-left"></i> Go back</button>
+                </form>
+            </div>
+            <div class="col-auto">
+                <form asp-action="Save">
+                    <button type="submit" class="btn btn-lg btn-info text-white px-5 shadow">Save</button>
+                </form>
             </div>
         </div>
-        <div class="col" id="drawFiles">
-            <h4>Drawing files</h4>
-        </div>
-    </div>
-</div>
-<div class="row justify-content-end">
-    <div class="col-auto">
-        <form asp-action="New" method="post">
-            <input asp-for="Po_title" hidden />
-            <input asp-for="Po_date" type="date" hidden />
-            <input asp-for="Po_number" hidden />
-            <input asp-for="Po_language" hidden />
-            <input asp-for="Quotation_number" hidden />
-            <input asp-for="Contact_person_ID" hidden />
-            <input asp-for="Payment_term" hidden />
-            <input asp-for="Delivery_term" hidden />
-            <input asp-for="Delivery_address_ID" hidden />
-            <input asp-for="Correspondent_ID" hidden />
-            <input asp-for="Include_tax" hidden />
-
-            @for (int i = 0; i < Model?.Po_items?.Count; i++)
-            {
-                <textarea asp-for="Po_items[i].Item_name" hidden>@Model.Po_items[i].Item_name</textarea>
-                <input asp-for="Po_items[i].Item_quantity" hidden />
-                <input asp-for="Po_items[i].Unit" hidden />
-                <input asp-for="Po_items[i].Item_price" hidden />
-            }
-
-            <button class="btn btn-lg btn-link text-decoration-none" type="submit"><i class="bi bi-arrow-left"></i> Go back</button>
-        </form>
-    </div>
-    <div class="col-auto">
-        <form asp-action="Save">
-            <button type="submit" class="btn btn-lg btn-info text-white px-5 shadow">Save</button>
-        </form>
     </div>
 </div>
 
-<!-- Pdf preview Modal -->
-<div class="modal fade" id="pdfPreviewModal" tabindex="-1">
+<!-- Preview Modal -->
+<div class="modal fade" id="filePreviewModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header border-0">
-                <h1 class="modal-title fs-5" id="pdfPreviewModalLabel">Preview</h1>
+                <h1 class="modal-title fs-5" id="filePreviewModalLabel">Preview</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <iframe id="pdfFrame" src="" width="100%" height="900px"></iframe>
+                <iframe id="fileFrame" src="" width="100%" height="900px"></iframe>
             </div>
         </div>
     </div>

@@ -13,7 +13,7 @@
     </button>
     <ul class="dropdown-menu">
         <li><a asp-controller="Po" asp-action="New" class="dropdown-item">New PO</a></li>
-        <li><a asp-controller="Po" asp-action="FromQuotation" class="dropdown-item">From Quotation file</a></li>
+        <li><a asp-controller="Po" asp-action="FromQuotation" class="dropdown-item disabled">From Quotation file</a></li>
     </ul>
 </div>
 
@@ -57,10 +57,14 @@
                 {
                     <tr>
                         <td><i class="bi bi-file-earmark-richtext"></i> @file.Name</td>
-                        <td>File</td>
+                        <td>@(file.Extension.TrimStart('.').ToUpper() + " File")</td>
                         <td>@file.CreationTime</td>
                         <td>@(file.Length / 1024) KB</td>
-                        <td></td>
+                        <td>
+                            <a href="@Url.Action("Download", new { path = System.IO.Path.Combine(currentPath ?? "", file.Name) })">
+                                Download
+                            </a>
+                        </td>
                     </tr>
                 }
             }
@@ -79,9 +83,6 @@
             ],
             responsive: true,
             fixedHeader: true
-        });
-
-        $(document).ready(function () {
         });
     </script>
 }

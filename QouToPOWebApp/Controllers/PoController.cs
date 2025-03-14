@@ -55,6 +55,23 @@ namespace QouToPOWebApp.Controllers
             }
             return breadcrumbs;
         }
+        public IActionResult Download(string path)
+        {
+            string fullPath = Path.Combine(_poPath, path);
+
+            if (!System.IO.File.Exists(fullPath))
+                return NotFound("File not found!");
+
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read))
+            {
+                stream.CopyTo(memory);
+            }
+            memory.Position = 0;
+
+            string fileName = Path.GetFileName(fullPath);
+            return File(memory, "application/octet-stream", fileName);
+        }
 
         public IActionResult FromQuotation()
         {
@@ -717,6 +734,9 @@ namespace QouToPOWebApp.Controllers
             {
                 _db.Po_drafts.Remove(draft);
                 await _db.SaveChangesAsync();
+
+                // Remove also attachments
+                await RemoveAttachments();
             }
             catch (Exception ex)
             {
@@ -742,6 +762,33 @@ namespace QouToPOWebApp.Controllers
 
             var userId = GetPersonnelID();
 
+            // Get attachments in temp files if exists
+            var attachments = await _db.Attachments
+                    .Where(a => a.User_ID == userId && a.Status == "pending")
+                    .ToListAsync();
+
+            if (attachments.Count > 0)
+            {
+                foreach (var attachment in attachments)
+                {
+                    // Delete if not found
+                    if (!System.IO.File.Exists(attachment.File_path))
+                        _db.Attachments.Remove(attachment); // Remove in DB
+
+                }
+
+                await _db.SaveChangesAsync();
+
+                ViewBag.Attachments = attachments;
+            }
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> RemoveAttachments()
+        {
+            var userId = GetPersonnelID();
+
             // Removed unused attachments in temp files
             var attachments = await _db.Attachments
                     .Where(a => a.User_ID == userId && a.Status == "pending")
@@ -762,13 +809,15 @@ namespace QouToPOWebApp.Controllers
                 await _db.SaveChangesAsync();
             }
 
-            return View(model);
+            return Ok(new { message = "Attachments have been removed." });
         }
 
         public async Task<IActionResult> Save()
         {
             try
             {
+                var poLink = "";
+
                 var userId = GetPersonnelID();
 
                 // Get PO draft
@@ -784,19 +833,20 @@ namespace QouToPOWebApp.Controllers
                         .Where(f => f.Date_created.Date == DateTime.Now.Date)
                         .Count();
 
-                    var fileGroupDir = Path.Combine(_poPath, DateTime.Now.ToString("yyyy/MMMM/d"), $"{savedPoCount + 1}");
+                    var groupDir = Path.Combine(DateTime.Now.ToString("yyyy/MMMM/d"), $"{savedPoCount + 1}");
+                    var finalDir = Path.Combine(_poPath, groupDir);
 
                     // Ensure the File group directory exists
-                    if (!Directory.Exists(fileGroupDir))
+                    if (!Directory.Exists(finalDir))
                     {
-                        Directory.CreateDirectory(fileGroupDir);
+                        Directory.CreateDirectory(finalDir);
                     }
 
                     var fileGroup = new File_group
                     {
                         Date_created = DateTime.Now,
                         User_ID = userId,
-                        Directory_path = fileGroupDir
+                        Directory_path = finalDir
                     };
 
                     _db.File_groups.Add(fileGroup);
@@ -817,10 +867,10 @@ namespace QouToPOWebApp.Controllers
                     _db.Pos.Add(po);
                     await _db.SaveChangesAsync();
 
-                    if (poDataJson["Po_items"] != null)
-                    {
-                        var poItems = poDataJson["Po_items"].ToObject<List<Po_item>>();
+                    var poItems = poDataJson?["Po_items"]?.ToObject<List<Po_item>>();
 
+                    if (poItems != null && poItems.Count > 0)
+                    {
                         foreach (var poItem in poItems)
                         {
                             poItem.Po_ID = po.Po_ID;
@@ -833,7 +883,7 @@ namespace QouToPOWebApp.Controllers
                         .Where(a => a.User_ID == userId && a.Status == "pending")
                         .ToListAsync();
 
-                    if (attachments.Count != 0)
+                    if (attachments != null && attachments.Count() != 0)
                     {
                         foreach (var attachment in attachments)
                         {
@@ -861,9 +911,11 @@ namespace QouToPOWebApp.Controllers
 
                     _db.Po_drafts.Remove(draft);
                     await _db.SaveChangesAsync();
+
+                    poLink = po.File_path;
                 }
 
-                return RedirectToAction(nameof(Saved));
+                return View(nameof(Saved), poLink);
             }
             catch (Exception ex)
             {
