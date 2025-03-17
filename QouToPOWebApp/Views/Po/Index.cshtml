@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "PO";
     string currentPath = ViewBag.CurrentPath as string ?? "";
+    string parentPath = System.IO.Path.GetDirectoryName(currentPath) ?? "";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -36,6 +37,17 @@
             }
         </ol>
     </nav>
+
+    <!-- Back button -->
+    @if (!string.IsNullOrEmpty(currentPath))
+    {
+        <div class="row mb-3">
+            <div class="col">
+                <a href="@Url.Action("Index", new { path = parentPath })" class="btn btn-light border px-4"><i class="bi bi-arrow-left"></i> Back</a>
+            </div>
+        </div>
+    }
+
     <!-- Files and Folders Table -->
     <table class="table datatable table-hover">
         <thead>
