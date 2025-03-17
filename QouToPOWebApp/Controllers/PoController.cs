@@ -802,6 +802,8 @@ namespace QouToPOWebApp.Controllers
 
         public async Task<IActionResult> Save()
         {
+            using (var transaction = _db.Database.BeginTransaction())
+            {
             try
             {
                 var poLink = "";
@@ -900,6 +902,9 @@ namespace QouToPOWebApp.Controllers
                     _db.Po_drafts.Remove(draft);
                     await _db.SaveChangesAsync();
 
+                        // If everything is fine, commit the transaction
+                        transaction.Commit();
+
                     poLink = po.File_path;
                 }
 
@@ -907,9 +912,16 @@ namespace QouToPOWebApp.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
-                throw;
+                    Console.WriteLine(ex.Message);
+
+                    // If something goes wrong, rollback changes
+                    transaction.Rollback();
+
+                    TempData["message"] = "danger-Something went wrong! Please try again.";
+                    return RedirectToAction(nameof(Index));
             }
+            }
+        }
         }
 
         public IActionResult Saved()
