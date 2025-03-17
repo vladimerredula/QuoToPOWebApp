@@ -39,7 +39,7 @@ let typingTimer;
 const delay = 3000; // 3 seconds delay
 
 /// Event Handlers
-$(document).on("input", "input.forDraft", function () {
+$(document).on("input change", "input.forDraft", function () {
     clearTimeout(typingTimer); // Reset timer
     typingTimer = setTimeout(() => {
         saveDraft();
@@ -252,9 +252,10 @@ function formatDate(date) {
     };
 }
 
-function formatDateToPoNumber(dateString) {
+async function formatDateToPoNumber(dateString) {
     let { day, month, year } = formatDate(dateString);
     let id = "000";
+    let poCount = await getPoCount();
 
     $.ajax({
         url: "/User/PersonnelID",
@@ -262,10 +263,27 @@ function formatDateToPoNumber(dateString) {
         success: function (response) {
             id = response.toString().padStart(3, '0');
 
-            $("#Po_number").val(`${year}${month}${day}/FF-000-${id}`);
+            $("#Po_number").val(`${year}${month}${day}/FF-${poCount}-${id}`);
         },
         error: handleAjaxError
     });
+}
+
+async function getPoCount() {
+    let poCount = "000";
+
+    await $.ajax({
+        url: "/Po/GetPoCount",
+        method: 'GET',
+        success: function (response) {
+            let count = (response.poCount + 1).toString().padStart(3, '0');
+
+            poCount = count;
+        },
+        error: handleAjaxError
+    });
+
+    return poCount;
 }
 
 function changeLang() {

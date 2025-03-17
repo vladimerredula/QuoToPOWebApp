@@ -804,114 +804,118 @@ namespace QouToPOWebApp.Controllers
         {
             using (var transaction = _db.Database.BeginTransaction())
             {
-            try
-            {
-                var poLink = "";
-
-                var userId = GetPersonnelID();
-
-                // Get PO draft
-                var draft = await _db.Po_drafts
-                    .Where(d => d.User_ID == userId && !d.Is_completed)
-                    .OrderByDescending(d => d.Last_saved)
-                    .FirstOrDefaultAsync();
-
-                if (draft != null)
+                try
                 {
-                    // Get the number of saved Po within today
-                    var savedPoCount = _db.File_groups
-                        .Where(f => f.Date_created.Date == DateTime.Now.Date)
-                        .Count();
+                    var poLink = "";
 
-                    var groupDir = Path.Combine(DateTime.Now.ToString("yyyy/MMMM/d"), $"{savedPoCount + 1}");
-                    var finalDir = Path.Combine(_poPath, groupDir);
+                    var userId = GetPersonnelID();
 
-                    // Ensure the File group directory exists
-                    if (!Directory.Exists(finalDir))
+                    // Get PO draft
+                    var draft = await _db.Po_drafts
+                        .Where(d => d.User_ID == userId && !d.Is_completed)
+                        .OrderByDescending(d => d.Last_saved)
+                        .FirstOrDefaultAsync();
+
+                    if (draft != null)
                     {
-                        Directory.CreateDirectory(finalDir);
-                    }
 
-                    var fileGroup = new File_group
-                    {
-                        Date_created = DateTime.Now,
-                        User_ID = userId,
-                        Directory_path = finalDir
-                    };
+                        var poDataJson = JObject.Parse(draft.Po_data_json);
 
-                    _db.File_groups.Add(fileGroup);
-                    await _db.SaveChangesAsync();
+                        // Convert PO data JSON to PO model
+                        // and PO view model for PO generation
+                        var poView = poDataJson.ToObject<PoViewModel>();
+                        var po = poDataJson.ToObject<Po>();
 
-                    var poDataJson = JObject.Parse(draft.Po_data_json);
+                        // Get the number of saved Po within today
+                        var savedPoCount = _db.File_groups
+                            .Where(f => f.Date_created.Date == DateTime.Now.Date)
+                            .Count();
 
-                    // Convert PO data JSON to PO model
-                    // and PO view model for PO generation
-                    var po = poDataJson.ToObject<Po>();
-                    var poView = poDataJson.ToObject<PoViewModel>();
-                    poView.File_path = Path.Combine(fileGroup.Directory_path, poView.File_name);
-                    GeneratePo(poView, true);
+                        var groupDir = Path.Combine(DateTime.Now.ToString("yyyy/MMMM/d"), po?.Po_number?.Replace("/", "_"));
+                        var finalDir = Path.Combine(_poPath, groupDir);
 
-                    po.File_group_ID = fileGroup.File_group_ID;
-                    po.File_path = Path.Combine(fileGroup.Directory_path, po.File_name);
-
-                    _db.Pos.Add(po);
-                    await _db.SaveChangesAsync();
-
-                    var poItems = poDataJson?["Po_items"]?.ToObject<List<Po_item>>();
-
-                    if (poItems != null && poItems.Count > 0)
-                    {
-                        foreach (var poItem in poItems)
+                        // Ensure the File group directory exists
+                        if (!Directory.Exists(finalDir))
                         {
-                            poItem.Po_ID = po.Po_ID;
-                            _db.Po_items.Add(poItem);
+                            Directory.CreateDirectory(finalDir);
                         }
-                    }
 
-                    // Get Attachments
-                    var attachments = await _db.Attachments
-                        .Where(a => a.User_ID == userId && a.Status == "pending")
-                        .ToListAsync();
-
-                    if (attachments != null && attachments.Count() != 0)
-                    {
-                        foreach (var attachment in attachments)
+                        var fileGroup = new File_group
                         {
-                            var newFilePath = Path.Combine(fileGroup.Directory_path, attachment.File_name);
+                            Date_created = DateTime.Now,
+                            User_ID = userId,
+                            Directory_path = finalDir
+                        };
 
-                            // Check if attachment file exists
-                            if (System.IO.File.Exists(attachment.File_path))
+                        _db.File_groups.Add(fileGroup);
+                        await _db.SaveChangesAsync();
+
+                        poView.File_path = Path.Combine(fileGroup.Directory_path, poView.File_name);
+
+                        // Generate PO and save to file
+                        GeneratePo(poView, true);
+
+                        po.File_group_ID = fileGroup.File_group_ID;
+                        po.File_path = Path.Combine(fileGroup.Directory_path, po.File_name);
+
+                        _db.Pos.Add(po);
+                        await _db.SaveChangesAsync();
+
+                        var poItems = poDataJson?["Po_items"]?.ToObject<List<Po_item>>();
+
+                        if (poItems != null && poItems.Count > 0)
+                        {
+                            foreach (var poItem in poItems)
                             {
-                                // Copy the attachment file from temp folder to the file group folder
-                                System.IO.File.Copy(attachment.File_path, newFilePath);
+                                poItem.Po_ID = po.Po_ID;
+                                _db.Po_items.Add(poItem);
+                            }
+                        }
 
-                                // Delete files from temp folder
-                                System.IO.File.Delete(attachment.File_path);
+                        // Get Attachments
+                        var attachments = await _db.Attachments
+                            .Where(a => a.User_ID == userId && a.Status == "pending")
+                            .ToListAsync();
+
+                        if (attachments != null && attachments.Count() != 0)
+                        {
+                            foreach (var attachment in attachments)
+                            {
+                                var newFilePath = Path.Combine(fileGroup.Directory_path, attachment.File_name);
+
+                                // Check if attachment file exists
+                                if (System.IO.File.Exists(attachment.File_path))
+                                {
+                                    // Copy the attachment file from temp folder to the file group folder
+                                    System.IO.File.Copy(attachment.File_path, newFilePath);
+
+                                    // Delete files from temp folder
+                                    System.IO.File.Delete(attachment.File_path);
+                                }
+
+                                attachment.File_path = newFilePath;
+                                attachment.File_group_ID = fileGroup.File_group_ID;
+                                attachment.Status = "saved";
+
+                                _db.Update(attachment);
                             }
 
-                            attachment.File_path = newFilePath;
-                            attachment.File_group_ID = fileGroup.File_group_ID;
-                            attachment.Status = "saved";
-
-                            _db.Update(attachment);
+                            await _db.SaveChangesAsync();
                         }
 
+                        _db.Po_drafts.Remove(draft);
                         await _db.SaveChangesAsync();
-                    }
-
-                    _db.Po_drafts.Remove(draft);
-                    await _db.SaveChangesAsync();
 
                         // If everything is fine, commit the transaction
                         transaction.Commit();
 
-                    poLink = po.File_path;
-                }
+                        poLink = po.File_path; 
+                    }
 
-                return View(nameof(Saved), poLink);
-            }
-            catch (Exception ex)
-            {
+                    return View(nameof(Saved), poLink);
+                }
+                catch (Exception ex)
+                {
                     Console.WriteLine(ex.Message);
 
                     // If something goes wrong, rollback changes
@@ -919,9 +923,27 @@ namespace QouToPOWebApp.Controllers
 
                     TempData["message"] = "danger-Something went wrong! Please try again.";
                     return RedirectToAction(nameof(Index));
-            }
+                }
             }
         }
+
+        public IActionResult GetPoCount(string? date)
+        {
+            if (string.IsNullOrWhiteSpace(date))
+            {
+                date = DateTime.Now.ToString("yyyy-MM-dd");
+            }
+
+            var parsedDate = DateTime.Parse(date);
+
+            // Get the number of saved Po within today
+            var savedPoCount = _db.File_groups
+                .Where(f => f.Date_created.Date == parsedDate.Date)
+                .Count();
+
+            return Json(new {
+                PoCount = savedPoCount
+            });
         }
 
         public IActionResult Saved()
