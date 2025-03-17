@@ -158,7 +158,58 @@ $("#poPreview").on("click", function () {
     }
 });
 
+$("#loadDraft").on("click", function () {
+    $("#draftModal").modal("hide");
+    loadDraft();
+});
+
+$("#deleteDraft").on("click", function () {
+    var id = $("#deleteDraft").attr("data-id");
+    deleteDraft(id);
+    $("#draftModal").modal("hide");
+});
+
 // Functions
+function loadDraft() {
+    $.get('/Po/GetPoDraft', function (response) {
+        if (response.hasDraft) {
+            let poData = JSON.parse(response.draftData);
+            Object.keys(poData).forEach(key => {
+                if (key == "Po_items") {
+                    let poItems = poData[key];
+
+                    if (poItems != null) {
+                        poItems.forEach(poItem => {
+                            let item = {
+                                name: poItem.Item_name,
+                                quantity: poItem.Item_quantity,
+                                unit: poItem.Unit,
+                                price: poItem.Item_price
+                            };
+
+                            var itemorder = poItem.Order;
+                            var totalprice = poItem.Item_quantity * poItem.Item_price;
+
+                            addTableRow(itemorder, item, totalprice);
+                        });
+                    }
+                } else if (key == "Include_tax") {
+                    $(`[name=${key}]`).prop("checked", poData[key]);
+                } else {
+                    let value = poData[key];
+
+                    if (key == "Po_date" && value != null) {
+                        let date = formatDate(value);
+                        value = `${date.year}-${date.month}-${date.day}`;
+                    }
+
+                    $(`[name=${key}]`).val(value); // Restore values to form inputs
+                }
+            });
+        }
+    });
+}
+
 function saveDraft() {
     reorderTable();
     let poData = $("#poForm").serializeArray(); // Get all form inputs
@@ -170,6 +221,20 @@ function saveDraft() {
         success: function (response) {
             console.log(response.message);
         }
+    });
+}
+
+function deleteDraft(draftId) {
+    $.ajax({
+        url: '/Po/RemovePoDraft',
+        type: 'POST',
+        data: {
+            id: draftId,
+        },
+        success: function (e) {
+            console.log(e.message);
+        },
+        error: handleAjaxError
     });
 }
 

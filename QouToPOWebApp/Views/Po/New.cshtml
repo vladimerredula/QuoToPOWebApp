@@ -475,6 +475,22 @@
     </div>
 </div>
 
+<!-- Load draft Modal -->
+<div class="modal fade" id="draftModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p class="fs-5 fw-semibold">You have an unsaved PO draft.</p>
+                <p>Would you like to load it?</p>
+            </div>
+            <div class="modal-footer border-0">
+                <a class="btn btn-primary me-2 shadow" href="javascript:void(0)" id="loadDraft">Load draft</a>
+                <a class="btn btn-danger px-3" href="javascript:void(0)" data-id="" id="deleteDraft">Discard</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
@@ -488,53 +504,8 @@
                 // Get PO draft
                 $.get('/Po/GetPoDraft', function (response) {
                     if (response.hasDraft) {
-                        if (confirm("You have an unsaved PO draft. Do you want to load it?")) {
-                            let poData = JSON.parse(response.draftData);
-                            Object.keys(poData).forEach(key => {
-                                if (key == "Po_items") {
-                                    let poItems = poData[key];
-
-                                    if (poItems != null) {
-                                        poItems.forEach(poItem => {
-                                            let item = {
-                                                name: poItem.Item_name,
-                                                quantity: poItem.Item_quantity,
-                                                unit: poItem.Unit,
-                                                price: poItem.Item_price
-                                            };
-
-                                            var itemorder = poItem.Order;
-                                            var totalprice = poItem.Item_quantity * poItem.Item_price;
-
-                                            addTableRow(itemorder, item, totalprice);
-                                        });
-                                    }
-                                } else if (key == "Include_tax") {
-                                    $(`[name=${key}]`).prop("checked", poData[key]);
-                                } else {
-                                    let value = poData[key];
-
-                                    if (key == "Po_date" && value != null) {
-                                        let date = formatDate(value);
-                                        value = `${date.year}-${date.month}-${date.day}`;
-                                    }
-
-                                    $(`[name=${key}]`).val(value); // Restore values to form inputs
-                                }
-                            });
-                        } else {
-                            $.ajax({
-                                url: '/Po/RemovePoDraft',
-                                type: 'POST',
-                                data: {
-                                    id: response.draftId,
-                                },
-                                success: function (e) {
-                                    console.log(e.message);
-                                },
-                                error: handleAjaxError
-                            });
-                        }
+                        $("#deleteDraft").attr("data-id", response.draftId);
+                        $("#draftModal").modal("show");
                     }
                 });
             }
