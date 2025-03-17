@@ -14,6 +14,7 @@ namespace QouToPOWebApp.Controllers
         private readonly ApplicationDbContext _db;
         private readonly PdfSharpService _pdf;
         private readonly string _tempDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+        private readonly string _poDir = Path.Combine(Directory.GetCurrentDirectory(), "AppData/PO");
         
         public PdfController(ApplicationDbContext db)
         {
@@ -226,6 +227,26 @@ namespace QouToPOWebApp.Controllers
             }
 
             return File(System.IO.File.OpenRead(filePath), contentType, Path.GetFileName(filePath));
+        }
+
+        [HttpGet]
+        public IActionResult GetSavedFile(string filePath)
+        {
+            var fullPath = Path.Combine(_poDir, filePath);
+            if (!System.IO.File.Exists(fullPath))
+            {
+                return NotFound("File not found.");
+            }
+
+            var fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
+
+            var provider = new FileExtensionContentTypeProvider();
+            if (!provider.TryGetContentType(fullPath, out string contentType))
+            {
+                contentType = "application/octet-stream"; // Default binary type if unknown
+            }
+
+            return File(fileStream, contentType);
         }
 
         [HttpPost]
