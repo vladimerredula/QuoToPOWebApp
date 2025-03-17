@@ -27,10 +27,17 @@ namespace QouToPOWebApp.Controllers
 
         public IActionResult Index(string path = "")
         {
+            // Create the base PO directory if it don't exists
+            if (!Directory.Exists(_poPath))
+                Directory.CreateDirectory(_poPath);
+
             string fullPath = Path.Combine(_poPath, path);
 
             if (!Directory.Exists(fullPath))
-                return NotFound("Directory not found!");
+            {
+                TempData["message"] = $"danger-Directory not found!";
+                return RedirectToAction(nameof(Index));
+            }
 
             var directories = Directory.GetDirectories(fullPath).Select(d => new DirectoryInfo(d));
             var files = Directory.GetFiles(fullPath).Select(f => new FileInfo(f));
