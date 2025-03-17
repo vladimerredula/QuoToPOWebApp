@@ -36,25 +36,13 @@ namespace QouToPOWebApp.Controllers
             var files = Directory.GetFiles(fullPath).Select(f => new FileInfo(f));
 
             ViewBag.CurrentPath = path;
-            ViewBag.Paths = GenerateBreadcrumbs(path);
+
+            var filebd = new BreadcrumbService();
+            ViewBag.Paths = filebd.GetBreadcrumbs(path);
 
             return View(directories.Concat<object>(files));
         }
 
-        private List<(string Name, string Path)> GenerateBreadcrumbs(string path)
-        {
-            var breadcrumbs = new List<(string Name, string Path)> { ("PO", "") };
-            if (string.IsNullOrEmpty(path)) return breadcrumbs;
-
-            string[] parts = path.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
-            string cumulativePath = "";
-            foreach (var part in parts)
-            {
-                cumulativePath = Path.Combine(cumulativePath, part);
-                breadcrumbs.Add((part, cumulativePath));
-            }
-            return breadcrumbs;
-        }
         public IActionResult Download(string path)
         {
             string fullPath = Path.Combine(_poPath, path);

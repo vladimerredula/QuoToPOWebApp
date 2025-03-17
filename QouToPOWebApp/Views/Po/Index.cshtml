@@ -21,11 +21,18 @@
     <!-- Breadcrumb Navigation -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            @foreach (var crumb in ViewBag.Paths)
+            @foreach (var crumb in ViewBag.Paths as List<QouToPOWebApp.Models.MiscModels.Breadcrumb>)
             {
-                <li class="breadcrumb-item">
-                    <a class="text-decoration-none" href="@Url.Action("Index", new { path = crumb.Item2 })">@crumb.Item1</a>
-                </li>
+                if (crumb.IsCurrent)
+                {
+                    <li class="breadcrumb-item active" aria-current="page">@crumb.Title</li>
+                }
+                else
+                {
+                    <li class="breadcrumb-item">
+                        <a class="text-decoration-none" href="@Url.Action("Index", new { path = crumb.Url })">@crumb.Title</a>
+                    </li>
+                }
             }
         </ol>
     </nav>

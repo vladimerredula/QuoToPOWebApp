@@ -71,5 +71,36 @@
 
             return breadcrumbs;
         }
+
+        public List<Breadcrumb> GetBreadcrumbs(string path)
+        {
+            var breadcrumbs = new List<Breadcrumb>();
+
+            breadcrumbs.Add(new Breadcrumb
+            {
+                Title = "PO",
+                Url = "",
+                IsCurrent = false
+            });
+
+            if (string.IsNullOrEmpty(path)) return breadcrumbs;
+
+            string[] parts = path.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+            string cumulativePath = "";
+
+            foreach (var part in parts)
+            {
+                cumulativePath = Path.Combine(cumulativePath, part);
+                breadcrumbs.Add(new Breadcrumb
+                {
+                    Title = part,
+                    Url = cumulativePath
+                });
+            }
+
+            breadcrumbs.Last().IsCurrent = true;
+
+            return breadcrumbs;
+        }
     }
 }
