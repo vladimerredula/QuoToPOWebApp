@@ -122,9 +122,16 @@ $(".dismissAlert").on("click", function (event) {
 });
 
 function previewFile(thisLink) {
+    var validPreviewFiles = ["pdf", "png", "jpg", "jpeg"];
+
     var e = $(thisLink);
-    $('#fileFrame').attr("src", `${e.data("filepath")}#toolbar=0&view=Fit&navpanes=0`);
-    $("#filePreviewModal").modal("show");
+    var filePath = e.data("filepath");
+    var fileExtension = filePath.split('.').pop().toLowerCase(); // Extract file extension
+
+    if (validPreviewFiles.includes(fileExtension)) {
+        $('#fileFrame').attr("src", `${filePath}#toolbar=0&view=Fit&navpanes=0`);
+        $("#filePreviewModal").modal("show");
+    }
 }
 
 function removeFile(fileId) {
