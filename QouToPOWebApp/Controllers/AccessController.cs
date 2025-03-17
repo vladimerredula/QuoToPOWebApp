@@ -22,7 +22,7 @@ namespace QouToPOWebApp.Controllers
 
             if (claimUser.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Po");
             }
 
             return View("Login");
