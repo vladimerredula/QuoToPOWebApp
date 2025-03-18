@@ -25,7 +25,7 @@ namespace QouToPOWebApp.Controllers
             _db = dbContext;
         }
 
-        public IActionResult Index(string path = "")
+        public IActionResult Index(string path = "", string searchTerm = "")
         {
             // Create the base PO directory if it don't exists
             if (!Directory.Exists(_poPath))
@@ -33,21 +33,42 @@ namespace QouToPOWebApp.Controllers
 
             string fullPath = Path.Combine(_poPath, path);
 
+            var filebd = new BreadcrumbService();
+            ViewBag.Paths = filebd.GetBreadcrumbs(path);
+            ViewBag.CurrentPath = path;
+
             if (!Directory.Exists(fullPath))
             {
                 TempData["message"] = $"danger-Directory not found!";
                 return RedirectToAction(nameof(Index));
             }
 
-            var directories = Directory.GetDirectories(fullPath).Select(d => new DirectoryInfo(d));
-            var files = Directory.GetFiles(fullPath).Select(f => new FileInfo(f));
+            IEnumerable<FileSystemInfo> items;
 
-            ViewBag.CurrentPath = path;
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                // Search for both directories and files inside "PO" folder
+                var directories = Directory.GetDirectories(_poPath, "*", SearchOption.AllDirectories)
+                    .Where(d => new DirectoryInfo(d).Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                    .Select(d => new DirectoryInfo(d));
 
-            var filebd = new BreadcrumbService();
-            ViewBag.Paths = filebd.GetBreadcrumbs(path);
+                var files = Directory.GetFiles(_poPath, "*", SearchOption.AllDirectories)
+                    .Where(f => Path.GetFileName(f).Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                    .Select(f => new FileInfo(f));
 
-            return View(directories.Concat<object>(files));
+                items = directories.Cast<FileSystemInfo>().Concat(files)
+                    .OrderBy(f => f is DirectoryInfo ? 0 : 1) // Folders first
+                    .ThenBy(f => f.Name);
+            }
+            else
+            {
+                // Load the contents of the current directory
+                items = new DirectoryInfo(fullPath).GetFileSystemInfos()
+                    .OrderBy(f => f is DirectoryInfo ? 0 : 1)
+                    .ThenBy(f => f.Name);
+            }
+
+            return View(items);
         }
 
         public IActionResult Download(string path)

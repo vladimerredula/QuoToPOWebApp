@@ -4,6 +4,7 @@
     ViewData["Title"] = "PO";
     string currentPath = ViewBag.CurrentPath as string ?? "";
     string parentPath = System.IO.Path.GetDirectoryName(currentPath) ?? "";
+    string _poPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "AppData/PO");
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -38,15 +39,27 @@
         </ol>
     </nav>
 
-    <!-- Back button -->
-    @if (!string.IsNullOrEmpty(currentPath))
-    {
-        <div class="row mb-3">
-            <div class="col">
+    <!-- Back button & Search Bar -->
+    <div class="row justify-content-between">
+        <div class="col">
+            @if (!string.IsNullOrEmpty(currentPath))
+            {
                 <a href="@Url.Action("Index", new { path = parentPath })" class="btn btn-light border px-4"><i class="bi bi-arrow-left"></i> Back</a>
-            </div>
+            } else
+            {
+                <a href="#" class="btn btn-light border px-4 disabled"><i class="bi bi-arrow-left"></i> Back</a>
+            }
         </div>
-    }
+        <div class="col-auto">
+            <form method="get" action="@Url.Action("Index")" class="mb-3">
+                <input type="hidden" name="path" value="@currentPath" />
+                <div class="input-group">
+                    <input type="text" name="searchTerm" class="form-control" placeholder="Search files and folders..." value="@Context.Request.Query["searchTerm"]">
+                    <button type="submit" class="btn btn-light border">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Files and Folders Table -->
     <table class="table datatable table-hover">
@@ -67,7 +80,7 @@
                     <tr onclick="window.location='@Url.Action("Index", new { path = System.IO.Path.Combine(currentPath, dir.Name) })'" style="cursor:pointer;">
                         <td><i class="bi bi-folder"></i> @dir.Name</td>
                         <td>Folder</td>
-                        <td>@dir.CreationTime</td>
+                        <td>@dir.CreationTime.ToString("yyyy-MM-dd HH:mm")</td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -75,15 +88,16 @@
                 else if (item is System.IO.FileInfo file)
                 {
                     <tr>
-                        <td><a class="text-decoration-none" href="#" data-id="@System.IO.Path.Combine(currentPath ?? "", file.Name)" onclick="previewFile(this)">
+                        <td>
+                            <a class="text-decoration-none" href="#" data-id="@System.IO.Path.GetRelativePath(_poPath, file.FullName)" onclick="previewFile(this)">
                                 <i class="bi bi-file-earmark-richtext"></i> @file.Name
                             </a>
                         </td>
                         <td>@(file.Extension.TrimStart('.').ToUpper() + " File")</td>
-                        <td>@file.CreationTime</td>
+                        <td>@file.CreationTime.ToString("yyyy-MM-dd HH:mm")</td>
                         <td>@(file.Length / 1024) KB</td>
                         <td>
-                            <a href="@Url.Action("Download", new { path = System.IO.Path.Combine(currentPath ?? "", file.Name) })">
+                            <a href="@Url.Action("Download", new { path = System.IO.Path.GetRelativePath(_poPath, file.FullName) })">
                                 Download
                             </a>
                         </td>
@@ -119,7 +133,10 @@
                 { targets: 0, className: "text-start" } // Bootstrap class for left alignment
             ],
             responsive: true,
-            fixedHeader: true
+            fixedHeader: true,
+            filter: false,
+            lengthChange: false,
+            pageLength: 15 // Set default number of rows per page
         });
 
         function previewFile(a) {
