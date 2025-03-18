@@ -957,5 +957,16 @@ namespace QouToPOWebApp.Controllers
         {
             return View();
         }
+
+        public IActionResult GetItemSuggestions(string term)
+        {
+            var results = _db.Po_items
+                .Where(x => x.Item_name.ToLower().Contains(term.ToLower()))
+                .Select(x => x.Item_name)
+                .Distinct()
+                .ToList();
+
+            return Json(results);
+        }
     }
 }

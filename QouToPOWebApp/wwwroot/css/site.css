@@ -30,3 +30,7 @@ button:focus, a:focus, input:focus, select:focus, textarea:focus {
 textarea {
     overflow-y: hidden;
 }
+
+.ui-autocomplete {
+    z-index: 9999 !important; /* Bootstrap modals use 1050, so set it higher */
+}

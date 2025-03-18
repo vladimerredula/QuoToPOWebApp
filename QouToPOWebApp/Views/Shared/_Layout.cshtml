@@ -16,6 +16,9 @@
 
     <!-- Data Tables -->
     <link rel="stylesheet" href="~/css/datatables.min.css" asp-append-version="true" />
+
+    <!-- jQuery UI CSS (For Styling the Autocomplete Dropdown) -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css">
 </head>
 <body>
     @{
@@ -145,6 +148,9 @@
 
     <!-- Data Tables -->
     <script src="~/js/datatables.min.js" asp-append-version="true"></script>
+
+    <!-- jQuery UI JS (Contains the .autocomplete() Function) -->
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

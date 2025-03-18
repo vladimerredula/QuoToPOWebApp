@@ -1,6 +1,20 @@
 ﻿$(document).ready(function () {
     changeLang();
     taxSwitch();
+
+    $(".autocomplete-input").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/Po/GetItemSuggestions",
+                type: "GET",
+                data: { term: request.term },
+                success: function (data) {
+                    response(data); // Return results to autocomplete
+                }
+            });
+        },
+        minLength: 1 // Start searching after typing 1 character
+    });
 });
 
 var itemTable = $('table.datatable').DataTable({
