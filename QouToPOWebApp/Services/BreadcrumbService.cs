@@ -83,19 +83,20 @@
                 IsCurrent = false
             });
 
-            if (string.IsNullOrEmpty(path)) return breadcrumbs;
-
-            string[] parts = path.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
-            string cumulativePath = "";
-
-            foreach (var part in parts)
+            if (!string.IsNullOrEmpty(path))
             {
-                cumulativePath = Path.Combine(cumulativePath, part);
-                breadcrumbs.Add(new Breadcrumb
+                string[] parts = path.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+                string cumulativePath = "";
+
+                foreach (var part in parts)
                 {
-                    Title = part,
-                    Url = cumulativePath
-                });
+                    cumulativePath = Path.Combine(cumulativePath, part);
+                    breadcrumbs.Add(new Breadcrumb
+                    {
+                        Title = part,
+                        Url = cumulativePath
+                    });
+                }
             }
 
             breadcrumbs.Last().IsCurrent = true;
