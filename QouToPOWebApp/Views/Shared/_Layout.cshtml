@@ -140,7 +140,8 @@
 
     <input id="haserror" value="@(TempData["passerror"] != null ? TempData["passerror"] : "")" hidden />
 
-    <partial name="_Notification" />
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -151,6 +152,17 @@
 
     <!-- jQuery UI JS (Contains the .autocomplete() Function) -->
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            let tempMessage = '@TempData["toastMessage"]';
+
+            if (tempMessage && tempMessage !== 'null') {
+                var toastMessage = tempMessage.split("-");
+                showToast(toastMessage[0], toastMessage[1]);
+            }
+        });
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
