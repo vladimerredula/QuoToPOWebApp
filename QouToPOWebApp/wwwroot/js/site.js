@@ -71,7 +71,7 @@ $(document).ready(function () {
     }
 });
 
-function showToast(type = "success", message, duration = 7000) {
+function showToast(message, type = "success", duration = 7000) {
     let toastContainer = $("#toastContainer"); // Ensure toast container exists
 
     if (!toastContainer.length) {
@@ -81,7 +81,7 @@ function showToast(type = "success", message, duration = 7000) {
 
     // Create a unique toast element
     let toast = $(`
-        <div class="toast align-items-center text-bg-${type} border-0 fade" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="${duration}">
+        <div class="toast align-items-center text-bg-${type} border-0 shadow fade" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="${duration}">
             <div class="d-flex">
                 <div class="toast-body">${message}</div>
                 <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>

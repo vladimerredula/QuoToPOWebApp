@@ -39,7 +39,7 @@ namespace QouToPOWebApp.Controllers
 
             if (!Directory.Exists(fullPath))
             {
-                TempData["toastMessage"] = $"danger-Directory not found!";
+                TempData["toastMessage"] = $"Directory not found!-danger";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -949,7 +949,7 @@ namespace QouToPOWebApp.Controllers
                     // If something goes wrong, rollback changes
                     transaction.Rollback();
 
-                    TempData["toastMessage"] = "danger-Something went wrong! Please try again.";
+                    TempData["toastMessage"] = "Something went wrong! Please try again.-danger";
                     return RedirectToAction(nameof(Index));
                 }
             }

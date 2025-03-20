@@ -233,7 +233,7 @@ function saveDraft() {
         type: 'POST',
         data: poData,
         success: function (response) {
-            console.log(response.message);
+            showToast(response.message, "light", 1500);
         }
     });
 }

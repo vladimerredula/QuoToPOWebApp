@@ -158,8 +158,8 @@
             let tempMessage = '@TempData["toastMessage"]';
 
             if (tempMessage && tempMessage !== 'null') {
-                var toastMessage = tempMessage.split("-");
-                showToast(toastMessage[0], toastMessage[1]);
+                let [message, type] = tempMessage.split("-");
+                showToast(message, type || "success");
             }
         });
     </script>

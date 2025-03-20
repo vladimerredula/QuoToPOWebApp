@@ -33,7 +33,7 @@ namespace QouToPOWebApp.Controllers
                 user.Last_password_changed = DateTime.Now;
                 _db.SaveChanges();
 
-                TempData["toastMessage"] = "success-Password successfully changed.";
+                TempData["toastMessage"] = "Password successfully changed.-success";
             }
             else
             {
@@ -69,11 +69,11 @@ namespace QouToPOWebApp.Controllers
                 user.Last_password_changed = DateTime.Now;
                 _db.SaveChanges();
 
-                TempData["toastMessage"] = "success-Password successfully changed.";
+                TempData["toastMessage"] = "Password successfully changed.-success";
             }
             else
             {
-                TempData["toastMessage"] = "danger-User not found";
+                TempData["toastMessage"] = "User not found-danger";
             }
 
             return RedirectToAction(nameof(Index));
