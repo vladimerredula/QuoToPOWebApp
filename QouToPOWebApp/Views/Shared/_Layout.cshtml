@@ -39,8 +39,29 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Po" asp-action="Index" asp-route-path="@DateTime.Now.ToString("yyyy\\\\MMMM")" >POs</a>
+                        <li class="nav-item dropdown">
+                            <button class="nav-link dropdown-toggle" id="poDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                POs
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="poDropdown">
+                                <li class="submenu submenu-md dropend">
+                                    <a class="dropdown-item dropdown-toggle" role="button"
+                                       data-bs-toggle="dropdown" aria-expanded="false"
+                                       onclick="event.stopPropagation();">
+                                        Create PO
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-controller="Po" asp-action="New">New</a></li>
+                                        <li><a class="dropdown-item disabled" asp-controller="Po" asp-action="FromQuotation">From Quotation</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a asp-controller="Po" asp-action="Index" asp-route-path="@DateTime.Now.ToString("yyyy")" class="dropdown-item">PO list</a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Po" asp-action="Template" class="dropdown-item">Templates</a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <button class="nav-link dropdown-toggle" id="infoDropdown" data-bs-toggle="dropdown" aria-expanded="false">

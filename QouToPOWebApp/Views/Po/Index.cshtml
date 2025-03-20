@@ -90,7 +90,30 @@
                     <tr>
                         <td>
                             <a class="text-decoration-none" href="#" data-id="@System.IO.Path.GetRelativePath(_poPath, file.FullName)" onclick="previewFile(this)">
-                                <i class="bi bi-file-earmark-richtext"></i> @file.Name
+                                @switch (file.Extension.TrimStart('.').ToLower())
+                                {
+                                    case "pdf":
+                                        <i class="bi bi-file-earmark-pdf"></i>
+                                        break;
+                                    case "png":
+                                    case "jpg":
+                                    case "jpeg":
+                                        <i class="bi bi-file-earmark-image"></i>
+                                        break;
+                                    case "xlsx":
+                                        <i class="bi bi-file-earmark-spreadsheet"></i>
+                                        break;
+                                    case "txt":
+                                        <i class="bi bi-file-earmark-text"></i>
+                                        break;
+                                    case string ext when new[] { "obj", "stl", "fbx", "dae", "iges", "step", "3ds", "skp", "amf", "gbl", "vrml" }.Contains(ext):
+                                        <i class="bi bi-badge-3d"></i>
+                                        break;
+                                    default:
+                                        <i class="bi bi-file-earmark-richtext"></i>
+                                        break;
+                                }
+                                 @file.Name
                             </a>
                         </td>
                         <td>@(file.Extension.TrimStart('.').ToUpper() + " File")</td>

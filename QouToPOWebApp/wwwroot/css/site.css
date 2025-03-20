@@ -34,3 +34,35 @@ textarea {
 .ui-autocomplete {
     z-index: 9999 !important; /* Bootstrap modals use 1050, so set it higher */
 }
+
+@media (min-width: 768px) {
+    /* common styles */
+    li.submenu-md ul.dropdown-menu[data-bs-popper] {
+        border-width: var(--bs-dropdown-border-width);
+        padding-top: var(--bs-dropdown-padding-y);
+        padding-bottom: var(--bs-dropdown-padding-y);
+        margin-top: -0.5em;
+    }
+
+    li.submenu-md ul.dropdown-menu[data-bs-popper] li {
+        padding-left: var(--bs-dropdown-padding-x);
+    }
+
+    li.submenu-md a[role="button"] {
+        display: inline-flex;
+        align-items: center;
+    }
+    /* dropend styles */
+    li.submenu-md.dropend ul.dropdown-menu[data-bs-popper] {
+        margin-left: -0.3em;
+    }
+
+    li.submenu-md.dropend a[role="button"].show::after {
+        transform: unset;
+    }
+
+    li.submenu-md.dropend a[role="button"]::after {
+        position: absolute;
+        right: 0.4em;
+    }
+}
