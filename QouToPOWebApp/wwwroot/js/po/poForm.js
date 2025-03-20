@@ -183,6 +183,34 @@ $("#deleteDraft").on("click", function () {
     $("#draftModal").modal("hide");
 });
 
+$("#templateSave").on("click", function () {
+    if ($("#poForm").valid()) {
+        $("#templateModal").modal("show");
+    }
+});
+
+$("#saveTemplate").on("click", function () {
+    if ($("#templateForm").valid()) {
+        let formData = new FormData($("#poForm")[0]); // Convert form to FormData
+        formData.append("templateName", $("#templateName").val());
+
+        $.ajax({
+            url: '/Po/SavePoTemplate',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                $("#templateModal").modal("hide");
+                showToast(response.message);
+            },
+            error: function (error) {
+                $("#templateError").text(error.responseJSON.message);
+            }
+        });
+    }
+});
+
 // Functions
 function loadDraft() {
     $.get('/Po/GetPoDraft', function (response) {

@@ -214,7 +214,15 @@
     </div>
     <div class="row justify-content-end">
         <div class="col-auto">
-            <a class="btn btn-lg btn-light border" href="javascript:void(0)" id="poPreview">Preview</a>
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                <a class="btn btn-lg btn-light border" href="javascript:void(0)" id="poPreview">Preview</a>
+                <button type="button" class="btn btn-light border dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="visually-hidden">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#" id="templateSave">Save as Template</a></li>
+                </ul>
+            </div>
         </div>
         <div class="col-auto">
             @* <a class="btn btn-lg btn-info text-white shadow" href="javascript:void(0)" id="generatePo">Generate PO</a> *@
@@ -486,6 +494,28 @@
             <div class="modal-footer border-0">
                 <a class="btn btn-primary me-2 shadow" href="javascript:void(0)" id="loadDraft">Load draft</a>
                 <a class="btn btn-danger px-3" href="javascript:void(0)" data-id="" id="deleteDraft">Discard</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template Modal -->
+<div class="modal fade" id="templateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h1 class="modal-title fs-5" id="templateModalLabel">Save as template</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="templateForm">
+                    <label class="form-label">Template name</label><span class="text-danger" title="Required">*</span>
+                    <input class="form-control" name="templateName" id="templateName" data-val="true" data-val-required="The Template name field is required." required />
+                    <span id="templateError" class="text-danger field-validation-valid" data-valmsg-for="templateName" data-valmsg-replace="true"></span>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <a class="btn btn-primary px-3" href="javascript:void(0)" id="saveTemplate">Save</a>
             </div>
         </div>
     </div>
