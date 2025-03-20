@@ -1,0 +1,167 @@
+﻿@using QouToPOWebApp.Models.PoModels
+@model Po_template
+
+@{
+    ViewData["Title"] = "Templates";
+
+    var templates = ViewBag.Templates as List<Po_template>;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p class="mb-4">
+    <a class="btn btn-primary shadow" asp-action="CreateTemplate">Create New</a>
+</p>
+
+<div class="card p-3 border-0 shadow-sm">
+    <table class="datatable table table-hover">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Template_name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Contact_person_ID)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Date_created)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Date_modified)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in templates) {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Template_name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Contact_person.Company.Company_name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Date_created)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Date_modified)
+                    </td>
+                    <td class="text-nowrap">
+                        <a href="javascript:void(0)" onclick="previewTemplate(@item.Template_ID)">Preview</a> |
+                        <a asp-controller="Po" asp-action="Template" asp-route-id="@item.Template_ID">Edit</a> |
+                        <a href="javascript:void(0)" onclick="deleteTemplate(@item.Template_ID)">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Pdf preview Modal -->
+<div class="modal fade" id="pdfPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h1 class="modal-title fs-5" id="pdfPreviewModalLabel">Preview</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <iframe id="pdfFrame" src="" width="100%" height="900px"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="deleteModalLabel">Delete template</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.Template_name)
+                    </dt>
+                    <dd class="col-sm-8" id="template_name">
+                    </dd>
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.Contact_person.Company.Company_name)
+                    </dt>
+                    <dd class="col-sm-8" id="contact_person_ID">
+                    </dd>
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.Date_modified)
+                    </dt>
+                    <dd class="col-sm-8" id="date_modified">
+                    </dd>
+                </dl>
+            </div>
+            <div class="modal-footer border-0">
+                <form asp-action="DeleteTemplate">
+                    <input type="hidden" name="id" id="deleteID" />
+                    <a class="btn btn-link" href="javascript:void(0)" data-bs-dismiss="modal">Cancel</a>
+                    <input type="submit" value="Delete" class="btn btn-danger" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $("table.datatable").DataTable({
+            responsive: true,
+            fixedHeader: true
+        });
+
+        $(document).ready(function () {
+        });
+
+        function previewTemplate(id) {
+            $.ajax({
+                url: "/Po/PreviewTemplate",
+                method: 'POST',
+                data: { id: id },
+                success: function (response) {
+                    $('#pdfFrame').attr('src', response.pdfDataUrl + "#toolbar=0&view=Fit&navpanes=0&scrollbar=0");
+                    $("#pdfPreviewModal").modal("show");
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        function deleteTemplate(id) {
+            $.ajax({
+                url: "/Po/getTemplate",
+                type: "POST",
+                data: {id: id},
+                success: function (data) {
+                    // Iterate over the properties of the data object and set the corresponding form field values
+                    $.each(data, function (key, value) {
+                        var $element = $("#" + key);
+                        if ($element.length) {
+                            $element.text(value);
+                        }
+                    });
+
+                    $("#deleteID").val(data["template_ID"]);
+
+                    // Show the modal
+                    $("#deleteModal").modal("show");
+                },
+                error: function (response) {
+                    console.error("Error:", response);
+                }
+            });
+        }
+    </script>
+}

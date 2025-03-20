@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using QouToPOWebApp.Models.InfoModels;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QouToPOWebApp.Models.PoModels
 {
@@ -10,6 +12,9 @@ namespace QouToPOWebApp.Models.PoModels
         [Display(Name = "Template name")]
         public string Template_name { get; set; }
 
+        [Display(Name = "Company")]
+        public int? Contact_person_ID { get; set; }
+
         public string Po_data_json { get; set; }
 
         [Display(Name = "Created on")]
@@ -20,5 +25,8 @@ namespace QouToPOWebApp.Models.PoModels
 
         [Display(Name = "Created by")]
         public int User_ID { get; set; }
+
+        [ForeignKey("Contact_person_ID")]
+        public virtual Contact_person? Contact_person { get; set; }
     }
 }

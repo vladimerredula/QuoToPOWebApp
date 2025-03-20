@@ -989,5 +989,193 @@ namespace QouToPOWebApp.Controllers
 
             return Json(results);
         }
+
+        public IActionResult Template(int id)
+        {
+            if (id == 0 || id == null)
+            {
+                ViewBag.Templates = _db.Po_templates
+                    .Include(t => t.Contact_person.Company)
+                    .ToList();
+                return View();
+            }
+
+            var template = _db.Po_templates.Find(id);
+
+            if (template == null)
+            {
+                TempData["toastMessage"] = "Template not found!-danger";
+                return RedirectToAction(nameof(Template));
+            }
+
+            var templateViewModel = new TemplateViewModel
+            {
+                Template_ID = template.Template_ID,
+                Template_name = template.Template_name,
+            };
+
+            templateViewModel.Po = JObject.Parse(template.Po_data_json).ToObject<PoViewModel>();
+
+            ViewBag.deliveryAddressList = GetDeliveryAddressList();
+            ViewBag.contactPersonList = GetContactPersonList();
+            ViewBag.correspondentList = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name", templateViewModel?.Po?.Correspondent_ID);
+            ViewBag.paymentTerms = _db.Payment_terms.ToList();
+            ViewBag.deliveryTerms = _db.Delivery_terms.ToList();
+
+            return View("CreateTemplate", templateViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PreviewTemplate(int id)
+        {
+            var template = await GetTemplate(id);
+
+            if (template == null)
+            {
+                TempData["toastMessage"] = "Template not found!-danger";
+                return RedirectToAction(nameof(Template));
+            }
+
+            var po = JObject.Parse(template.Po_data_json).ToObject<PoViewModel>();
+
+            byte[] pdfData = GeneratePo(po);
+            string base64Pdf = Convert.ToBase64String(pdfData);
+            string dataUrl = "data:application/pdf;base64," + base64Pdf;
+
+            return Json(new { PdfDataUrl = dataUrl });
+        }
+
+        public IActionResult CreateTemplate()
+        {
+            ViewBag.deliveryAddressList = GetDeliveryAddressList();
+            ViewBag.contactPersonList = GetContactPersonList();
+            ViewBag.correspondentList = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name");
+            ViewBag.paymentTerms = _db.Payment_terms.ToList();
+            ViewBag.deliveryTerms = _db.Delivery_terms.ToList();
+
+            return View();
+        }
+
+        public async Task<IActionResult> SaveTemplate(TemplateViewModel model)
+        {
+            var existingTemplate = await GetTemplate(model.Template_ID);
+
+            if (existingTemplate != null)
+            {
+                var poJson = JsonConvert.SerializeObject(model);
+
+                existingTemplate.Template_name = model.Template_name;
+                existingTemplate.Contact_person_ID = model.Po.Contact_person_ID;
+                existingTemplate.Po_data_json = poJson;
+                existingTemplate.Date_modified = DateTime.Now;
+                existingTemplate.User_ID = GetPersonnelID();
+
+            } else
+            {
+                var template = new Po_template
+                {
+                    Template_name = model.Template_name,
+                    Contact_person_ID = model.Po.Contact_person_ID,
+                    Po_data_json = JsonConvert.SerializeObject(model.Po),
+                    Date_created = DateTime.Now,
+                    Date_modified = DateTime.Now,
+                    User_ID = GetPersonnelID()
+                };
+
+                await _db.Po_templates.AddAsync(template);
+            }
+
+            await _db.SaveChangesAsync();
+
+            TempData["toastMessage"] = "Template successfully saved.-success";
+
+            return RedirectToAction(nameof(Template));
+        }
+
+        public async Task<IActionResult> DeleteTemplate(int id)
+        {
+            var existingTemplate = await GetTemplate(id);
+
+            if (existingTemplate == null)
+            {
+                TempData["toastMessage"] = "Template not found!-danger";
+                return RedirectToAction(nameof(Template));
+            }
+
+            _db.Po_templates.Remove(existingTemplate);
+            await _db.SaveChangesAsync();
+
+            TempData["toastMessage"] = "Template successfully deleted!-success";
+
+            return RedirectToAction(nameof(Template));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SavePoTemplate(PoViewModel po, string templateName)
+        {
+            var existingTemplate = await _db.Po_templates.FirstOrDefaultAsync(d => d.Template_name.ToLower() == templateName.ToLower());
+
+            if (existingTemplate != null)
+                return BadRequest(new { message = "Template name already exists."});
+
+            if (po == null)
+                return BadRequest(new { message = "No data received." });
+
+            po.File_name = DateTime.Now.ToString("yyyyMMdd");
+
+            if (po.Contact_person_ID != null)
+            {
+                var cp = await _db.Contact_persons
+                    .Include(c => c.Company)
+                    .Where(c => c.Contact_person_ID == po.Contact_person_ID)
+                    .FirstOrDefaultAsync();
+
+                po.File_name += $" {(cp?.Company?.Company_name ?? po?.Po_number)}.pdf";
+            }
+            else
+            {
+                po.File_name += $" {po.Po_number}.pdf";
+            }
+
+            var newTemplate = new Po_template
+            {
+                Template_name = templateName,
+                Contact_person_ID = po?.Contact_person_ID,
+                Po_data_json = JsonConvert.SerializeObject(po),
+                Date_created = DateTime.UtcNow,
+                Date_modified = DateTime.UtcNow,
+                User_ID = GetPersonnelID(),
+            };
+
+            await _db.Po_templates.AddAsync(newTemplate);
+            await _db.SaveChangesAsync();
+
+            return Ok(new { message = "Template successfully saved." });
+        }
+
+        private async Task<Po_template?> GetTemplate(int id)
+        {
+            return await _db.Po_templates
+                .FindAsync(id);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> getTemplate(int id)
+        {
+            var template = await GetTemplate(id);
+
+            var contact_person = await _db.Contact_persons
+                .Include(c => c.Company)
+                .FirstOrDefaultAsync(x => x.Contact_person_ID == template.Contact_person_ID);
+
+            return Json(new
+            {
+                template_ID = template.Template_ID,
+                template_name = template.Template_name,
+                contact_person_ID = contact_person.Company.Company_name,
+                date_created = template.Date_modified.ToString("yyyy-MM-dd HH:mm"),
+                date_modified = template.Date_modified.ToString("yyyy-MM-dd HH:mm")
+            });
+        }
     }
 }
