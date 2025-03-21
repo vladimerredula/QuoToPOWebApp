@@ -665,6 +665,13 @@ function addCustomContactPerson() {
                 $("#Postal_code").val(null);
                 $("#Contact_person").val(null);
                 $("#Contact_person_jpn").val(null);
+
+                showToast("Company added successfully.", "success");
+
+                clearTimeout(typingTimer); // Reset timer
+                typingTimer = setTimeout(() => {
+                    saveDraft();
+                }, 5000);
             },
             error: handleAjaxError
         });
@@ -741,6 +748,13 @@ function addPaymentTerm() {
 
                 $("#Payment_term").val(lang == "en" ? ptEng : ptJpn)
                 $("#paymentTermAddModal").modal("hide");
+
+                showToast("Payment term added successfully.", "success");
+
+                clearTimeout(typingTimer); // Reset timer
+                typingTimer = setTimeout(() => {
+                    saveDraft();
+                }, 5000);
             },
             error: handleAjaxError
         });
@@ -784,6 +798,13 @@ function addDeliveryTerm() {
 
                 $("#Delivery_term").val(lang == "en" ? dtEng : dtJpn)
                 $("#deliveryTermAddModal").modal("hide");
+
+                showToast("Delivery term added successfully.", "success");
+
+                clearTimeout(typingTimer); // Reset timer
+                typingTimer = setTimeout(() => {
+                    saveDraft();
+                }, 5000);
             },
             error: handleAjaxError
         });
