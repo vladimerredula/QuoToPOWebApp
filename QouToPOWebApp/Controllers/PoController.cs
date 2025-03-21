@@ -861,7 +861,9 @@ namespace QouToPOWebApp.Controllers
                             .Where(f => f.Date_created.Date == DateTime.Now.Date)
                             .Count();
 
-                        var groupDir = Path.Combine(DateTime.Now.ToString("yyyy/MMMM/d"), po?.Po_number?.Replace("/", "_"));
+                        var dirName = $"{(savedPoCount + 1).ToString("D3")}-{userId.ToString("D3")}";
+
+                        var groupDir = Path.Combine(DateTime.Now.ToString("yyyy/MMMM/d"), dirName);
                         var finalDir = Path.Combine(_poPath, groupDir);
 
                         // Ensure the File group directory exists
