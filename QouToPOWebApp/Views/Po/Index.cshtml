@@ -177,7 +177,7 @@
             var filePath = e.data("id");
             var fileExtension = filePath.split('.').pop().toLowerCase();
 
-            $('#fileFrame').attr("src", `/Pdf/GetSavedFile?filePath=${filePath}#toolbar=0&view=Fit&navpanes=0`);
+            $('#fileFrame').attr("src", `/Pdf/GetSavedFile?filePath=${encodeURIComponent(filePath)}#toolbar=0&view=Fit&navpanes=0`);
 
             if (validPreviewFiles.includes(fileExtension)) {
                 $("#filePreviewModal").modal("show");
