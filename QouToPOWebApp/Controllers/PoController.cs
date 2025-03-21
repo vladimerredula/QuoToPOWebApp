@@ -626,6 +626,7 @@ namespace QouToPOWebApp.Controllers
             ViewBag.correspondentList = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name");
             ViewBag.paymentTerms = _db.Payment_terms.ToList();
             ViewBag.deliveryTerms = _db.Delivery_terms.ToList();
+            ViewBag.templates = _db.Po_templates.Include(t => t.Contact_person.Company).ToList();
 
             return View();
         }
@@ -638,6 +639,7 @@ namespace QouToPOWebApp.Controllers
             ViewBag.correspondentList = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name", po?.Correspondent_ID);
             ViewBag.paymentTerms = _db.Payment_terms.ToList();
             ViewBag.deliveryTerms = _db.Delivery_terms.ToList();
+            ViewBag.templates = _db.Po_templates.Include(t => t.Contact_person.Company).ToList();
 
             return View(po);
         }
@@ -1173,6 +1175,7 @@ namespace QouToPOWebApp.Controllers
                 template_ID = template.Template_ID,
                 template_name = template.Template_name,
                 contact_person_ID = contact_person.Company.Company_name,
+                po_data_json = template.Po_data_json,
                 date_created = template.Date_modified.ToString("yyyy-MM-dd HH:mm"),
                 date_modified = template.Date_modified.ToString("yyyy-MM-dd HH:mm")
             });

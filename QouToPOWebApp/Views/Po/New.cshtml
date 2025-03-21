@@ -11,12 +11,20 @@
     ViewData["Title"] = "Create PO";
     var paymentTerms = ViewBag.paymentTerms as List<Payment_term>;
     var deliveryTerms = ViewBag.deliveryTerms as List<Delivery_term>;
+    var templates = ViewBag.templates as List<QouToPOWebApp.Models.PoModels.Po_template>;
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
 <form asp-action="AddAttachments" id="poForm">
-    <h4>Details</h4>
+    <div class="row justify-content-between">
+        <div class="col-auto align-self-end">
+            <h4>Details</h4>
+        </div>
+        <div class="col-auto">
+            <a class="btn btn-light border mb-2" id="templates">Templates</a>
+        </div>
+    </div>
     <div class="card p-3 border-0 shadow-sm mb-3">
         <div class="row mb-3">
             <div class="col-4 mb-2">
@@ -504,7 +512,48 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header border-0">
-                <h1 class="modal-title fs-5" id="templateModalLabel">Save as template</h1>
+                <h1 class="modal-title fs-5" id="templateModalLabel">Select template</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-hover" id="templateTable">
+                    <thead>
+                        <tr>
+                            <th>Template ID</th>
+                            <th>Template name</th>
+                            <th>Company</th>
+                            <th>Date modified</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (templates != null)
+                        {
+                            foreach (var template in templates)
+                            {
+                                <tr>
+                                    <td>@template.Template_ID</td>
+                                    <td>@template.Template_name</td>
+                                    <td>@template.Contact_person.Company.Company_name</td>
+                                    <td>@template.Date_modified.ToString("yyyy-MM-dd HH:mm")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer border-0">
+                <a class="btn btn-primary px-3 disabled" href="javascript:void(0)" id="loadTemplate">Load</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Save as Template Modal -->
+<div class="modal fade" id="templateSaveModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h1 class="modal-title fs-5" id="templateSaveModalLabel">Save as template</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">

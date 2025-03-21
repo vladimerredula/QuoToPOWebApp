@@ -17,6 +17,20 @@
     });
 });
 
+var templateTable = $("#templateTable").DataTable({
+    fixedHeader: true,
+    filter: false,
+    paging: false,
+    info: false,
+    select: {
+        style: 'single',
+        info: false
+    },
+    columnDefs: [
+        { targets: 0, visible: false } // Hide column index 0 (1st column)
+    ]
+});
+
 var itemTable = $('table.datatable').DataTable({
     info: false,
     responsive: true,
@@ -79,12 +93,29 @@ itemTable.on('select.dt', function () {
     $('#removeItem').removeClass('disabled');
 });
 
+templateTable.on('select.dt', function () {
+    $('#loadTemplate').removeClass('disabled');
+});
+
 // Disable button when no row is selected
 itemTable.on('deselect.dt', function () {
     if (!itemTable.rows('.selected').any()) {
         $('#editItem').addClass('disabled');
         $('#removeItem').addClass('disabled');
     }
+});
+
+templateTable.on('deselect.dt', function () {
+    if (!templateTable.rows('.selected').any()) {
+        $('#loadTemplate').addClass('disabled');
+    }
+});
+
+$("#loadTemplate").on("click", function () {
+    var row = templateTable.row(".selected");
+    var rowData = row.data();
+
+    loadTemplate(rowData[0]);
 });
 
 $("#submitItem").on("click", function () {
@@ -183,9 +214,21 @@ $("#deleteDraft").on("click", function () {
     $("#draftModal").modal("hide");
 });
 
+$("#templates").on("click", function () {
+    $.get('/Po/GetPoDraft', function (response) {
+        if (response.hasDraft) {
+            if (confirm("Are you sure you want to load a template? \nYour current progress will be discarded once a template is loaded.")) {
+                $("#templateModal").modal("show");
+            }
+        } else {
+            $("#templateModal").modal("show");
+        }
+    });
+});
+
 $("#templateSave").on("click", function () {
     if ($("#poForm").valid()) {
-        $("#templateModal").modal("show");
+        $("#templateSaveModal").modal("show");
     }
 });
 
@@ -201,7 +244,7 @@ $("#saveTemplate").on("click", function () {
             processData: false,
             contentType: false,
             success: function (response) {
-                $("#templateModal").modal("hide");
+                $("#templateSaveModal").modal("hide");
                 showToast(response.message);
             },
             error: function (error) {
@@ -212,6 +255,64 @@ $("#saveTemplate").on("click", function () {
 });
 
 // Functions
+function loadTemplate(id) {
+    $.ajax({
+        url: '/Po/getTemplate',
+        type: 'POST',
+        data: { id: id },
+        success: function (response) {
+            let templateData = JSON.parse(response.po_data_json);
+
+            // Remove all rows from the table
+            itemTable.clear().draw();
+
+            Object.keys(templateData).forEach(key => {
+                if (key == "Po_items") {
+                    let poItems = templateData[key];
+
+                    if (poItems != null) {
+
+                        poItems.forEach(poItem => {
+                            let item = {
+                                name: poItem.Item_name,
+                                quantity: poItem.Item_quantity,
+                                unit: poItem.Unit,
+                                price: poItem.Item_price
+                            };
+
+                            var itemorder = poItem.Order;
+                            var totalprice = poItem.Item_quantity * poItem.Item_price;
+
+                            addTableRow(itemorder, item, totalprice);
+                        });
+                    }
+                } else if (key == "Include_tax") {
+                    $(`[name=${key}]`).prop("checked", templateData[key]);
+                } else {
+                    let value = templateData[key];
+
+                    if (key == "Po_date" && value != null) {
+                        let date = formatDate(value);
+                        value = `${date.year}-${date.month}-${date.day}`;
+                    }
+
+                    $(`[name=${key}]`).val(value); // Restore values to form inputs
+                }
+            });
+
+            $("#templateModal").modal("hide");
+
+            clearTimeout(typingTimer); // Reset timer
+            typingTimer = setTimeout(() => {
+                saveDraft();
+            }, 5000);
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
+}
+
 function loadDraft() {
     $.get('/Po/GetPoDraft', function (response) {
         if (response.hasDraft) {
