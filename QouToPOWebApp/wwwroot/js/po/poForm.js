@@ -1,4 +1,13 @@
 ﻿$(document).ready(function () {
+    $("textarea").each(function () {
+        if ($(this).val().trim() != "") {
+            this.style.height = "auto";
+            this.style.height = (this.scrollHeight) + "px";
+        } else {
+            this.style.height = "38px";
+        }
+    });
+
     changeLang();
     taxSwitch();
 

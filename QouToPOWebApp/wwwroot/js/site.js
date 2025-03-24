@@ -24,12 +24,14 @@ $(this).keypress(function () {
 $(this).on('touchstart touchmove', function () {
     idleTime = 0; // Reset idle time on touch start or touch move
 });
-$("textarea").each(function () {
-    this.style.height = "auto";
-    this.style.height = (this.scrollHeight) + "px";
-}).on("input", function () {
-    this.style.height = "auto";
-    this.style.height = (this.scrollHeight) + "px";
+
+$(document).on("input", "textarea", function () {
+    if ($(this).val().trim() != "") {
+        this.style.height = "auto";
+        this.style.height = (this.scrollHeight) + "px";
+    } else {
+        this.style.height = "38px";
+    }
 });
 
 $(document).ready(function () {
