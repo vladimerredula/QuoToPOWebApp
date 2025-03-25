@@ -4,7 +4,7 @@
     ViewData["Title"] = "PO";
     string currentPath = ViewBag.CurrentPath as string ?? "";
     string parentPath = System.IO.Path.GetDirectoryName(currentPath) ?? "";
-    string _poPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "AppData\\PO");
+    string _poPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "AppData/PO");
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -97,7 +97,7 @@
                 {
                     <tr>
                         <td>
-                            <a class="text-decoration-none" href="#" data-id="@System.IO.Path.GetRelativePath(_poPath, file.FullName)" onclick="previewFile(this)">
+                            <a class="text-decoration-none" href="#" data-id="@file.FullName.Replace(_poPath, "").TrimStart('\\', '/')" onclick="previewFile(this)">
                                 @switch (file.Extension.TrimStart('.').ToLower())
                                 {
                                     case "pdf":
