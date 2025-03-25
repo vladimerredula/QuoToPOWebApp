@@ -581,6 +581,11 @@ function createCellWithTextarea(displayText, textareaValue, inputName) {
 function updateCell(rowData, index, value, inputType = "input", displayText = value) {
     var cell = $(rowData[index]);
     cell.find(inputType).val(value).attr("value", value);
+
+    if (inputType == "textarea") {
+        cell.find(inputType).text(value);
+    }
+
     cell.find("span").html(displayText);
     rowData[index] = cell.prop("outerHTML");
 }

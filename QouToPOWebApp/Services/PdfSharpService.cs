@@ -2,7 +2,6 @@
 using PdfSharp.Drawing.Layout;
 using PdfSharp.Fonts;
 using PdfSharp.Pdf;
-using QouToPOWebApp.Models.PoModels;
 using QouToPOWebApp.ViewModel;
 using System.Globalization;
 
@@ -367,60 +366,79 @@ namespace QouToPOWebApp.Services
 
             float totalAmount = 0;
 
+            string text = "This is a long text that needs to be wrapped dynamically. It should adjust its height automatically.";
+
+
             // PO title
             var title = po?.Po_title ?? string.Empty;
 
             if (title != string.Empty)
             {
-                gfx.DrawString(title, new XFont("Meiryo-bold", 10), XBrushes.Black, new XRect(42, y, column1, tableRowHeight), XStringFormats.CenterLeft);
-                gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36, y, column1, tableRowHeight);
-                gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1, y, column2, tableRowHeight);
-                gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1 + column2, y, column3, tableRowHeight);
-                gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1 + column2 + column3, y, column4, tableRowHeight);
+                var y1 = y;
+                var currentRowHeight = 12;
 
-                y += tableRowHeight;
+                // Measure and wrap text
+                var formattedText = BreakTextIntoLines(gfx, title, new XFont("Meiryo-bold", 10), column1 - 4);
+
+                // Draw each line and adjust Y position
+                foreach (var line in formattedText)
+                {
+                    gfx.DrawString(line, new XFont("Meiryo-bold", 10), XBrushes.Black, new XRect(42, y1 + 7, column1, tableRowHeight), XStringFormats.TopLeft);
+                    y1 += rowHeight;
+                    currentRowHeight += 14;
+                }
+
+                gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36, y, column1, currentRowHeight);
+                gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1, y, column2, currentRowHeight);
+                gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1 + column2, y, column3, currentRowHeight);
+                gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1 + column2 + column3, y, column4, currentRowHeight);
+
+                y += currentRowHeight;
             }
-
-            var y1 = y;
 
             if (po?.Po_items?.Count() > 0)
             {
                 foreach (var item in po?.Po_items?.OrderBy(q => q.Order))
                 {
-                    var y2 = y1;
+                    var y1 = y;
                     var currentRowHeight = 12;
 
                     // Remove un-needed characters
                     var itemName = item?.Item_name?.Replace("\r", "").Split("\n");
                     foreach (var lineName in itemName)
                     {
-                        gfx.DrawString(lineName, bodyFont, XBrushes.Black, new XRect(42, y2 + 7, column1, 10), XStringFormats.CenterLeft);
-                        y2 += rowHeight;
-                        currentRowHeight += 14;
+
+                        // Measure and wrap text
+                        var formattedText = BreakTextIntoLines(gfx, lineName, bodyFont, column1 - 4);
+
+                        // Draw each line and adjust Y position
+                        foreach (var line in formattedText)
+                        {
+                            gfx.DrawString(line, bodyFont, XBrushes.Black, new XRect(42, y1 + 7, column1, 10), XStringFormats.TopLeft);
+                            y1 += rowHeight;
+                            currentRowHeight += 14;
+                        }
                     }
 
-                    //gfx.DrawString(item.Item_name, bodyFont, XBrushes.Black, new XRect(42, y1, column1, tableRowHeight), XStringFormats.CenterLeft);
-                    gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36, y1, column1, currentRowHeight);
+                    gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36, y, column1, currentRowHeight);
 
                     var itemQuantity = item?.Item_quantity?.ToString() + (item?.Unit != null ? " " + item.Unit : "");
-                    gfx.DrawString(itemQuantity, bodyFont, XBrushes.Black, new XRect(36 + column1, y1, column2, currentRowHeight), XStringFormats.Center);
-                    gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1, y1, column2, currentRowHeight);
+                    gfx.DrawString(itemQuantity, bodyFont, XBrushes.Black, new XRect(36 + column1, y, column2, currentRowHeight), XStringFormats.Center);
+                    gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1, y, column2, currentRowHeight);
 
                     var itemPrice = item?.Item_price?.ToString("N0", new CultureInfo("ja-JP"));
-                    gfx.DrawString(itemPrice, bodyFont, XBrushes.Black, new XRect(32 + column1 + column2, y1, column3, currentRowHeight), XStringFormats.CenterRight);
-                    gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1 + column2, y1, column3, currentRowHeight);
+                    gfx.DrawString(itemPrice, bodyFont, XBrushes.Black, new XRect(32 + column1 + column2, y, column3, currentRowHeight), XStringFormats.CenterRight);
+                    gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1 + column2, y, column3, currentRowHeight);
 
                     float totalprice = (float)(item.Item_price * item.Item_quantity);
-                    gfx.DrawString(totalprice.ToString("N0", new CultureInfo("ja-JP")), bodyFont, XBrushes.Black, new XRect(32 + column1 + column2 + column3, y1, column4, currentRowHeight), XStringFormats.CenterRight);
-                    gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1 + column2 + column3, y1, column4, currentRowHeight);
+                    gfx.DrawString(totalprice.ToString("N0", new CultureInfo("ja-JP")), bodyFont, XBrushes.Black, new XRect(32 + column1 + column2 + column3, y, column4, currentRowHeight), XStringFormats.CenterRight);
+                    gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1 + column2 + column3, y, column4, currentRowHeight);
 
                     totalAmount += totalprice;
 
-                    y1 += currentRowHeight;
+                    y += currentRowHeight;
                 }
             }
-
-            y = y1;
 
             var itemCount = po.Po_items != null ? po.Po_items.Count() : 0;
             // Draw table rows
@@ -636,19 +654,41 @@ namespace QouToPOWebApp.Services
             var supplierAddress = po?.Contact_persons?.Company?.Address ?? po?.Contact_persons?.Company?.Address_jpn ?? string.Empty;
             var telephone = "\nTel.: " + (po?.Contact_persons?.Company?.Telephone ?? string.Empty);
             var fax = "\nFax: " + (po?.Contact_persons?.Company?.Fax ?? string.Empty);
-            tf.DrawString($"{supplierAddress}{telephone}{fax}", arial, XBrushes.Black, new XRect(x, y-3, 130, 66), XStringFormats.TopLeft);
+            //tf.DrawString($"{supplierAddress}{telephone}{fax}", arial, XBrushes.Black, new XRect(x, y-3, 130, 66), XStringFormats.TopLeft);
 
-            y += rowHeight * 8;
+            var fullSupplierAdd = ($"{supplierAddress}{telephone}{fax}").Replace("\r", "").Split("\n");
+            foreach (var lineName in fullSupplierAdd)
+            {
+                // Draw each line and adjust Y position
+                foreach (var line in BreakTextIntoLines(gfx, lineName, arial, 130))
+                {
+                    gfx.DrawString(line, arial, XBrushes.Black, new XRect(x, y, 130, rowHeight), XStringFormats.TopLeft);
+                    y += rowHeight;
+                }
+            }
+
+            y += rowHeight * 3;
 
             // Contact Person
             gfx.DrawString($"Dear {contactPerson},", arial, XBrushes.Black, new XRect(x, y - 6, 200, 10), XStringFormats.CenterLeft);
 
             y += rowHeight;
 
-            // Message
-            tf.DrawString($"Faraday Factory Japan LLC would like to place the Official Purchase Order for the {poTitle}, based on your Price Quotation {quotationnumber}.", calibri, XBrushes.Black, new XRect(x, y, page.Width - 85, 30), XStringFormats.TopLeft);
 
-            y += rowHeight + 26;
+            // Message
+            var message = $"Faraday Factory Japan LLC would like to place the Official Purchase Order for the {poTitle}, based on your Price Quotation {quotationnumber}.";
+
+            // Measure and wrap text
+            var formattedMessage = BreakTextIntoLines(gfx, message, calibri, page.Width - 89);
+
+            // Draw each line and adjust Y position
+            foreach (var line in formattedMessage)
+            {
+                gfx.DrawString(line, calibri, XBrushes.Black, new XRect(x, y, page.Width - 85, 30), XStringFormats.TopLeft);
+                y += rowHeight;
+            }
+
+            y += 26;
 
             var column1 = 30;
             var column2 = 270;
@@ -683,56 +723,63 @@ namespace QouToPOWebApp.Services
 
             float totalAmount = 0;
 
-            var y1 = y + 3;
+            y += 3;
 
             if (po?.Po_items?.Count() > 0)
             {
                 foreach (var item in po?.Po_items?.OrderBy(q => q.Order))
                 {
-                    gfx.DrawString(item?.Order?.ToString(), calibri, XBrushes.Black, new XRect(x, y1, column1, rowHeight), XStringFormats.CenterLeft);
+                    gfx.DrawString(item?.Order?.ToString(), calibri, XBrushes.Black, new XRect(x, y, column1, rowHeight), XStringFormats.CenterLeft);
 
-                    var y2 = y1;
+                    var y1 = y;
                     double currentRowHeight = 0;
 
                     var itemName = item?.Item_name?.Replace("\r", "").Split("\n");
                     foreach (var lineName in itemName)
                     {
-                        gfx.DrawString(lineName, calibri, XBrushes.Black, new XRect(x + column1, y2, column2, rowHeight), XStringFormats.CenterLeft);
-                        y2 += rowHeight;
-                        currentRowHeight += rowHeight;
+                        // Measure and wrap text
+                        var formattedText = BreakTextIntoLines(gfx, lineName, calibri, column2);
+
+                        // Draw each line and adjust Y position
+                        foreach (var line in formattedText)
+                        {
+                            gfx.DrawString(line, calibri, XBrushes.Black, new XRect(x + column1, y1, column2, rowHeight), XStringFormats.CenterLeft);
+                            y1 += rowHeight;
+                            currentRowHeight += rowHeight;
+                        }
                     }
 
-                    //gfx.DrawString(item.Item_name, calibri, XBrushes.Black, new XRect(x + column1, y1, column2, rowHeight), XStringFormats.CenterLeft);
-                    gfx.DrawString(item?.Item_quantity?.ToString() + (item?.Unit != null ? " " + item?.Unit : ""), calibri, XBrushes.Black, new XRect(x + column1 + column2, y1, column3, rowHeight), XStringFormats.Center);
-                    gfx.DrawString(item?.Item_price?.ToString("N2", new CultureInfo("en-US")), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3, y1, column4, rowHeight), XStringFormats.Center);
+                    //gfx.DrawString(item.Item_name, calibri, XBrushes.Black, new XRect(x + column1, y, column2, rowHeight), XStringFormats.CenterLeft);
+                    gfx.DrawString(item?.Item_quantity?.ToString() + (item?.Unit != null ? " " + item?.Unit : ""), calibri, XBrushes.Black, new XRect(x + column1 + column2, y, column3, currentRowHeight), XStringFormats.TopCenter);
+                    gfx.DrawString(item?.Item_price?.ToString("N2", new CultureInfo("en-US")), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3, y, column4, currentRowHeight), XStringFormats.TopCenter);
 
                     float totalprice = (float)(item?.Item_price * item?.Item_quantity);
-                    gfx.DrawString(totalprice.ToString("N2", new CultureInfo("en-US")), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y1, column5, rowHeight), XStringFormats.Center);
+                    gfx.DrawString(totalprice.ToString("N2", new CultureInfo("en-US")), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y, column5, currentRowHeight), XStringFormats.TopCenter);
 
                     totalAmount += totalprice;
 
-                    y1 += currentRowHeight + 3;
+                    y += currentRowHeight + 3;
                 }
             }
 
             if (po.Include_tax)
             {
-                y1 += rowHeight;
+                y += rowHeight;
 
                 float taxAmount = (float)(totalAmount * 0.1);
 
                 // Total tax
-                //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, x + column1, y1, column2, rowHeight);
-                gfx.DrawString("Consumption tax 10%", calibri, XBrushes.Black, new XRect(x + column1, y1, column2, rowHeight), XStringFormats.CenterLeft);
-                //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, x + column1, y1, column2, rowHeight);
-                gfx.DrawString(taxAmount.ToString("N2", new CultureInfo("en-US")), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y1, column5, rowHeight), XStringFormats.Center);
+                //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, x + column1, y, column2, rowHeight);
+                gfx.DrawString("Consumption tax 10%", calibri, XBrushes.Black, new XRect(x + column1, y, column2, rowHeight), XStringFormats.CenterLeft);
+                //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, x + column1, y, column2, rowHeight);
+                gfx.DrawString(taxAmount.ToString("N2", new CultureInfo("en-US")), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y, column5, rowHeight), XStringFormats.Center);
 
-                y1 += rowHeight;
+                y += rowHeight;
 
                 totalAmount += taxAmount;
             }
 
-            y = y1 < 400 ? 400 : y1 + 5; // set the default height of table
+            y = y < 400 ? 400 : y + 5; // set the default height of table
 
             gfx.DrawLine(new XPen(XColors.Black, 0.5), 37, y, tableWitdh + x, y);
 
@@ -897,6 +944,37 @@ namespace QouToPOWebApp.Services
                 document.Save(stream, false);
                 return stream.ToArray();
             }
+        }
+
+        // Helper method to break text into lines
+        private List<string> BreakTextIntoLines(XGraphics gfx, string text, XFont font, double maxWidth)
+        {
+            var words = text.Split(' ');
+            var lines = new List<string>();
+            string currentLine = "";
+
+            foreach (var word in words)
+            {
+                var testLine = string.IsNullOrEmpty(currentLine) ? word : currentLine + " " + word;
+                var size = gfx.MeasureString(testLine, font);
+
+                if (size.Width > maxWidth)
+                {
+                    lines.Add(currentLine);
+                    currentLine = word; // Start new line
+                }
+                else
+                {
+                    currentLine = testLine;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(currentLine))
+            {
+                lines.Add(currentLine);
+            }
+
+            return lines;
         }
     }
 }
