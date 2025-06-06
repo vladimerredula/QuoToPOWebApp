@@ -45,6 +45,10 @@ namespace QouToPOWebApp.Models.PoModels
         [Required]
         public string? Po_language { get; set; }
 
+        [Display(Name = "Currency")]
+        [Required]
+        public string? Currency { get; set; }
+
         public string? File_name { get; set; }
         public string? File_path { get; set; }
         public int? File_group_ID { get; set; }

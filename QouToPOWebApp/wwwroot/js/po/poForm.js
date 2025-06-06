@@ -152,6 +152,35 @@ $("#Po_date").change(function () {
     formatDateToPoNumber(dateValue);
 });
 
+$("#Currency").on("change", function () {
+    var currencyCode = $("#Currency").val();
+    $(".currencySign").text(currencyCode == 'USD' ? '$' : '¥');
+    calculateTotal();
+});
+
+function formatCurrency(amount) {
+    if (amount == null || isNaN(amount)) {
+        console.warn("Invalid amount:", amount);
+        return '';
+    }
+
+    let currencyCode = $("#Currency").val()
+
+    if (currencyCode === 'JPY') {
+        // Round to whole number for Yen
+        return Math.round(amount).toLocaleString('ja-JP', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+    } else {
+        // For USD or others: format with up to 2 decimals
+        return amount.toLocaleString('en-US', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        });
+    }
+}
+
 $("#customContactPerson").on("click", function () {
     $("#contactPersonModal").modal("show");
 });
@@ -274,7 +303,6 @@ function loadTemplate(id) {
 
             // Remove all rows from the table
             itemTable.clear().draw();
-
             Object.keys(templateData).forEach(key => {
                 if (key == "Po_items") {
                     let poItems = templateData[key];
@@ -290,9 +318,8 @@ function loadTemplate(id) {
                             };
 
                             var itemorder = poItem.Order;
-                            var totalprice = poItem.Item_quantity * poItem.Item_price;
 
-                            addTableRow(itemorder, item, totalprice);
+                            addTableRow(itemorder, item);
                         });
                     }
                 } else if (key == "Include_tax") {
@@ -343,9 +370,8 @@ function loadDraft() {
                             };
 
                             var itemorder = poItem.Order;
-                            var totalprice = poItem.Item_quantity * poItem.Item_price;
 
-                            addTableRow(itemorder, item, totalprice);
+                            addTableRow(itemorder, item);
                         });
                     }
                 } else if (key == "Include_tax") {
@@ -482,12 +508,11 @@ function changeLang() {
 function addItem() {
     var item = getItemDetails('#itemName', '#quantity', '#unit', '#price');
     var itemorder = itemTable.rows().count() + 1;
-    var totalprice = item.quantity * item.price;
 
     clearItemForm();
     $("#itemModal").modal("hide");
 
-    addTableRow(itemorder, item, totalprice);
+    addTableRow(itemorder, item);
 
     saveDraft();
     calculateTotal();
@@ -495,12 +520,11 @@ function addItem() {
 
 function updateItem() {
     var item = getItemDetails('#itemEditName', '#itemEditQuantity', '#itemEditUnit', '#itemEditPrice');
-    var totalprice = item.quantity * item.price;
 
     clearEditForm();
     $("#itemEditModal").modal("hide");
 
-    updateTableRow(item, totalprice);
+    updateTableRow(item);
     calculateTotal();
 }
 
@@ -532,9 +556,10 @@ function clearEditForm() {
 }
 
 // Helper: Add new row to table
-function addTableRow(order, item, totalprice) {
+function addTableRow(order, item) {
     var itemIndex = itemTable.rows().count();
     var itemnameDisplay = item.name.replace(/\n/g, "<br>");
+    var totalprice = item.quantity * item.price;
 
     itemTable.row.add([
         "",
@@ -542,8 +567,8 @@ function addTableRow(order, item, totalprice) {
         createCellWithTextarea(itemnameDisplay, item.name, `Po_items[${itemIndex}].Item_name`),
         createCell(item.quantity, `Po_items[${itemIndex}].Item_quantity`),
         createCell(item.unit, `Po_items[${itemIndex}].Unit`),
-        createCell(item.price.toLocaleString(), `Po_items[${itemIndex}].Item_price`, item.price),
-        `<span class='itemPrice'>${totalprice.toLocaleString()}</span>`
+        createCell(item.price, `Po_items[${itemIndex}].Item_price`, item.price),
+        `<span class='itemPrice'>${formatCurrency(totalprice)}</span>`
     ]).draw();
 }
 
@@ -551,13 +576,14 @@ function addTableRow(order, item, totalprice) {
 function updateTableRow(item, totalprice) {
     var row = itemTable.row(".selected");
     var rowData = row.data();
+    var totalprice = item.quantity * item.price;
 
     updateCell(rowData, 2, item.name, `textarea`, item.name.replace(/\n/g, "<br>"));
     updateCell(rowData, 3, item.quantity);
     updateCell(rowData, 4, item.unit);
-    updateCell(rowData, 5, item.price.toLocaleString(), `input`, item.price);
+    updateCell(rowData, 5, item.price, `input`, item.price);
 
-    rowData[6] = `<span class="itemPrice">${totalprice.toLocaleString()}</span>`;
+    rowData[6] = `<span class="itemPrice">${formatCurrency(totalprice)}</span>`;
 
     row.data(rowData).draw();
 }
@@ -703,6 +729,7 @@ function taxSwitch() {
 }
 
 function calculateTotal() {
+    calculateItemPrices();
     var totalPrice = 0.0;
     var itemPrices = $(".itemPrice");
 
@@ -710,17 +737,31 @@ function calculateTotal() {
         totalPrice += parseFloat($(element).text().replace(/,/g, ''));
     });
 
-    $("#subTotal").text(totalPrice.toLocaleString());
+    $("#subTotal").text(formatCurrency(totalPrice));
 
 
     if ($("#Include_tax").prop("checked")) {
         var taxValue = totalPrice * 0.1;
 
-        $("#taxValue").text(taxValue.toLocaleString());
+        $("#taxValue").text(formatCurrency(taxValue));
         totalPrice += parseFloat(taxValue);
     }
 
-    $("#totalAmount").text(totalPrice.toLocaleString());
+    $("#totalAmount").text(formatCurrency(totalPrice));
+}
+
+function calculateItemPrices() {
+    itemTable.rows().every(function () {
+        var data = this.data();
+
+        var itemQuantity = $(data[3]).find("input").val();
+        var itemPrice = $(data[5]).find("input").val();
+        var totalPrice = itemQuantity * itemPrice;
+
+        data[6] = `<span class="itemPrice">${formatCurrency(totalPrice)}</span>`;
+
+        this.data(data);
+    });
 }
 
 function getFloatValue(string) {

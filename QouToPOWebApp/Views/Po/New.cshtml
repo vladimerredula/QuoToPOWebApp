@@ -140,6 +140,14 @@
                 </select>
                 <span class="text-danger field-validation-valid" data-valmsg-for="Correspondent_ID" data-valmsg-replace="true"></span>
             </div>
+            <div class="col-auto mb-2">
+                <label class="form-label" asp-for="Currency"></label><span class="text-danger" title="Required">*</span>
+                <select class="form-select forDraft" asp-for="Currency">
+                    <option value="JPY" selected>JPY</option>
+                    <option value="USD">USD</option>
+                </select>
+                <span class="text-danger field-validation-valid" data-valmsg-for="Correspondent_ID" data-valmsg-replace="true"></span>
+            </div>
         </div>
     </div>
     <h3>Items</h3>
@@ -345,7 +353,7 @@
                         <div class="col-6">
                             <label class="form-label">Price</label><span class="text-danger" title="Required">*</span>
                             <div class="input-group">
-                                <span class="input-group-text" id="yenSign">¥</span>
+                                <span class="input-group-text currencySign">¥</span>
                                 <input class="form-control" name="price" id="price" data-val="true" data-val-required="The Price field is required." required />
                             </div>
                             <span class="text-danger field-validation-valid" data-valmsg-for="price" data-valmsg-replace="true"></span>
@@ -398,7 +406,7 @@
                         <div class="col-6">
                             <label class="form-label">Price</label><span class="text-danger" title="Required">*</span>
                             <div class="input-group">
-                                <span class="input-group-text" id="yenSign">¥</span>
+                                <span class="input-group-text currencySign">¥</span>
                                 <input class="form-control" name="itemEditPrice" id="itemEditPrice" data-val="true" data-val-required="The Price field is required." required />
                             </div>
                             <span class="text-danger field-validation-valid" data-valmsg-for="itemEditPrice" data-valmsg-replace="true"></span>
