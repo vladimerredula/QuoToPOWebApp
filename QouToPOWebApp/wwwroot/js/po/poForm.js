@@ -297,6 +297,9 @@ function loadTemplate(id) {
                     }
                 } else if (key == "Include_tax") {
                     $(`[name=${key}]`).prop("checked", templateData[key]);
+                } else if (key == "Po_language") {
+                    $(`[name=${key}]`).val(templateData[key]);
+                    $("#Po_language").change();
                 } else {
                     let value = templateData[key];
 
