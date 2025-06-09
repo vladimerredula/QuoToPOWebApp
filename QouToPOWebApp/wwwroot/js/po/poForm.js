@@ -376,6 +376,9 @@ function loadDraft() {
                     }
                 } else if (key == "Include_tax") {
                     $(`[name=${key}]`).prop("checked", poData[key]);
+                } else if (key == "Po_language") {
+                    $(`[name=${key}]`).val(poData[key]);
+                    $("#Po_language").change();
                 } else {
                     let value = poData[key];
 
