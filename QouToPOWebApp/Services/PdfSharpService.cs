@@ -238,6 +238,7 @@ namespace QouToPOWebApp.Services
             XFont bodyFont2 = new XFont("Meiryo", 11);
             XBrush ClayCreekBrush = new XSolidBrush(ClayCreek);
             XPen ClayCreekPen = new XPen(ClayCreek, 2);
+            var currency = po?.Currency ?? "JPY";
 
             // Header
             gfx.DrawString("発注書", headerFont, XBrushes.Black, new XRect(0, y, page.Width, rowHeight), XStringFormats.Center);
@@ -426,12 +427,12 @@ namespace QouToPOWebApp.Services
                     gfx.DrawString(itemQuantity, bodyFont, XBrushes.Black, new XRect(36 + column1, y, column2, currentRowHeight), XStringFormats.Center);
                     gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1, y, column2, currentRowHeight);
 
-                    var itemPrice = item?.Item_price?.ToString("N0", new CultureInfo("ja-JP"));
+                    var itemPrice = GetCurrencyAmount(currency, item.Item_price);
                     gfx.DrawString(itemPrice, bodyFont, XBrushes.Black, new XRect(32 + column1 + column2, y, column3, currentRowHeight), XStringFormats.CenterRight);
                     gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1 + column2, y, column3, currentRowHeight);
 
                     float totalprice = (float)(item.Item_price * item.Item_quantity);
-                    gfx.DrawString(totalprice.ToString("N0", new CultureInfo("ja-JP")), bodyFont, XBrushes.Black, new XRect(32 + column1 + column2 + column3, y, column4, currentRowHeight), XStringFormats.CenterRight);
+                    gfx.DrawString(GetCurrencyAmount(currency, totalprice), bodyFont, XBrushes.Black, new XRect(32 + column1 + column2 + column3, y, column4, currentRowHeight), XStringFormats.CenterRight);
                     gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 36 + column1 + column2 + column3, y, column4, currentRowHeight);
 
                     totalAmount += totalprice;
@@ -464,7 +465,7 @@ namespace QouToPOWebApp.Services
             //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 35 + column1 + column2, y, 85, 26);
             gfx.DrawString("小　計 (税抜)", new XFont("Meiryo-bold", 12), XBrushes.Black, new XRect(33 + column1 + column2, y, 80, 26), XStringFormats.CenterRight);
             //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 35 + column1 + column2 + column3, y, 87, 26);
-            gfx.DrawString(totalAmount.ToString("C0", new CultureInfo("ja-JP")), new XFont("Meiryo-bold", 11), XBrushes.Black, new XRect(33 + column1 + column2 + column3, y, 87, 26), XStringFormats.CenterRight);
+            gfx.DrawString(GetCurrencyAmount(currency, totalAmount), new XFont("Meiryo-bold", 11), XBrushes.Black, new XRect(33 + column1 + column2 + column3, y, 87, 26), XStringFormats.CenterRight);
 
             y += 26;
 
@@ -477,7 +478,7 @@ namespace QouToPOWebApp.Services
                 gfx.DrawString("消費税", new XFont("Meiryo-bold", 12), XBrushes.Black, new XRect(33 + column1 + column2, y, 40, 26), XStringFormats.CenterRight);
                 gfx.DrawString("(10%)", new XFont("Meiryo-bold", 10), XBrushes.Black, new XRect(93 + column1 + column2, y, 20, 26), XStringFormats.CenterRight);
                 //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 35 + column1 + column2 + column3, y, 87, 26);
-                gfx.DrawString(taxAmount.ToString("C0", new CultureInfo("ja-JP")), new XFont("Meiryo-bold", 11), XBrushes.Black, new XRect(33 + column1 + column2 + column3, y, 87, 26), XStringFormats.CenterRight);
+                gfx.DrawString(GetCurrencyAmount(currency, taxAmount), new XFont("Meiryo-bold", 11), XBrushes.Black, new XRect(33 + column1 + column2 + column3, y, 87, 26), XStringFormats.CenterRight);
 
                 y += 26;
 
@@ -486,13 +487,13 @@ namespace QouToPOWebApp.Services
 
             // Total amount
             //gfx.DrawRectangle(new XPen(ClayCreek, 1), XBrushes.Transparent, 181, y-4, 150, 20);
-            gfx.DrawString(totalAmount.ToString("C0", new CultureInfo("ja-JP")) + "-", new XFont("Meiryo-bold", 16), XBrushes.Black, new XRect(181, 246, 150, 20), XStringFormats.CenterRight);
+            gfx.DrawString(GetCurrencyAmount(currency, totalAmount) + "-", new XFont("Meiryo-bold", 16), XBrushes.Black, new XRect(181, 246, 150, 20), XStringFormats.CenterRight);
 
             // Total amount
             //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 35 + column1 + column2, y, 85, 26);
             gfx.DrawString("合　計 (" + (po.Include_tax ? "税込" : "税抜") + ")", new XFont("Meiryo-bold", 12), XBrushes.Black, new XRect(33 + column1 + column2, y, 80, 26), XStringFormats.CenterRight);
             //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, 35 + column1 + column2 + column3, y, 87, 26);
-            gfx.DrawString(totalAmount.ToString("C0", new CultureInfo("ja-JP")), new XFont("Meiryo-bold", 11), XBrushes.Black, new XRect(33 + column1 + column2 + column3, y, 87, 26), XStringFormats.CenterRight);
+            gfx.DrawString(GetCurrencyAmount(currency, totalAmount), new XFont("Meiryo-bold", 11), XBrushes.Black, new XRect(33 + column1 + column2 + column3, y, 87, 26), XStringFormats.CenterRight);
 
             y += 26;
 
@@ -576,6 +577,8 @@ namespace QouToPOWebApp.Services
             XFont arialBold = new XFont("Arial-bold", 10);
             XFont arialItalic = new XFont("Arial-italic", 10);
             XFont tnrBold = new XFont("Times new roman-bold", 10.5);
+
+            var currency = po?.Currency ?? "USD";
 
             // FFJ logo
             string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "AppData/Images", "FFJ_LOGO.jpg");
@@ -714,8 +717,8 @@ namespace QouToPOWebApp.Services
 
             y += rowHeight;
 
-            gfx.DrawString("USD", calibriBold, XBrushes.Black, new XRect(x + column1 + column2 + column3, y, column4, 10), XStringFormats.Center);
-            gfx.DrawString("USD", calibriBold, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y, column5, 10), XStringFormats.Center);
+            gfx.DrawString(currency, calibriBold, XBrushes.Black, new XRect(x + column1 + column2 + column3, y, column4, 10), XStringFormats.Center);
+            gfx.DrawString(currency, calibriBold, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y, column5, 10), XStringFormats.Center);
 
             y += rowHeight;
 
@@ -751,10 +754,10 @@ namespace QouToPOWebApp.Services
 
                     //gfx.DrawString(item.Item_name, calibri, XBrushes.Black, new XRect(x + column1, y, column2, rowHeight), XStringFormats.CenterLeft);
                     gfx.DrawString(item?.Item_quantity?.ToString() + (item?.Unit != null ? " " + item?.Unit : ""), calibri, XBrushes.Black, new XRect(x + column1 + column2, y, column3, currentRowHeight), XStringFormats.TopCenter);
-                    gfx.DrawString(item?.Item_price?.ToString("N2", new CultureInfo("en-US")), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3, y, column4, currentRowHeight), XStringFormats.TopCenter);
+                    gfx.DrawString(GetCurrencyAmount(currency, item?.Item_price, false), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3, y, column4, currentRowHeight), XStringFormats.TopCenter);
 
                     float totalprice = (float)(item?.Item_price * item?.Item_quantity);
-                    gfx.DrawString(totalprice.ToString("N2", new CultureInfo("en-US")), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y, column5, currentRowHeight), XStringFormats.TopCenter);
+                    gfx.DrawString(GetCurrencyAmount(currency, totalprice, false), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y, column5, currentRowHeight), XStringFormats.TopCenter);
 
                     totalAmount += totalprice;
 
@@ -772,7 +775,7 @@ namespace QouToPOWebApp.Services
                 //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, x + column1, y, column2, rowHeight);
                 gfx.DrawString("Consumption tax 10%", calibri, XBrushes.Black, new XRect(x + column1, y, column2, rowHeight), XStringFormats.CenterLeft);
                 //gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, x + column1, y, column2, rowHeight);
-                gfx.DrawString(taxAmount.ToString("N2", new CultureInfo("en-US")), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y, column5, rowHeight), XStringFormats.Center);
+                gfx.DrawString(GetCurrencyAmount(currency, taxAmount, false), calibri, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y, column5, rowHeight), XStringFormats.Center);
 
                 y += rowHeight;
 
@@ -786,8 +789,8 @@ namespace QouToPOWebApp.Services
             y += rowHeight;
 
             gfx.DrawString("TOTAL:", calibriBold, XBrushes.Black, new XRect(x + column1 + column2, y, column3, 10), XStringFormats.Center);
-            gfx.DrawString("USD", calibriBold, XBrushes.Black, new XRect(x + column1 + column2 + column3, y, column4, 10), XStringFormats.Center);
-            gfx.DrawString(totalAmount.ToString("N2", new CultureInfo("en-US")), calibriBold, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y, column5, 10), XStringFormats.Center);
+            gfx.DrawString(currency, calibriBold, XBrushes.Black, new XRect(x + column1 + column2 + column3, y, column4, 10), XStringFormats.Center);
+            gfx.DrawString(GetCurrencyAmount(currency, totalAmount, false), calibriBold, XBrushes.Black, new XRect(x + column1 + column2 + column3 + column4, y, column5, 10), XStringFormats.Center);
 
             y += rowHeight * 3;
 
@@ -892,6 +895,37 @@ namespace QouToPOWebApp.Services
                     return stream.ToArray();
                 }
             }
+        }
+
+        public static string GetCurrencyAmount(string currency, float? amount, bool includeSymbol = true)
+        {
+            if (amount == null)
+                return string.Empty;
+
+            CultureInfo culture;
+            string format;
+
+            switch (currency)
+            {
+                case "USD":
+                    culture = new CultureInfo("en-US");
+                    format = includeSymbol ? "C2" : "N2"; // $1,234.56 or 1,234.56
+                    break;
+
+                case "JPY":
+                case "YEN":
+                    culture = new CultureInfo("ja-JP");
+                    format = includeSymbol ? "C0" : "N0"; // ¥1,235 or 1,235
+                    break;
+
+                default:
+                    // Fallback: no symbol, standard number format
+                    culture = CultureInfo.InvariantCulture;
+                    format = "N2";
+                    break;
+            }
+
+            return amount.Value.ToString(format, culture);
         }
 
         public byte[]? CreatePdfWithTable(string title, string[][] tableData)
