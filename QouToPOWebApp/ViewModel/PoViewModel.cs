@@ -49,6 +49,9 @@ namespace QouToPOWebApp.ViewModel
         [Required]
         public string? Po_language { get; set; }
 
+        [Display(Name = "Custom term")]
+        public string? Custom_term { get; set; }
+
         [Display(Name = "Currency")]
         [Required]
         public string? Currency { get; set; }

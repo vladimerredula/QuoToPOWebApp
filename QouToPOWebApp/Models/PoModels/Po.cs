@@ -30,6 +30,9 @@ namespace QouToPOWebApp.Models.PoModels
         [Display(Name = "Delivery term")]
         public string? Delivery_term { get; set; }
 
+        [Display(Name = "Custom term")]
+        public string? Custom_term { get; set; }
+
         [Display(Name = "Delivery address")]
         [Required]
         public int? Delivery_address_ID { get; set; }

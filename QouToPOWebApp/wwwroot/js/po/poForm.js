@@ -26,6 +26,34 @@
     });
 });
 
+const toolbarOptions = [
+    ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+    ['clean']                                         // remove formatting button
+];
+
+var quill = new Quill("#editor", {
+    modules: {
+        toolbar: toolbarOptions
+    },
+    placeholder: 'Compose an epic...',
+    theme: 'snow'
+});
+
+quill.on("text-change", (delta, oldDelta, source) => {
+    // Get the HTML from the Quill editor
+    var html = quill.container.firstChild.innerHTML;
+
+    // Update the hidden textarea using jQuery
+    $("#Custom_term").val(html);
+
+    if (quill.getLength() > 1) {
+        $("#customTermIndicator").html('<i class="bi bi-check-circle-fill"></i>');
+    } else {
+        $("#customTermIndicator").html('<i class="bi bi-circle"></i>');
+    }
+});
+
 var templateTable = $("#templateTable").DataTable({
     fixedHeader: true,
     filter: false,
@@ -292,6 +320,10 @@ $("#saveTemplate").on("click", function () {
     }
 });
 
+$("#customTermBtn").on("click", function () {
+    $("#customTermModal").modal("show");
+});
+
 // Functions
 function loadTemplate(id) {
     $.ajax({
@@ -303,6 +335,10 @@ function loadTemplate(id) {
 
             // Remove all rows from the table
             itemTable.clear().draw();
+
+            // Clear the contents of editor
+            clearEditor();
+
             Object.keys(templateData).forEach(key => {
                 if (key == "Po_items") {
                     let poItems = templateData[key];
@@ -324,9 +360,9 @@ function loadTemplate(id) {
                     }
                 } else if (key == "Include_tax") {
                     $(`[name=${key}]`).prop("checked", templateData[key]);
-                } else if (key == "Po_language") {
+                } else if (key == "Custom_term") {
                     $(`[name=${key}]`).val(templateData[key]);
-                    $("#Po_language").change();
+                    quill.clipboard.dangerouslyPasteHTML(0, templateData[key]);
                 } else {
                     let value = templateData[key];
 
@@ -338,6 +374,10 @@ function loadTemplate(id) {
                     $(`[name=${key}]`).val(value); // Restore values to form inputs
                 }
             });
+
+            $("#Po_language").change();
+            $("#Include_tax").change();
+            calculateTotal();
 
             $("#templateModal").modal("hide");
 
@@ -356,6 +396,11 @@ function loadDraft() {
     $.get('/Po/GetPoDraft', function (response) {
         if (response.hasDraft) {
             let poData = JSON.parse(response.draftData);
+
+            itemTable.clear().draw();
+
+            clearEditor();
+
             Object.keys(poData).forEach(key => {
                 if (key == "Po_items") {
                     let poItems = poData[key];
@@ -376,9 +421,9 @@ function loadDraft() {
                     }
                 } else if (key == "Include_tax") {
                     $(`[name=${key}]`).prop("checked", poData[key]);
-                } else if (key == "Po_language") {
+                } else if (key == "Custom_term") {
                     $(`[name=${key}]`).val(poData[key]);
-                    $("#Po_language").change();
+                    quill.clipboard.dangerouslyPasteHTML(0, poData[key]);
                 } else {
                     let value = poData[key];
 
@@ -390,8 +435,18 @@ function loadDraft() {
                     $(`[name=${key}]`).val(value); // Restore values to form inputs
                 }
             });
+
+            $("#Po_language").change();
+            $("#Include_tax").change();
+            calculateTotal();
         }
     });
+}
+
+function clearEditor() {
+    quill.setContents([]);
+    quill.setSelection(0); // Move cursor to start
+    quill.history.clear(); // Optional: clear undo/redo history
 }
 
 function saveDraft() {

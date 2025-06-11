@@ -1,6 +1,6 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+}
 
 @using QouToPOWebApp.ViewModel
 @using QouToPOWebApp.Models.InfoModels
@@ -42,6 +42,11 @@
                 <input class="form-control forDraft" type="text" asp-for="Po_number" />
                 <span asp-validation-for="Po_number" class="text-danger"></span>
             </div>
+            <div class="col-3 mb-2">
+                <label class="form-label" asp-for="Quotation_number" id="quoNumberLabel"></label><span id="quotationNumberRequired" class="text-danger visually-hidden" title="Required">*</span>
+                <input class="form-control forDraft" type="text" asp-for="Quotation_number" data-val="true" data-val-required="The Quotation number field is required." />
+                <span class="text-danger field-validation-valid" data-valmsg-for="Quotation_number" data-valmsg-replace="true"></span>
+            </div>
         </div>
         <div class="row mb-3">
             <div class="col-3 mb-2">
@@ -52,10 +57,13 @@
                 </select>
                 <span asp-validation-for="Po_language" class="text-danger"></span>
             </div>
-            <div class="col-3 mb-2">
-                <label class="form-label" asp-for="Quotation_number" id="quoNumberLabel"></label><span id="quotationNumberRequired" class="text-danger visually-hidden" title="Required">*</span>
-                <input class="form-control forDraft" type="text" asp-for="Quotation_number" data-val="true" data-val-required="The Quotation number field is required." />
-                <span class="text-danger field-validation-valid" data-valmsg-for="Quotation_number" data-valmsg-replace="true"></span>
+            <div class="col-auto mb-2">
+                <label class="form-label" asp-for="Currency"></label><span class="text-danger" title="Required">*</span>
+                <select class="form-select forDraft" asp-for="Currency">
+                    <option value="JPY" selected>JPY</option>
+                    <option value="USD">USD</option>
+                </select>
+                <span asp-validation-for="Currency" class="text-danger"></span>
             </div>
             <div class="col-auto mb-2">
                 <label class="form-label" asp-for="Contact_person_ID"></label><span class="text-danger" title="Required">*</span>
@@ -121,15 +129,8 @@
                 </div>
                 <span asp-validation-for="Delivery_term" class="text-danger"></span>
             </div>
-            <div class="col-3 mb-2">
-                <label class="form-label" asp-for="Delivery_address_ID">Delivery Address</label><span class="text-danger" title="Required">*</span>
-                <select class="form-select forDraft" asp-for="Delivery_address_ID">
-                    <option value="1">FFJ Zama</option>
-                    <option value="2">FFJ Hachioji</option>
-                    <option value="3">FFJ Hashimoto</option>
-                    <option value="4">FFJ SIC</option>
-                </select>
-                <span asp-validation-for="Delivery_address_ID" class="text-danger"></span>
+            <div class="col-4 mb-2 align-content-end">
+                <a class="btn btn-light border" id="customTermBtn"><span class="text-secondary" id="customTermIndicator"><i class="bi bi-circle"></i></span> Custom term</a>
             </div>
         </div>
         <div class="row">
@@ -140,13 +141,15 @@
                 </select>
                 <span class="text-danger field-validation-valid" data-valmsg-for="Correspondent_ID" data-valmsg-replace="true"></span>
             </div>
-            <div class="col-auto mb-2">
-                <label class="form-label" asp-for="Currency"></label><span class="text-danger" title="Required">*</span>
-                <select class="form-select forDraft" asp-for="Currency">
-                    <option value="JPY" selected>JPY</option>
-                    <option value="USD">USD</option>
+            <div class="col-3 mb-2">
+                <label class="form-label" asp-for="Delivery_address_ID">Delivery Address</label><span class="text-danger" title="Required">*</span>
+                <select class="form-select forDraft" asp-for="Delivery_address_ID">
+                    <option value="1">FFJ Zama</option>
+                    <option value="2">FFJ Hachioji</option>
+                    <option value="3">FFJ Hashimoto</option>
+                    <option value="4">FFJ SIC</option>
                 </select>
-                <span class="text-danger field-validation-valid" data-valmsg-for="Correspondent_ID" data-valmsg-replace="true"></span>
+                <span asp-validation-for="Delivery_address_ID" class="text-danger"></span>
             </div>
         </div>
     </div>
@@ -243,6 +246,27 @@
         <div class="col-auto">
             @* <a class="btn btn-lg btn-info text-white shadow" href="javascript:void(0)" id="generatePo">Generate PO</a> *@
             <a class="btn btn-lg btn-info text-white shadow px-5" href="javascript:void(0)" id="generatePo">Next</a>
+        </div>
+    </div>
+
+
+    <!-- Custom term Modal -->
+    <div class="modal fade" id="customTermModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h1 class="modal-title fs-5" id="customTermModalLabel">Custom term</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea class="forDraft" asp-for="Custom_term" hidden></textarea>
+                    <div class="editor" id="editor">
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <a class="btn btn-primary px-3" href="javascript:void(0)" id="saveCustomTerm">Save</a>
+                </div>
+            </div>
         </div>
     </div>
 </form>
@@ -582,7 +606,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script>
         $(document).ready(function () {
             var model = @Html.Raw(Json.Serialize(Model));
