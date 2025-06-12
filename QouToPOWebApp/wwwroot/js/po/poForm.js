@@ -192,17 +192,18 @@ function formatCurrency(amount) {
         return '';
     }
 
-    let currencyCode = $("#Currency").val()
+    let currencyCode = $("#Currency").val();
+    let numericAmount = Number(amount);
 
     if (currencyCode === 'JPY') {
         // Round to whole number for Yen
-        return Math.round(amount).toLocaleString('ja-JP', {
+        return Math.round(numericAmount).toLocaleString('ja-JP', {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         });
     } else {
         // For USD or others: format with up to 2 decimals
-        return amount.toLocaleString('en-US', {
+        return numericAmount.toLocaleString('en-US', {
             minimumFractionDigits: 0,
             maximumFractionDigits: 2
         });
@@ -625,13 +626,13 @@ function addTableRow(order, item) {
         createCellWithTextarea(itemnameDisplay, item.name, `Po_items[${itemIndex}].Item_name`),
         createCell(item.quantity, `Po_items[${itemIndex}].Item_quantity`),
         createCell(item.unit, `Po_items[${itemIndex}].Unit`),
-        createCell(item.price, `Po_items[${itemIndex}].Item_price`, item.price),
-        `<span class='itemPrice'>${formatCurrency(totalprice)}</span>`
+        createCell(formatCurrency(item.price), `Po_items[${itemIndex}].Item_price`, item.price),
+        `<span class='itemAmount'>${formatCurrency(totalprice)}</span>`
     ]).draw();
 }
 
 // Helper: Update existing row
-function updateTableRow(item, totalprice) {
+function updateTableRow(item) {
     var row = itemTable.row(".selected");
     var rowData = row.data();
     var totalprice = item.quantity * item.price;
@@ -639,9 +640,9 @@ function updateTableRow(item, totalprice) {
     updateCell(rowData, 2, item.name, `textarea`, item.name.replace(/\n/g, "<br>"));
     updateCell(rowData, 3, item.quantity);
     updateCell(rowData, 4, item.unit);
-    updateCell(rowData, 5, item.price, `input`, item.price);
+    updateCell(rowData, 5, item.price, `input`, formatCurrency(item.price));
 
-    rowData[6] = `<span class="itemPrice">${formatCurrency(totalprice)}</span>`;
+    rowData[6] = `<span class="itemAmount">${formatCurrency(totalprice)}</span>`;
 
     row.data(rowData).draw();
 }
@@ -789,7 +790,7 @@ function taxSwitch() {
 function calculateTotal() {
     calculateItemPrices();
     var totalPrice = 0.0;
-    var itemPrices = $(".itemPrice");
+    var itemPrices = $(".itemAmount");
 
     itemPrices.each(function (index, element) {
         totalPrice += parseFloat($(element).text().replace(/,/g, ''));
@@ -813,10 +814,15 @@ function calculateItemPrices() {
         var data = this.data();
 
         var itemQuantity = $(data[3]).find("input").val();
-        var itemPrice = $(data[5]).find("input").val();
-        var totalPrice = itemQuantity * itemPrice;
+        var itemPrice = formatCurrency($(data[5]).find("input").val());
 
-        data[6] = `<span class="itemPrice">${formatCurrency(totalPrice)}</span>`;
+        var data5 = $(data[5]);
+        data5.find("span").text(itemPrice);
+
+        var totalPrice = itemQuantity * getFloatValue(itemPrice);
+
+        data[5] = data5.prop("outerHTML");
+        data[6] = `<span class="itemAmount">${formatCurrency(totalPrice)}</span>`;
 
         this.data(data);
     });

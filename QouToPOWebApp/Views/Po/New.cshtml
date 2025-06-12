@@ -198,7 +198,7 @@
                                 <td><div><span>@Model?.Po_items[i]?.Item_quantity</span><input hidden asp-for="Po_items[i].Item_quantity" value='@Model?.Po_items[i]?.Item_quantity'></div></td>
                                 <td><div><span>@Model?.Po_items[i]?.Unit</span><input hidden asp-for="Po_items[i].Unit" value='@Model?.Po_items[i]?.Unit'></div></td>
                                 <td><div><span>@Model?.Po_items[i]?.Item_price?.ToString("N0")</span><input hidden asp-for="Po_items[i].Item_price" value='@Model?.Po_items[i]?.Item_price'></div></td>
-                                <td><div><span class='itemPrice'>@price.ToString("N0")</span></div></td>
+                                <td><div><span class='itemAmount'>@price.ToString("N0")</span></div></td>
                             </tr>
 
                             counter++;
