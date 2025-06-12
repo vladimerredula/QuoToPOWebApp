@@ -15,6 +15,32 @@
         },
         minLength: 1 // Start searching after typing 1 character
     });
+
+    setCustomTermIndicator();
+});
+
+const toolbarOptions = [
+    ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+    ['clean']                                         // remove formatting button
+];
+
+var quill = new Quill("#editor", {
+    modules: {
+        toolbar: toolbarOptions
+    },
+    placeholder: 'Compose an epic...',
+    theme: 'snow'
+});
+
+quill.on("text-change", (delta, oldDelta, source) => {
+    // Get the HTML from the Quill editor
+    var html = quill.container.firstChild.innerHTML;
+
+    // Update the hidden textarea using jQuery
+    $("#Po_Custom_term").val(html);
+
+    setCustomTermIndicator();
 });
 
 var itemTable = $('table.datatable').DataTable({
@@ -182,7 +208,41 @@ $("#saveTemplate").on("click", function () {
     }
 });
 
+$("#Po_Currency").on("change", function () {
+    var currencyCode = $("#Currency").val();
+    $(".currencySign").text(currencyCode == 'USD' ? '$' : '¥');
+    calculateTotal();
+});
+
+$("#customTermBtn").on("click", function () {
+    $("#customTermModal").modal("show");
+});
+
 // Functions
+function formatCurrency(amount) {
+    if (amount == null || isNaN(amount)) {
+        console.warn("Invalid amount:", amount);
+        return '';
+    }
+
+    let currencyCode = $("#Po_Currency").val();
+    let numericAmount = Number(amount);
+
+    if (currencyCode === 'JPY') {
+        // Round to whole number for Yen
+        return Math.round(numericAmount).toLocaleString('ja-JP', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+    } else {
+        // For USD or others: format with up to 2 decimals
+        return numericAmount.toLocaleString('en-US', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        });
+    }
+}
+
 function setTerm(term) {
     var selected = $(term).text();
     $(term).closest('.input-group').find('input').first().val(selected);
@@ -272,24 +332,22 @@ function changeLang() {
 function addItem() {
     var item = getItemDetails('#itemName', '#quantity', '#unit', '#price');
     var itemorder = itemTable.rows().count() + 1;
-    var totalprice = item.quantity * item.price;
 
     clearItemForm();
     $("#itemModal").modal("hide");
 
-    addTableRow(itemorder, item, totalprice);
+    addTableRow(itemorder, item);
 
     calculateTotal();
 }
 
 function updateItem() {
     var item = getItemDetails('#itemEditName', '#itemEditQuantity', '#itemEditUnit', '#itemEditPrice');
-    var totalprice = item.quantity * item.price;
 
     clearEditForm();
     $("#itemEditModal").modal("hide");
 
-    updateTableRow(item, totalprice);
+    updateTableRow(item);
     calculateTotal();
 }
 
@@ -320,10 +378,26 @@ function clearEditForm() {
     $('#itemEditPrice').val(null);
 }
 
+// Helper: Clear editor form
+function clearEditor() {
+    quill.setContents([]);
+    quill.setSelection(0); // Move cursor to start
+    quill.history.clear(); 
+}
+
+function setCustomTermIndicator() {
+    if (quill.getLength() > 1) {
+        $("#customTermIndicator").html('<i class="bi bi-check-circle-fill"></i>');
+    } else {
+        $("#customTermIndicator").html('<i class="bi bi-circle"></i>');
+    }
+}
+
 // Helper: Add new row to table
-function addTableRow(order, item, totalprice) {
+function addTableRow(order, item) {
     var itemIndex = itemTable.rows().count();
     var itemnameDisplay = item.name.replace(/\n/g, "<br>");
+    var totalprice = item.quantity * item.price;
 
     itemTable.row.add([
         "",
@@ -331,22 +405,23 @@ function addTableRow(order, item, totalprice) {
         createCellWithTextarea(itemnameDisplay, item.name, `Po.Po_items[${itemIndex}].Item_name`),
         createCell(item.quantity, `Po.Po_items[${itemIndex}].Item_quantity`),
         createCell(item.unit, `Po.Po_items[${itemIndex}].Unit`),
-        createCell(item.price.toLocaleString(), `Po.Po_items[${itemIndex}].Item_price`, item.price),
-        `<span class='itemPrice'>${totalprice.toLocaleString()}</span>`
+        createCell(item.price, `Po.Po_items[${itemIndex}].Item_price`, item.price),
+        `<span class='itemPrice'>${formatCurrency(totalprice)}</span>`
     ]).draw();
 }
 
 // Helper: Update existing row
-function updateTableRow(item, totalprice) {
+function updateTableRow(item) {
     var row = itemTable.row(".selected");
     var rowData = row.data();
+    var totalprice = item.quantity * item.price;
 
     updateCell(rowData, 2, item.name, `textarea`, item.name.replace(/\n/g, "<br>"));
     updateCell(rowData, 3, item.quantity);
     updateCell(rowData, 4, item.unit);
-    updateCell(rowData, 5, item.price.toLocaleString(), `input`, item.price);
+    updateCell(rowData, 5, item.price, `input`, item.price);
 
-    rowData[6] = `<span class="itemPrice">${totalprice.toLocaleString()}</span>`;
+    rowData[6] = `<span class="itemPrice">${formatCurrency(totalprice)}</span>`;
 
     row.data(rowData).draw();
 }
@@ -480,8 +555,9 @@ function taxSwitch() {
 }
 
 function calculateTotal() {
+    calculateItemPrices();
     var totalPrice = 0.0;
-    var itemPrices = $(".itemPrice");
+    var itemPrices = $(".itemAmount");
 
     itemPrices.each(function (index, element) {
         totalPrice += parseFloat($(element).text().replace(/,/g, ''));
@@ -498,6 +574,20 @@ function calculateTotal() {
     }
 
     $("#totalAmount").text(totalPrice.toLocaleString());
+}
+
+function calculateItemPrices() {
+    itemTable.rows().every(function () {
+        var data = this.data();
+
+        var itemQuantity = $(data[3]).find("input").val();
+        var itemPrice = $(data[5]).find("input").val();
+        var totalPrice = itemQuantity * itemPrice;
+
+        data[6] = `<span class="itemAmount">${formatCurrency(totalPrice)}</span>`;
+
+        this.data(data);
+    });
 }
 
 function getFloatValue(string) {

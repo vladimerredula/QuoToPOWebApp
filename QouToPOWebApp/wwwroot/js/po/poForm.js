@@ -24,6 +24,8 @@
         },
         minLength: 1 // Start searching after typing 1 character
     });
+
+    setCustomTermIndicator();
 });
 
 const toolbarOptions = [
@@ -46,13 +48,16 @@ quill.on("text-change", (delta, oldDelta, source) => {
 
     // Update the hidden textarea using jQuery
     $("#Custom_term").val(html);
+    setCustomTermIndicator();
+});
 
+function setCustomTermIndicator() {
     if (quill.getLength() > 1) {
         $("#customTermIndicator").html('<i class="bi bi-check-circle-fill"></i>');
     } else {
         $("#customTermIndicator").html('<i class="bi bi-circle"></i>');
     }
-});
+}
 
 var templateTable = $("#templateTable").DataTable({
     fixedHeader: true,
@@ -626,7 +631,7 @@ function addTableRow(order, item) {
         createCellWithTextarea(itemnameDisplay, item.name, `Po_items[${itemIndex}].Item_name`),
         createCell(item.quantity, `Po_items[${itemIndex}].Item_quantity`),
         createCell(item.unit, `Po_items[${itemIndex}].Unit`),
-        createCell(formatCurrency(item.price), `Po_items[${itemIndex}].Item_price`, item.price),
+        createCell(item.price, `Po_items[${itemIndex}].Item_price`, item.price),
         `<span class='itemAmount'>${formatCurrency(totalprice)}</span>`
     ]).draw();
 }
@@ -640,7 +645,7 @@ function updateTableRow(item) {
     updateCell(rowData, 2, item.name, `textarea`, item.name.replace(/\n/g, "<br>"));
     updateCell(rowData, 3, item.quantity);
     updateCell(rowData, 4, item.unit);
-    updateCell(rowData, 5, item.price, `input`, formatCurrency(item.price));
+    updateCell(rowData, 5, item.price, `input`, item.price);
 
     rowData[6] = `<span class="itemAmount">${formatCurrency(totalprice)}</span>`;
 
@@ -814,14 +819,9 @@ function calculateItemPrices() {
         var data = this.data();
 
         var itemQuantity = $(data[3]).find("input").val();
-        var itemPrice = formatCurrency($(data[5]).find("input").val());
+        var itemPrice = $(data[5]).find("input").val();
+        var totalPrice = itemQuantity * itemPrice;
 
-        var data5 = $(data[5]);
-        data5.find("span").text(itemPrice);
-
-        var totalPrice = itemQuantity * getFloatValue(itemPrice);
-
-        data[5] = data5.prop("outerHTML");
         data[6] = `<span class="itemAmount">${formatCurrency(totalPrice)}</span>`;
 
         this.data(data);

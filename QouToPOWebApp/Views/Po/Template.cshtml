@@ -35,22 +35,21 @@
         <tbody>
             @foreach (var item in templates) {
                 <tr>
-                    <td>
+                    <td onclick="previewTemplate(@item.Template_ID)" style="cursor: pointer;">
                         @Html.DisplayFor(modelItem => item.Template_name)
                     </td>
-                    <td>
+                    <td onclick="previewTemplate(@item.Template_ID)" style="cursor: pointer;">
                         @Html.DisplayFor(modelItem => item.Contact_person.Company.Company_name)
                     </td>
-                    <td>
+                    <td onclick="previewTemplate(@item.Template_ID)" style="cursor: pointer;">
                         @Html.DisplayFor(modelItem => item.Date_created)
                     </td>
-                    <td>
+                    <td onclick="previewTemplate(@item.Template_ID)" style="cursor: pointer;">
                         @Html.DisplayFor(modelItem => item.Date_modified)
                     </td>
                     <td class="text-nowrap">
-                        <a href="javascript:void(0)" onclick="previewTemplate(@item.Template_ID)">Preview</a> |
-                        <a asp-controller="Po" asp-action="Template" asp-route-id="@item.Template_ID">Edit</a> |
-                        <a href="javascript:void(0)" onclick="deleteTemplate(@item.Template_ID)">Delete</a>
+                        <a class="btn btn-sm btn-light me-1" asp-controller="Po" asp-action="Template" asp-route-id="@item.Template_ID">Edit</a>
+                        <a class="btn btn-sm btn-light text-danger" href="javascript:void(0)" onclick="deleteTemplate(@item.Template_ID)">Delete</a>
                     </td>
                 </tr>
             }

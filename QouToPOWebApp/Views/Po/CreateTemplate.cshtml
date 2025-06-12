@@ -1,6 +1,6 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+}
 
 @using QouToPOWebApp.ViewModel
 @using QouToPOWebApp.Models.InfoModels
@@ -43,6 +43,11 @@
                 <input class="form-control" type="text" asp-for="Po.Po_number" />
                 <span asp-validation-for="Po.Po_number" class="text-danger"></span>
             </div>
+            <div class="col-3 mb-2">
+                <label class="form-label" asp-for="Po.Quotation_number" id="quoNumberLabel"></label><span id="quotationNumberRequired" class="text-danger visually-hidden" title="Required">*</span>
+                <input class="form-control" type="text" asp-for="Po.Quotation_number" data-val="true" data-val-required="The Quotation number field is required." />
+                <span class="text-danger field-validation-valid" data-valmsg-for="Quotation_number" data-valmsg-replace="true"></span>
+            </div>
         </div>
         <div class="row mb-3">
             <div class="col-3 mb-2">
@@ -53,10 +58,13 @@
                 </select>
                 <span asp-validation-for="Po.Po_language" class="text-danger"></span>
             </div>
-            <div class="col-3 mb-2">
-                <label class="form-label" asp-for="Po.Quotation_number" id="quoNumberLabel"></label><span id="quotationNumberRequired" class="text-danger visually-hidden" title="Required">*</span>
-                <input class="form-control" type="text" asp-for="Po.Quotation_number" data-val="true" data-val-required="The Quotation number field is required." />
-                <span class="text-danger field-validation-valid" data-valmsg-for="Quotation_number" data-valmsg-replace="true"></span>
+            <div class="col-auto mb-2">
+                <label class="form-label" asp-for="Po.Currency"></label><span class="text-danger" title="Required">*</span>
+                <select class="form-select" asp-for="Po.Currency">
+                    <option value="JPY" selected>JPY</option>
+                    <option value="USD">USD</option>
+                </select>
+                <span asp-validation-for="Po.Currency" class="text-danger"></span>
             </div>
             <div class="col-auto mb-2">
                 <label class="form-label" asp-for="Po.Contact_person_ID"></label><span class="text-danger" title="Required">*</span>
@@ -122,8 +130,20 @@
                 </div>
                 <span asp-validation-for="Po.Delivery_term" class="text-danger"></span>
             </div>
+            <div class="col-4 mb-2 align-content-end">
+                <a class="btn btn-light border" id="customTermBtn"><span class="text-secondary" id="customTermIndicator"><i class="bi bi-circle"></i></span> Custom term</a>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-3 mb-2">
-        <label class="form-label" asp-for="Po.Delivery_address_ID">Delivery Address</label><span class="text-danger" title="Required">*</span>
+                <label class="form-label" asp-for="Po.Correspondent_ID" id="correspondentLabel"></label><span id="correspondentRequired" class="text-danger visually-hidden" title="Required">*</span>
+                <select class="form-select" asp-for="Po.Correspondent_ID" data-val="true" data-val-required="The Correspondent field is required." asp-items="ViewBag.correspondentList">
+                    <option selected disabled>Choose..</option>
+                </select>
+                <span class="text-danger field-validation-valid" data-valmsg-for="Po.Correspondent_ID" data-valmsg-replace="true"></span>
+            </div>
+            <div class="col-3 mb-2">
+                <label class="form-label" asp-for="Po.Delivery_address_ID">Delivery Address</label><span class="text-danger" title="Required">*</span>
                 <select class="form-select" asp-for="Po.Delivery_address_ID">
                     <option value="1">FFJ Zama</option>
                     <option value="2">FFJ Hachioji</option>
@@ -131,15 +151,6 @@
                     <option value="4">FFJ SIC</option>
                 </select>
                 <span asp-validation-for="Po.Delivery_address_ID" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-3 mb-2">
-            <label class="form-label" asp-for="Po.Correspondent_ID" id="correspondentLabel"></label><span id="correspondentRequired" class="text-danger visually-hidden" title="Required">*</span>
-                <select class="form-select" asp-for="Po.Correspondent_ID" data-val="true" data-val-required="The Correspondent field is required." asp-items="ViewBag.correspondentList">
-                    <option selected disabled>Choose..</option>
-                </select>
-                <span class="text-danger field-validation-valid" data-valmsg-for="Po.Correspondent_ID" data-valmsg-replace="true"></span>
             </div>
         </div>
     </div>
@@ -188,7 +199,7 @@
                                 <td><div><span>@Model?.Po.Po_items[i]?.Item_quantity</span><input hidden asp-for="Po.Po_items[i].Item_quantity" value='@Model?.Po.Po_items[i]?.Item_quantity'></div></td>
                                 <td><div><span>@Model?.Po.Po_items[i]?.Unit</span><input hidden asp-for="Po.Po_items[i].Unit" value='@Model?.Po.Po_items[i]?.Unit'></div></td>
                                 <td><div><span>@Model?.Po.Po_items[i]?.Item_price?.ToString("N0")</span><input hidden asp-for="Po.Po_items[i].Item_price" value='@Model?.Po.Po_items[i]?.Item_price'></div></td>
-                                <td><div><span class='itemPrice'>@price.ToString("N0")</span></div></td>
+                                <td><div><span class='itemAmount'>@price.ToString("N0")</span></div></td>
                             </tr>
 
                             counter++;
@@ -228,6 +239,28 @@
         <div class="col-auto">
             <a class="btn btn-lg btn-light border me-2" href="javascript:void(0)" id="poPreview">Preview</a>
             <a class="btn btn-lg btn-info text-white shadow" href="javascript:void(0)" id="generatePo">Save Template</a>
+        </div>
+    </div>
+
+
+    <!-- Custom term Modal -->
+    <div class="modal fade" id="customTermModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h1 class="modal-title fs-5" id="customTermModalLabel">Custom term</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea asp-for="Po.Custom_term" hidden></textarea>
+                    <div class="editor" id="editor">
+                        @Html.Raw(Model?.Po?.Custom_term)
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <a class="btn btn-primary px-3" href="javascript:void(0)" id="saveCustomTerm">Save</a>
+                </div>
+            </div>
         </div>
     </div>
 </form>
@@ -488,6 +521,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="/js/po/template.js"></script>
 }
