@@ -1020,6 +1020,11 @@ namespace QouToPOWebApp.Controllers
 
             templateViewModel.Po = JObject.Parse(template.Po_data_json).ToObject<PoViewModel>();
 
+            if (templateViewModel?.Po?.Currency == null)
+            {
+                templateViewModel.Po.Currency = templateViewModel?.Po?.Po_language == "en" ? "USD" : "JYP";
+            }
+
             ViewBag.deliveryAddressList = GetDeliveryAddressList();
             ViewBag.contactPersonList = GetContactPersonList();
             ViewBag.correspondentList = new SelectList(_db.Correspondents.ToList(), "Correspondent_ID", "Correspondent_name", templateViewModel?.Po?.Correspondent_ID);
@@ -1066,7 +1071,7 @@ namespace QouToPOWebApp.Controllers
 
             if (existingTemplate != null)
             {
-                var poJson = JsonConvert.SerializeObject(model);
+                var poJson = JsonConvert.SerializeObject(model.Po);
 
                 existingTemplate.Template_name = model.Template_name;
                 existingTemplate.Contact_person_ID = model.Po.Contact_person_ID;
