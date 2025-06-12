@@ -161,15 +161,30 @@ namespace QouToPOWebApp.Helpers
 
         private void EnsureSpaceForLine()
         {
-            if (cursorY + lineHeight > pageHeight - bottomMargin)
+            if (cursorY + lineHeight > pageHeight - bottomMargin - lineHeight)
             {
                 currentPage = document.AddPage();
                 gfx = XGraphics.FromPdfPage(currentPage);
+                DrawFooter(gfx, currentPage);
                 cursorY = topMargin;
                 cursorX = initialX;
                 pageHeight = currentPage.Height.Point;
             }
         }
+
+        private void DrawFooter(XGraphics gfx, PdfPage page)
+        {
+            XColor ClayCreek = XColor.FromCmyk(0.00, 0.06, 0.36, 0.42);
+            double margin = 65;
+            double y = page.Height - margin;
+            double x = 36;
+
+            XPen customDashedPen = new XPen(ClayCreek, 1.3);
+            customDashedPen.DashPattern = new double[] { 8, 3, 0.8, 3, 0.8, 3 };
+            gfx.DrawLine(customDashedPen, x, y, page.Width - x, y);
+            gfx.DrawLine(new XPen(ClayCreek, 2), x, y + 5, page.Width - x, y + 5);
+        }
+
         public PdfPage GetCurrentPage() => currentPage;
         public XGraphics GetCurrentGraphics() => gfx;
     }

@@ -212,7 +212,9 @@ namespace QouToPOWebApp.Services
 
             // Add a page
             PdfPage page = document.AddPage();
+            page.Size = PdfSharp.PageSize.A4;
             XGraphics gfx = XGraphics.FromPdfPage(page);
+            DrawFooter(gfx, page);
             XTextFormatter tf = new XTextFormatter(gfx);
 
             // Table dimensions
@@ -309,12 +311,6 @@ namespace QouToPOWebApp.Services
 
             // Tax included
             gfx.DrawString("(" + (po.Include_tax ? "税込" : "税抜") + ")", new XFont("Meiryo", 8), XBrushes.Black, new XRect(40, y-1, 85, rowHeight), XStringFormats.Center);
-
-            // Bottom page border
-            XPen customDashedPen = new XPen(ClayCreek, 1.3);
-            customDashedPen.DashPattern = new double[] { 8, 3, 0.8, 3, 0.8, 3 };
-            gfx.DrawLine(customDashedPen, x, page.Height - bottomMargin, page.Width - 36, page.Height - bottomMargin);
-            gfx.DrawLine(new XPen(ClayCreek, 2), x, page.Height - bottomMargin + 5, page.Width - 36, page.Height - bottomMargin + 5);
 
             y += 20;
 
@@ -416,7 +412,7 @@ namespace QouToPOWebApp.Services
 
             var itemCount = po.Po_items != null ? po.Po_items.Count() : 0;
             // Draw table rows
-            for (int row = itemCount; row < 9; row++)
+            for (int row = itemCount; row < 8; row++)
             {
                 if (y < 600) // limit the number of blank rows when it reaches certain point
                 {
@@ -496,7 +492,7 @@ namespace QouToPOWebApp.Services
             CheckPageBreak(ref y);
 
             // Custom term
-            var stripedCustomTerm = Regex.Replace(po?.Custom_term, "<.*?>", string.Empty);
+            var stripedCustomTerm = Regex.Replace(po?.Custom_term ?? string.Empty, "<.*?>", string.Empty);
             if (!string.IsNullOrEmpty(po?.Custom_term) && stripedCustomTerm != "")
             {
                 y += 10;
@@ -537,14 +533,28 @@ namespace QouToPOWebApp.Services
 
             void CheckPageBreak(ref double y)
             {
-                if (y + rowHeight >= page.Height.Point - bottomMargin)
+                if (y + rowHeight >= page.Height.Point - bottomMargin - rowHeight)
                 {
                     page = document.AddPage();
                     page.Size = PdfSharp.PageSize.A4;
                     gfx = XGraphics.FromPdfPage(page);
+                    DrawFooter(gfx, page);
                     y = topMargin;
                 }
             }
+        }
+
+        private void DrawFooter(XGraphics gfx, PdfPage page)
+        {
+            XColor ClayCreek = XColor.FromCmyk(0.00, 0.06, 0.36, 0.42);
+            double margin = 65;
+            double y = page.Height - margin;
+            double x = 36;
+
+            XPen customDashedPen = new XPen(ClayCreek, 1.3);
+            customDashedPen.DashPattern = new double[] { 8, 3, 0.8, 3, 0.8, 3 };
+            gfx.DrawLine(customDashedPen, x, y, page.Width - x, y);
+            gfx.DrawLine(new XPen(ClayCreek, 2), x, y + 5, page.Width - x, y + 5);
         }
 
         public byte[]? CreatePoEng(PoViewModel po, bool saveToFile = false)
@@ -556,6 +566,7 @@ namespace QouToPOWebApp.Services
 
             // Add a page
             PdfPage page = document.AddPage();
+            page.Size = PdfSharp.PageSize.A4;
             XGraphics gfx = XGraphics.FromPdfPage(page);
 
             // Table dimensions
@@ -798,7 +809,7 @@ namespace QouToPOWebApp.Services
             }
 
             // Custom term
-            var stripedCustomTerm = Regex.Replace(po?.Custom_term, "<.*?>", string.Empty);
+            var stripedCustomTerm = Regex.Replace(po?.Custom_term ?? string.Empty, "<.*?>", string.Empty);
             if (!string.IsNullOrEmpty(po?.Custom_term) && stripedCustomTerm != "")
             {
                 y += 9;
