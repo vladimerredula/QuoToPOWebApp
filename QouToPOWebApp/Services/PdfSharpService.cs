@@ -396,7 +396,20 @@ namespace QouToPOWebApp.Services
                     gfx.DrawString(itemQuantity, bodyFont, XBrushes.Black, new XRect(x + column1, y, column2, currentRowHeight), XStringFormats.Center);
                     gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, x + column1, y, column2, currentRowHeight);
 
-                    var itemPrice = GetCurrencyAmount(currency, item.Item_price);
+                    CultureInfo culture;
+                    if (currency == "USD")
+                    {
+                        culture = new CultureInfo("en-US");
+                    } else
+                    {
+                        // Replace the problematic line with the following code:
+                        culture = new CultureInfo("ja-JP");
+                        var hasDecimal = item?.Item_price % 1 != 0;
+
+                        culture.NumberFormat.CurrencyDecimalDigits = hasDecimal ? 2 : 0;
+                    }
+
+                    var itemPrice = item?.Item_price?.ToString("C", culture) ?? string.Empty;
                     gfx.DrawString(itemPrice, bodyFont, XBrushes.Black, new XRect(32 + column1 + column2, y, column3, currentRowHeight), XStringFormats.CenterRight);
                     gfx.DrawRectangle(new XPen(ClayCreek, 0.75), XBrushes.Transparent, x + column1 + column2, y, column3, currentRowHeight);
 
