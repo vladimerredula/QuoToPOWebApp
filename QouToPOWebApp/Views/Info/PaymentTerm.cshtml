@@ -15,9 +15,10 @@
 </p>
 
 <div class="card p-3 border-0 shadow-sm">
-    <table class="datatable table table-hover">
+    <table class="table table-hover" id="paymentTermTable">
         <thead>
             <tr>
+                <th></th>
                 <th>
                     @Html.DisplayNameFor(model => model.Payment_term_name)
                 </th>
@@ -33,18 +34,19 @@
         <tbody>
             @foreach (var item in paymentTerms) {
                 <tr>
-                    <td>
+                    <td></td>
+                    <td class="td-control">
                         @Html.DisplayFor(modelItem => item.Payment_term_name)
                     </td>
-                    <td>
+                    <td class="td-control">
                         @Html.DisplayFor(modelItem => item.Payment_term_name_jpn)
                     </td>
-                    <td>
+                    <td class="td-control">
                         @Html.DisplayFor(modelItem => item.Key_words)
                     </td>
-                    <td>
-                        <a href="javascript:void(0)" onclick="editPaymentTerm(@item.Payment_term_ID)">Edit</a> |
-                        <a href="javascript:void(0)" onclick="deletePaymentTerm(@item.Payment_term_ID)">Delete</a>
+                    <td class="text-nowrap">
+                        <a class="btn btn-sm btn-light me-1" href="javascript:void(0)" onclick="editPaymentTerm(@item.Payment_term_ID)">Edit</a>
+                        <a class="btn btn-sm btn-light text-danger" href="javascript:void(0)" onclick="deletePaymentTerm(@item.Payment_term_ID)">Delete</a>
                     </td>
                 </tr>
             }
@@ -132,12 +134,125 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        $("table.datatable").DataTable({
+        $.extend(true, $.fn.dataTable.defaults, {
+            colReorder: {
+                columns: ':gt(0)'
+            },
+            stateSave: true,
+            stateSaveParams: function (settings, data) {
+                data.search.search = '';
+                data.start = 0;
+            },
             responsive: true,
-            fixedHeader: true
+            fixedHeader: true,
+            layout: {
+                topStart: 'pageLength',
+                topEnd: {
+                    search: {
+                        placeholder: 'Search'
+                    },
+                    buttons: [
+                        {
+                            extend: 'colvis',
+                            text: 'Show/Hide columns',
+                            className: 'btn btn-sm btn-secondary-subtle',
+                            columns: ':not(.dt-control)', // Exclude control column
+                            attr: {
+                                title: 'Toggle visibility of table columns'
+                            }
+                        },
+                        {
+                            text: 'Restore table <i class="bi bi-arrow-clockwise"></i>',
+                            className: 'btn btn-sm btn-secondary',
+                            attr: {
+                                title: 'Reset table column visibility and order'
+                            },
+                            action: function (e, dt, node, config) {
+                                const tableId = dt.table().node().id;
+
+                                dt.state.clear(); // Clear saved state
+                                dt.destroy(); // Destroy DataTable instance
+
+                                // Replace the old table DOM with the original clone
+                                const $original = originalTableHTML[tableId].clone();
+                                $('#' + tableId).replaceWith($original);
+
+                                // Reinitialize
+                                initPaymentTermTable();
+                            }
+                        }
+                    ]
+                },
+                bottomStart: 'info',
+                bottomEnd: 'paging'
+            },
+            order: [[1, 'desc']]
         });
 
+
+        function initPaymentTermTable() {
+            $("#paymentTermTable").DataTable({
+                columnDefs: [
+                    {
+                        targets: 0,
+                        className: 'dt-control',
+                        orderable: false,
+                        defaultContent: '',
+                        width: '20px'
+                    },
+                    {
+                        targets: 3,
+                        visible: false,
+                        searchable: true
+                    },
+                    {
+                        targets: 4,
+                        searchable: false,
+                        orderable: false
+                    }
+                ]
+            });
+        }
+
+        const originalTableHTML = {}; // Use for cloning original table DOM
+
         $(document).ready(function () {
+            originalTableHTML["paymentTermTable"] = $('#paymentTermTable').clone(); // Deep copy
+            initPaymentTermTable();
+
+        });
+
+
+        $(document).on("click", ".dt-control, .td-control", function () {
+            var $tableElement = $(this).closest('table');
+
+            var tr = $(this).closest('tr');
+            var table = $tableElement.DataTable(); // Get the correct DataTable instance
+            var row = table.row(tr);
+
+            if (row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+            } else {
+                var rowData = row.data();
+                var childData = '<table class="table table-bordered table-sm mb-0 w-100">';
+
+                table.columns().every(function (index) {
+                    if (!this.visible() && index !== 0) {
+                        var header = $(table.column(index).header()).text();
+                        childData += `
+                            <tr>
+                                <th class="px-2 text-nowrap" style="width:2%;">${header}</th>
+                                <td class="px-2">${rowData[index] ? rowData[index] : '<span class="text-secondary">-</span>'}</td>
+                            </tr>`;
+                    }
+                });
+
+                childData += '</table>';
+
+                row.child(childData || '<em>No row child data</em>').show();
+                tr.addClass('shown');
+            }
         });
 
         function addPaymentTerm() {

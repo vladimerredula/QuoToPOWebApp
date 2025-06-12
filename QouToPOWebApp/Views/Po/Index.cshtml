@@ -67,7 +67,7 @@
             <tr>
                 <th>Name</th>
                 <th>Type</th>
-                <th>Date created</th>
+                <th class="text-nowrap">Date created</th>
                 <th>Size</th>
                 <th></th>
             </tr>
@@ -96,7 +96,7 @@
                 else if (item is System.IO.FileInfo file)
                 {
                     <tr>
-                        <td>
+                        <td class="text-truncate" style="max-width:600px;">
                             <a class="text-decoration-none" href="#" data-id="@file.FullName.Replace(_poPath, "").TrimStart('\\', '/')" onclick="previewFile(this)">
                                 @switch (file.Extension.TrimStart('.').ToLower())
                                 {
@@ -125,11 +125,11 @@
                             </a>
                         </td>
                         <td>@(file.Extension.TrimStart('.').ToUpper() + " File")</td>
-                        <td>@file.CreationTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="text-nowrap">@file.CreationTime.ToString("yyyy-MM-dd HH:mm")</td>
                         <td>@(file.Length / 1024) KB</td>
-                        <td>
-                            <a href="@Url.Action("Download", new { path = System.IO.Path.GetRelativePath(_poPath, file.FullName) })">
-                                Download
+                        <td class="text-nowrap">
+                            <a href="@Url.Action("Download", new { path = System.IO.Path.GetRelativePath(_poPath, file.FullName) })" class="btn btn-sm btn-light">
+                                <i class="bi bi-download"></i> Download
                             </a>
                         </td>
                     </tr>
@@ -167,7 +167,7 @@
             fixedHeader: true,
             filter: false,
             lengthChange: false,
-            pageLength: 15 // Set default number of rows per page
+            pageLength: 15, // Set default number of rows per page
         });
 
         function previewFile(a) {
