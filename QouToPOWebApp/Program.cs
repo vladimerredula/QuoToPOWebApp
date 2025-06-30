@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using QouToPOWebApp;
 using QouToPOWebApp.Filters;
+using QouToPOWebApp.Models.MiscModels;
 using QouToPOWebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,12 @@ builder.Services.AddScoped<TabulaService>();
 
 builder.Services.AddScoped<IBreadcrumbService, BreadcrumbService>();
 builder.Services.AddScoped<BreadcrumbActionFilter>();
+
+var poSetting = builder.Configuration.GetSection("PoSettings").Get<PoSetting>();
+if (poSetting == null)
+    throw new InvalidOperationException("PoSettings configuration section is missing or invalid.");
+
+builder.Services.AddSingleton(poSetting);
 
 // Add DbContext with MySQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

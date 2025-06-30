@@ -18,24 +18,26 @@ namespace QouToPOWebApp.Controllers
     public class PoController : Controller
     {
         private readonly ApplicationDbContext _db;
-        private readonly string _poPath = Path.Combine(Directory.GetCurrentDirectory(), "AppData/PO");
+        private readonly PoSetting _poSettings;
 
-        public PoController(ApplicationDbContext dbContext)
+        public PoController(ApplicationDbContext dbContext, PoSetting poSettings)
         {
             _db = dbContext;
+            _poSettings = poSettings;
         }
 
         public IActionResult Index(string path = "", string searchTerm = "")
         {
             // Create the base PO directory if it don't exists
-            if (!Directory.Exists(_poPath))
-                Directory.CreateDirectory(_poPath);
+            if (!Directory.Exists(_poSettings.Path))
+                Directory.CreateDirectory(_poSettings.Path);
 
-            string fullPath = Path.Combine(_poPath, path);
+            string fullPath = Path.Combine(_poSettings.Path, path);
 
             var filebd = new BreadcrumbService();
             ViewBag.Paths = filebd.GetBreadcrumbs(path);
             ViewBag.CurrentPath = path;
+            ViewBag.PoPath = _poSettings.Path;
 
             if (!Directory.Exists(fullPath))
             {
@@ -48,11 +50,11 @@ namespace QouToPOWebApp.Controllers
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 // Search for both directories and files inside "PO" folder
-                var directories = Directory.GetDirectories(_poPath, "*", SearchOption.AllDirectories)
+                var directories = Directory.GetDirectories(_poSettings.Path, "*", SearchOption.AllDirectories)
                     .Where(d => new DirectoryInfo(d).Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
                     .Select(d => new DirectoryInfo(d));
 
-                var files = Directory.GetFiles(_poPath, "*", SearchOption.AllDirectories)
+                var files = Directory.GetFiles(_poSettings.Path, "*", SearchOption.AllDirectories)
                     .Where(f => Path.GetFileName(f).Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
                     .Select(f => new FileInfo(f));
 
@@ -73,7 +75,7 @@ namespace QouToPOWebApp.Controllers
 
         public IActionResult Download(string path)
         {
-            string fullPath = Path.Combine(_poPath, path);
+            string fullPath = Path.Combine(_poSettings.Path, path);
 
             if (!System.IO.File.Exists(fullPath))
                 return NotFound("File not found!");
@@ -863,8 +865,8 @@ namespace QouToPOWebApp.Controllers
 
                         var dirName = $"{(savedPoCount + 1).ToString("D3")}-{userId.ToString("D3")}";
 
-                        var groupDir = Path.Combine(DateTime.Now.ToString("yyyy/MMMM/d"), dirName);
-                        var finalDir = Path.Combine(_poPath, groupDir);
+                        var groupDir = Path.Combine(DateTime.Now.ToString("yyyy/M. MMMM/dd"), dirName);
+                        var finalDir = Path.Combine(_poSettings.Path, groupDir);
 
                         // Ensure the File group directory exists
                         if (!Directory.Exists(finalDir))

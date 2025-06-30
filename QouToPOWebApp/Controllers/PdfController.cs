@@ -14,12 +14,13 @@ namespace QouToPOWebApp.Controllers
         private readonly ApplicationDbContext _db;
         private readonly PdfSharpService _pdf;
         private readonly string _tempDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
-        private readonly string _poDir = Path.Combine(Directory.GetCurrentDirectory(), "AppData/PO");
-        
-        public PdfController(ApplicationDbContext db)
+        private readonly PoSetting _poSettings;
+
+        public PdfController(ApplicationDbContext db, PoSetting poSettings)
         {
             _db = db;
             _pdf = new PdfSharpService();
+            _poSettings = poSettings;
         }
 
         public IActionResult Index()
@@ -232,7 +233,7 @@ namespace QouToPOWebApp.Controllers
         [HttpGet]
         public IActionResult GetSavedFile(string filePath)
         {
-            var fullPath = Path.Combine(_poDir, filePath);
+            var fullPath = Path.Combine(_poSettings.Path, filePath);
             if (!System.IO.File.Exists(fullPath))
             {
                 return NotFound("File not found.");

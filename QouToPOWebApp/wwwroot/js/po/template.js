@@ -29,7 +29,7 @@ var quill = new Quill("#editor", {
     modules: {
         toolbar: toolbarOptions
     },
-    placeholder: 'Compose an epic...',
+    placeholder: 'Custom term...',
     theme: 'snow'
 });
 
