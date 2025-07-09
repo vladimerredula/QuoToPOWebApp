@@ -95,6 +95,7 @@ var itemTable = $('table.datatable').DataTable({
             targets: [0, 1],
             width: "50px"
         },
+        { targets: 7, visible: false },
         { orderable: false, targets: '_all' },
         { targets: 2, className: "text-start" } // Bootstrap class for left alignment
     ],
@@ -627,12 +628,13 @@ function addTableRow(order, item) {
 
     itemTable.row.add([
         "",
-        createCell(order, `Po_items[${itemIndex}].Order`),
+        `<span>${order}</span>`,
         createCellWithTextarea(itemnameDisplay, item.name, `Po_items[${itemIndex}].Item_name`),
         createCell(item.quantity, `Po_items[${itemIndex}].Item_quantity`),
         createCell(item.unit, `Po_items[${itemIndex}].Unit`),
         createCell(item.price, `Po_items[${itemIndex}].Item_price`, item.price),
-        `<span class='itemAmount'>${formatCurrency(totalprice)}</span>`
+        `<span class='itemAmount'>${formatCurrency(totalprice)}</span>`,
+        `<div><input hidden name='Po_items[${itemIndex}].Order' value='${order}'></div>`
     ]).draw();
 }
 
@@ -686,7 +688,7 @@ function updateCell(rowData, index, value, inputType = "input", displayText = va
 function reorderTable() {
 
     // function to update the asp item names according to the row order in table
-    function updateCell(data, rowIndex, colIndex, inputType, inputName, spanUpdate = false) {
+    function updateCell(data, rowIndex, colIndex, inputType, inputName) {
         var element = $(data[colIndex]);
 
         element.find(inputType).attr("name", `Po_items[${rowIndex}].${inputName}`);
@@ -695,20 +697,16 @@ function reorderTable() {
             element.find("input").val(rowIndex + 1);
         }
 
-        if (spanUpdate) {
-            element.find("span").text(rowIndex + 1);  // For Order column
-        }
-
         data[colIndex] = element.prop("outerHTML");
     }
 
     // update this array if you need to add/remove columns
     var columns = [
-        { colIndex: 1, inputType: "input", inputName: "Order", hasSpan: true },
         { colIndex: 2, inputType: "textarea", inputName: "Item_name" },
         { colIndex: 3, inputType: "input", inputName: "Item_quantity" },
         { colIndex: 4, inputType: "input", inputName: "Unit" },
-        { colIndex: 5, inputType: "input", inputName: "Item_price" }
+        { colIndex: 5, inputType: "input", inputName: "Item_price" },
+        { colIndex: 7, inputType: "input", inputName: "Order" }
     ];
 
     var rowIndex = 0;
@@ -716,7 +714,7 @@ function reorderTable() {
         var data = this.data();
 
         columns.forEach(function (col) {
-            updateCell(data, rowIndex, col.colIndex, col.inputType, col.inputName, col.hasSpan || false);
+            updateCell(data, rowIndex, col.colIndex, col.inputType, col.inputName);
         });
 
         this.data(data);

@@ -194,12 +194,13 @@
                             totalAmount += price;
                             <tr>
                                 <td></td>
-                                <td><div><span>@(Model?.Po.Po_items[i]?.Order ?? counter)</span><input hidden asp-for="Po.Po_items[i].Order" value='@(Model?.Po.Po_items[i]?.Order ?? counter)'></div></td>
+                                <td><div><span>@(Model?.Po.Po_items[i]?.Order ?? counter)</span></div></td>
                                 <td><div><span>@Html.Raw(Model?.Po.Po_items[i]?.Item_name.Replace("\r\n", "<br>"))</span><textarea hidden asp-for="Po.Po_items[i].Item_name">@Model?.Po.Po_items[i]?.Item_name</textarea></div></td>
                                 <td><div><span>@Model?.Po.Po_items[i]?.Item_quantity</span><input hidden asp-for="Po.Po_items[i].Item_quantity" value='@Model?.Po.Po_items[i]?.Item_quantity'></div></td>
                                 <td><div><span>@Model?.Po.Po_items[i]?.Unit</span><input hidden asp-for="Po.Po_items[i].Unit" value='@Model?.Po.Po_items[i]?.Unit'></div></td>
                                 <td><div><span>@Model?.Po.Po_items[i]?.Item_price?.ToString("N0")</span><input hidden asp-for="Po.Po_items[i].Item_price" value='@Model?.Po.Po_items[i]?.Item_price'></div></td>
                                 <td><div><span class='itemAmount'>@price.ToString("N0")</span></div></td>
+                                <td><div><input hidden asp-for="Po.Po_items[i].Order" value='@(Model?.Po.Po_items[i]?.Order ?? counter)'></div></td>
                             </tr>
 
                             counter++;
