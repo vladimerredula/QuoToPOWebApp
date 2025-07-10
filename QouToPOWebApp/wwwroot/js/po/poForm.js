@@ -95,7 +95,10 @@ var itemTable = $('table.datatable').DataTable({
             targets: [0, 1],
             width: "50px"
         },
-        { targets: 7, visible: false },
+        {
+            targets: 7,
+            className: "visually-hidden"
+        },
         { orderable: false, targets: '_all' },
         { targets: 2, className: "text-start" } // Bootstrap class for left alignment
     ],
@@ -634,7 +637,7 @@ function addTableRow(order, item) {
         createCell(item.unit, `Po_items[${itemIndex}].Unit`),
         createCell(item.price, `Po_items[${itemIndex}].Item_price`, item.price),
         `<span class='itemAmount'>${formatCurrency(totalprice)}</span>`,
-        `<div><input hidden name='Po_items[${itemIndex}].Order' value='${order}'></div>`
+        createCell(null, `Po_items[${itemIndex}].Order`, order)
     ]).draw();
 }
 
@@ -649,7 +652,7 @@ function updateTableRow(item) {
     updateCell(rowData, 4, item.unit);
     updateCell(rowData, 5, item.price, `input`, item.price);
 
-    rowData[6] = `<span class="itemAmount">${formatCurrency(totalprice)}</span>`;
+    rowData[6] = `<div><span class="itemAmount">${formatCurrency(totalprice)}</span></div>`;
 
     row.data(rowData).draw();
 }
@@ -694,7 +697,9 @@ function reorderTable() {
         element.find(inputType).attr("name", `Po_items[${rowIndex}].${inputName}`);
 
         if (inputName === "Order") {
-            element.find("input").val(rowIndex + 1);
+            element.find("input").val($(data[1]).text());
+            element.find("input").attr("value", $(data[1]).text());
+            //console.log(element.find("input").val(), rowIndex + 1);
         }
 
         data[colIndex] = element.prop("outerHTML");
@@ -713,11 +718,13 @@ function reorderTable() {
     itemTable.rows().every(function () {
         var data = this.data();
 
+        data[1] = `<span>${rowIndex + 1}</span>`
+
         columns.forEach(function (col) {
             updateCell(data, rowIndex, col.colIndex, col.inputType, col.inputName);
         });
 
-        this.data(data);
+        this.data(data).draw(false);
         rowIndex++;
     });
 
