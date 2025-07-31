@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using QouToPOWebApp;
 using QouToPOWebApp.Filters;
+using QouToPOWebApp.Helpers;
 using QouToPOWebApp.Models.MiscModels;
 using QouToPOWebApp.Services;
 using System.Net;
@@ -22,10 +23,12 @@ builder.Services.AddScoped<PdfPigService>();
 builder.Services.AddScoped<TabulaService>();
 builder.Services.AddScoped<IBreadcrumbService, BreadcrumbService>();
 builder.Services.AddScoped<BreadcrumbActionFilter>();
+builder.Services.AddSingleton<EncryptionHelper>();
 
 builder.Services.AddHttpContextAccessor();
 
 // Load settings
+builder.Services.Configure<EncryptionSetting>(builder.Configuration.GetSection("Encryption"));
 var poSetting = builder.Configuration.GetSection("PoSettings").Get<PoSetting>();
 if (poSetting == null)
     throw new InvalidOperationException("PoSettings configuration section is missing or invalid.");
