@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using NReco.Logging.File;
 using QouToPOWebApp;
 using QouToPOWebApp.Filters;
 using QouToPOWebApp.Helpers;
@@ -23,6 +24,7 @@ builder.Services.AddScoped<PdfPigService>();
 builder.Services.AddScoped<TabulaService>();
 builder.Services.AddScoped<IBreadcrumbService, BreadcrumbService>();
 builder.Services.AddScoped<BreadcrumbActionFilter>();
+builder.Services.AddScoped(typeof(LogService<>));
 builder.Services.AddSingleton<EncryptionHelper>();
 
 builder.Services.AddHttpContextAccessor();
@@ -74,6 +76,78 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
     options.KnownProxies.Add(IPAddress.Parse("192.168.161.111")); // Nginx IP
+});
+
+// File Logging (General + Error)
+builder.Logging.AddFile(builder.Configuration.GetSection("Logging:File"), options =>
+{
+    string currentLogFileName = string.Empty;
+    DateTime currentDate = DateTime.MinValue;
+
+    options.FormatLogFileName = folder =>
+    {
+        var now = DateTime.UtcNow;
+        if (currentDate.Date != now.Date || string.IsNullOrEmpty(currentLogFileName))
+        {
+            currentDate = now;
+            string logPath = $"{now:yyyy}/{now:MM}/{now:dd}/{now:yyyy-MM-dd}.log";
+            currentLogFileName = Path.Combine(folder, logPath);
+            var directoryPath = Path.GetDirectoryName(currentLogFileName);
+            if (!string.IsNullOrEmpty(directoryPath))
+                Directory.CreateDirectory(directoryPath);
+        }
+        return currentLogFileName;
+    };
+
+    options.FormatLogEntry = msg =>
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.Append(DateTime.Now.ToString("o"));
+        sb.Append($" Level:{msg.LogLevel}, {msg.LogName}, ");
+        if (msg.Exception != null)
+        {
+            var trace = new System.Diagnostics.StackTrace(msg.Exception, true);
+            var frame = trace.GetFrame(0);
+            if (frame != null)
+                sb.Append($"Line:{frame.GetFileLineNumber()}, ");
+            sb.Append($"Exception:{msg.Exception.Message}");
+        }
+        else
+        {
+            sb.Append(msg.Message);
+        }
+        return sb.ToString();
+    };
+
+    options.FileSizeLimitBytes = 1 * 1024 * 1024;
+    options.MaxRollingFiles = 3;
+});
+
+builder.Logging.AddFile(builder.Configuration.GetSection("Logging:File"), options =>
+{
+    string errorLogFileName = string.Empty;
+    DateTime currentDate = DateTime.MinValue;
+
+    options.FormatLogFileName = folder =>
+    {
+        var now = DateTime.UtcNow;
+        if (currentDate.Date != now.Date || string.IsNullOrEmpty(errorLogFileName))
+        {
+            currentDate = now;
+            string logPath = $"errors/{now:yyyy}/{now:MM}/{now:dd}/{now:yyyy-MM-dd}-errors.log";
+            errorLogFileName = Path.Combine(folder, logPath);
+            var directoryPath = Path.GetDirectoryName(errorLogFileName);
+            if (!string.IsNullOrEmpty(directoryPath))
+                Directory.CreateDirectory(directoryPath);
+        }
+        return errorLogFileName;
+    };
+
+    options.FilterLogEntry = msg =>
+        msg.LogLevel == LogLevel.Error || msg.LogLevel == LogLevel.Critical;
+
+    options.FileSizeLimitBytes = 1 * 1024 * 1024;
+    options.MaxRollingFiles = 3;
 });
 
 // Bind to port 80 inside container

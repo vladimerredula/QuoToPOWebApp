@@ -15,26 +15,23 @@ namespace QouToPOWebApp.Controllers
         private readonly PdfSharpService _pdf;
         private readonly string _tempDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
         private readonly PoSetting _poSettings;
+        private readonly LogService<PdfController> _log;
 
-        public PdfController(ApplicationDbContext db, PoSetting poSettings)
+        public PdfController(ApplicationDbContext db, PoSetting poSettings, LogService<PdfController> log)
         {
             _db = db;
             _pdf = new PdfSharpService();
             _poSettings = poSettings;
+            _log = log;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+        public IActionResult Index() => View();
 
         [HttpPost]
         public async Task<IActionResult> UploadPdf(IFormFile pdfFile)
         {
             if (pdfFile == null || pdfFile.Length == 0)
-            {
                 return Json(new { success = false, message = "No file selected" });
-            }
 
             try
             {
@@ -49,9 +46,9 @@ namespace QouToPOWebApp.Controllers
                 //return GenerateThumbnail(filePath);
                 return GetPdfData(filePath);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                Console.WriteLine("Error uploading pdf file: " + ex.Message);
+                _log.LogError("Error uploading pdf file", ex);
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -88,9 +85,7 @@ namespace QouToPOWebApp.Controllers
         public IActionResult GetPdfData(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
-            {
                 return BadRequest("File path is required.");
-            }
 
             byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
             var currentImage = $"data:application/pdf;base64,{Convert.ToBase64String(fileBytes)}";
@@ -158,17 +153,13 @@ namespace QouToPOWebApp.Controllers
         public IActionResult UploadFile(IFormFile quoFile)
         {
             if (quoFile == null || quoFile.Length == 0)
-            {
                 return Json(new { success = false, message = "No file selected" });
-            }
 
             try
             {
                 // Ensure the Temp directory exists
                 if (!Directory.Exists(_tempDir))
-                {
                     Directory.CreateDirectory(_tempDir);
-                }
 
                 var personnelId = GetPersonnelID();
 
@@ -193,6 +184,7 @@ namespace QouToPOWebApp.Controllers
 
                     _db.Attachments.Add(file);
                     _db.SaveChanges();
+                    _log.LogInfo("File uploaded", file);
 
                     return Json(new
                     {
@@ -206,9 +198,9 @@ namespace QouToPOWebApp.Controllers
 
                 return Json(new { success = false, message = "Unable to upload file." });
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                Console.WriteLine("Error uploading file: " + ex.Message);
+                _log.LogError("Error uploading file", ex);
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -217,15 +209,11 @@ namespace QouToPOWebApp.Controllers
         public IActionResult GetFile(string filePath)
         {
             if (!System.IO.File.Exists(filePath))
-            {
                 return NotFound("File not found.");
-            }
 
             var provider = new FileExtensionContentTypeProvider();
             if (!provider.TryGetContentType(filePath, out string contentType))
-            {
                 contentType = "application/octet-stream"; // Default binary type if unknown
-            }
 
             return File(System.IO.File.OpenRead(filePath), contentType, Path.GetFileName(filePath));
         }
@@ -235,17 +223,13 @@ namespace QouToPOWebApp.Controllers
         {
             var fullPath = Path.Combine(_poSettings.Path, filePath);
             if (!System.IO.File.Exists(fullPath))
-            {
                 return NotFound("File not found.");
-            }
 
             var fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
 
             var provider = new FileExtensionContentTypeProvider();
             if (!provider.TryGetContentType(fullPath, out string contentType))
-            {
                 contentType = "application/octet-stream"; // Default binary type if unknown
-            }
 
             return File(fileStream, contentType);
         }

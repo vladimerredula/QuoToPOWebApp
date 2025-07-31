@@ -29,9 +29,7 @@ namespace QouToPOWebApp.Controllers
             ClaimsPrincipal claimUser = HttpContext.User;
 
             if (claimUser.Identity.IsAuthenticated)
-            {
                 return RedirectToAction("Index", "Po");
-            }
 
             return View("Login");
         }
@@ -117,7 +115,7 @@ namespace QouToPOWebApp.Controllers
 
             // Ensure session is initialized
             HttpContext.Session.SetString("SessionInitialized", HttpContext.Session.Id);
-            _log.LogInfo("Logged in", usernameOverride: user.Username);
+            _log.LogInfo("Logged in", usernameOverride: model.Username);
 
             return RedirectToAction("Index", "Access");
         }

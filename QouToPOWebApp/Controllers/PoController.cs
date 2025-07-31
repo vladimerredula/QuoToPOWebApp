@@ -19,11 +19,13 @@ namespace QouToPOWebApp.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly PoSetting _poSettings;
+        private readonly LogService<PoController> _log;
 
-        public PoController(ApplicationDbContext dbContext, PoSetting poSettings)
+        public PoController(ApplicationDbContext dbContext, PoSetting poSettings, LogService<PoController> log)
         {
             _db = dbContext;
             _poSettings = poSettings;
+            _log = log;
         }
 
         public IActionResult Index(string path = "", string searchTerm = "")
@@ -88,6 +90,8 @@ namespace QouToPOWebApp.Controllers
             memory.Position = 0;
 
             string fileName = Path.GetFileName(fullPath);
+
+            _log.LogInfo("Downloaded file", fileName);
             return File(memory, "application/octet-stream", fileName);
         }
 
@@ -711,6 +715,7 @@ namespace QouToPOWebApp.Controllers
             }
 
             await _db.SaveChangesAsync();
+            _log.LogInfo("PO draft saved", po);
             return Ok(new { message = "Draft saved." });
         }
 
@@ -760,9 +765,10 @@ namespace QouToPOWebApp.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Unable to delete Po Draft: {id} - {ex}");
+                _log.LogError("Unable to delete Po Draft", ex);
             }
 
+            _log.LogInfo("PO draft removed", draft);
             return Ok(new { message = "PO draft has been removed." });
         }
 
@@ -942,7 +948,7 @@ namespace QouToPOWebApp.Controllers
 
                         // If everything is fine, commit the transaction
                         transaction.Commit();
-
+                        _log.LogInfo("PO saved successfully", po);
                         poLink = po.File_path; 
                     }
 
@@ -1098,6 +1104,7 @@ namespace QouToPOWebApp.Controllers
 
             await _db.SaveChangesAsync();
 
+            _log.LogInfo("Template saved", model);
             TempData["toastMessage"] = "Template successfully saved.-success";
 
             return RedirectToAction(nameof(Template));
@@ -1116,6 +1123,7 @@ namespace QouToPOWebApp.Controllers
             _db.Po_templates.Remove(existingTemplate);
             await _db.SaveChangesAsync();
 
+            _log.LogInfo("Template deleted", existingTemplate);
             TempData["toastMessage"] = "Template successfully deleted!-success";
 
             return RedirectToAction(nameof(Template));
@@ -1160,6 +1168,7 @@ namespace QouToPOWebApp.Controllers
 
             await _db.Po_templates.AddAsync(newTemplate);
             await _db.SaveChangesAsync();
+            _log.LogInfo("PO template saved", newTemplate);
 
             return Ok(new { message = "Template successfully saved." });
         }

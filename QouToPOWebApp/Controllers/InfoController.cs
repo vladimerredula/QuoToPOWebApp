@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QouToPOWebApp.Models.InfoModels;
+using QouToPOWebApp.Services;
 
 namespace QouToPOWebApp.Controllers
 {
@@ -10,16 +11,15 @@ namespace QouToPOWebApp.Controllers
     public class InfoController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly LogService<InfoController> _log;
 
-        public InfoController(ApplicationDbContext context)
+        public InfoController(ApplicationDbContext context, LogService<InfoController> logger)
         {
             _db = context;
+            _log = logger;
         }
 
-        public IActionResult Index()
-        {
-            return RedirectToAction(nameof(Company));
-        }
+        public IActionResult Index() => RedirectToAction(nameof(Company));
 
         #region Company Functions
         // GET: Company
@@ -41,6 +41,7 @@ namespace QouToPOWebApp.Controllers
                 _db.Add(company);
                 await _db.SaveChangesAsync();
 
+                _log.LogInfo($"Created Company: {company.Company_name}", company);
                 TempData["toastMessage"] = "Successfully created Company!-success";
                 return RedirectToAction(nameof(Company));
             }
@@ -68,6 +69,7 @@ namespace QouToPOWebApp.Controllers
                     _db.Update(company);
                     await _db.SaveChangesAsync();
 
+                    _log.LogInfo($"Updated Company: {company.Company_name}", company);
                     TempData["toastMessage"] = "Successfully updated Company!-success";
                 }
                 catch (DbUpdateConcurrencyException)
@@ -102,6 +104,7 @@ namespace QouToPOWebApp.Controllers
                 _db.Companies.Remove(company);
                 await _db.SaveChangesAsync();
 
+                _log.LogInfo($"Deleted Company: {company.Company_name}", company);
                 TempData["toastMessage"] = "Successfully deleted Company!-success";
             }
             catch (Exception ex)
@@ -117,23 +120,16 @@ namespace QouToPOWebApp.Controllers
         public async Task<IActionResult> GetCompany(int? id)
         {
             if (id == null || _db.Companies == null)
-            {
                 return NoContent();
-            }
 
             var company = await _db.Companies.FindAsync(id);
             if (company == null)
-            {
                 return NotFound(new { message = "Company not found!" });
-            }
 
             return Ok(company);
         }
 
-        private bool CompanyExists(int id)
-        {
-            return _db.Companies.Any(e => e.Company_ID == id);
-        }
+        private bool CompanyExists(int id) => _db.Companies.Any(e => e.Company_ID == id);
 
         [HttpPost]
         public async Task<IActionResult> AddCustomContactPerson(
@@ -163,6 +159,7 @@ namespace QouToPOWebApp.Controllers
 
                 await _db.Companies.AddAsync(company);
                 await _db.SaveChangesAsync();
+                _log.LogInfo($"Created Company: {company.Company_name}", company);
 
                 var contactPerson = new Contact_person
                 {
@@ -173,6 +170,7 @@ namespace QouToPOWebApp.Controllers
 
                 await _db.Contact_persons.AddAsync(contactPerson);
                 await _db.SaveChangesAsync();
+                _log.LogInfo($"Created Contact Person: {contactPerson.Contact_person_name} for Company: {company.Company_name}", contactPerson);
 
                 var contactPersonName = contactPerson.Contact_person_name != null ? contactPerson.Contact_person_name : contactPerson.Contact_person_name_jpn != null ? contactPerson.Contact_person_name_jpn : "";
 
@@ -184,7 +182,7 @@ namespace QouToPOWebApp.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed to save custom Company. " + ex.Message);
+                _log.LogError("Failed to save custom Company", ex);
                 return Json(new
                 {
                     message = "Failed to save custom Company. Please try again"
@@ -215,6 +213,7 @@ namespace QouToPOWebApp.Controllers
                 _db.Add(contactPerson);
                 await _db.SaveChangesAsync();
 
+                _log.LogInfo($"Created Contact Person: {contactPerson.Contact_person_name}", contactPerson);
                 TempData["toastMessage"] = "Successfully created Contact Person!-success";
                 return RedirectToAction(nameof(ContactPerson));
             }
@@ -243,6 +242,7 @@ namespace QouToPOWebApp.Controllers
                     _db.Update(contactPerson);
                     await _db.SaveChangesAsync();
 
+                    _log.LogInfo($"Updated Contact Person: {contactPerson.Contact_person_name}", contactPerson);
                     TempData["toastMessage"] = "Successfully updated Contact Person.-success";
                 }
                 catch (DbUpdateConcurrencyException)
@@ -278,6 +278,7 @@ namespace QouToPOWebApp.Controllers
                 _db.Contact_persons.Remove(contactPerson);
                 await _db.SaveChangesAsync();
 
+                _log.LogInfo($"Deleted Contact Person: {contactPerson.Contact_person_name}", contactPerson);
                 TempData["toastMessage"] = "Successfully deleted Contact Person!-success";
             }
             catch (Exception ex)
@@ -293,23 +294,16 @@ namespace QouToPOWebApp.Controllers
         public async Task<IActionResult> GetContactPerson(int? id)
         {
             if (id == null || _db.Contact_persons == null)
-            {
                 return NoContent();
-            }
 
             var contactPerson = await _db.Contact_persons.Include(s => s.Company).FirstOrDefaultAsync(s => s.Contact_person_ID == id);
             if (contactPerson == null)
-            {
                 return NotFound(new { message = "Contact Person not found!" });
-            }
 
             return Ok(contactPerson);
         }
 
-        private bool ContactPersonExists(int id)
-        {
-            return _db.Contact_persons.Any(e => e.Contact_person_ID == id);
-        }
+        private bool ContactPersonExists(int id) => _db.Contact_persons.Any(e => e.Contact_person_ID == id);
 
         [HttpPost]
         public IActionResult GetContactPersonAddress(int id)
@@ -317,9 +311,7 @@ namespace QouToPOWebApp.Controllers
             var contactPerson = _db.Contact_persons.Find(id);
 
             if (contactPerson == null)
-            {
                 return NotFound();
-            }
 
             return GetDeliveryAddress((int)contactPerson.Company_ID);
         }
@@ -330,9 +322,7 @@ namespace QouToPOWebApp.Controllers
             var company = _db.Companies.Find(id);
 
             if (company == null)
-            {
                 return NotFound();
-            }
 
             return Json(company.Address ?? company.Address_jpn);
         }
@@ -361,6 +351,7 @@ namespace QouToPOWebApp.Controllers
                 _db.Add(deliveryTerm);
                 await _db.SaveChangesAsync();
 
+                _log.LogInfo($"Created Delivery Term: {deliveryTerm.Delivery_term_name}", deliveryTerm);
                 TempData["toastMessage"] = "Successfully created Delivery Term!-success";
                 return RedirectToAction(nameof(DeliveryTerm));
             }
@@ -389,6 +380,7 @@ namespace QouToPOWebApp.Controllers
                     _db.Update(deliveryTerm);
                     await _db.SaveChangesAsync();
 
+                    _log.LogInfo($"Updated Delivery Term: {deliveryTerm.Delivery_term_name}", deliveryTerm);
                     TempData["toastMessage"] = "Successfully updated Delivery Term!-success";
                 }
                 catch (DbUpdateConcurrencyException)
@@ -424,6 +416,7 @@ namespace QouToPOWebApp.Controllers
                 _db.Delivery_terms.Remove(deliveryTerm);
                 await _db.SaveChangesAsync();
 
+                _log.LogInfo($"Deleted Delivery Term: {deliveryTerm.Delivery_term_name}", deliveryTerm);
                 TempData["toastMessage"] = "Successfully deleted Delivery Term!-success";
             }
             catch (Exception ex)
@@ -439,23 +432,16 @@ namespace QouToPOWebApp.Controllers
         public async Task<IActionResult> GetDeliveryTerm(int id)
         {
             if (id == null || _db.Delivery_terms == null)
-            {
                 return NoContent();
-            }
 
             var deliveryTerm = await _db.Delivery_terms.FindAsync(id);
             if (deliveryTerm == null)
-            {
                 return NotFound(new { message = "Delivery Term not found!-danger" });
-            }
 
             return Ok(deliveryTerm);
         }
 
-        private bool DeliveryTermExists(int id)
-        {
-            return _db.Delivery_terms.Any(e => e.Delivery_term_ID == id);
-        }
+        private bool DeliveryTermExists(int id) => _db.Delivery_terms.Any(e => e.Delivery_term_ID == id);
 
         [HttpPost]
         public async Task<IActionResult> AddCustomDeliveryTerm(string DeliveryTermName, string DeliveryTermNameJpn)
@@ -479,7 +465,7 @@ namespace QouToPOWebApp.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed to save custom delivery term. " + ex.Message);
+                _log.LogError("Failed to save custom delivery term", ex);
                 return Json(new
                 {
                     message = "Failed to save custom delivery term. Please try again"
@@ -510,6 +496,7 @@ namespace QouToPOWebApp.Controllers
                 _db.Add(paymentTerm);
                 await _db.SaveChangesAsync();
 
+                _log.LogInfo($"Created Payment Term: {paymentTerm.Payment_term_name}", paymentTerm);
                 TempData["toastMessage"] = "Successfully created Payment Term!-success";
                 return RedirectToAction(nameof(PaymentTerm));
             }
@@ -538,6 +525,7 @@ namespace QouToPOWebApp.Controllers
                     _db.Update(paymentTerm);
                     await _db.SaveChangesAsync();
 
+                    _log.LogInfo($"Updated Payment Term: {paymentTerm.Payment_term_name}", paymentTerm);
                     TempData["toastMessage"] = "Successfully updated Payment Term!-success";
                 }
                 catch (DbUpdateConcurrencyException)
@@ -573,11 +561,12 @@ namespace QouToPOWebApp.Controllers
                 _db.Payment_terms.Remove(paymentTerm);
                 await _db.SaveChangesAsync();
 
+                _log.LogInfo($"Deleted Payment Term: {paymentTerm.Payment_term_name}", paymentTerm);
                 TempData["toastMessage"] = "Successfully deleted Payment Term!-success";
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Unable to delete Payment Term: {id} - {ex}");
+                _log.LogError($"Unable to delete Payment Term: {id} - {ex}");
                 TempData["toastMessage"] = "Something went wrong please try again.-danger";
             }
 
@@ -588,23 +577,16 @@ namespace QouToPOWebApp.Controllers
         public async Task<IActionResult> GetPaymentTerm(int? id)
         {
             if (id == null || _db.Payment_terms == null)
-            {
                 return NoContent();
-            }
 
             var paymentTerm = await _db.Payment_terms.FindAsync(id);
             if (paymentTerm == null)
-            {
                 return NotFound(new { message = "Payment Term not found!"});
-            }
 
             return Ok(paymentTerm);
         }
 
-        private bool PaymentTermExists(int id)
-        {
-            return _db.Payment_terms.Any(e => e.Payment_term_ID == id);
-        }
+        private bool PaymentTermExists(int id) => _db.Payment_terms.Any(e => e.Payment_term_ID == id);
 
         [HttpPost]
         public async Task<IActionResult> AddCustomPaymentTerm(string PaymentTermName, string PaymentTermNameJpn)
@@ -620,6 +602,8 @@ namespace QouToPOWebApp.Controllers
                 await _db.Payment_terms.AddAsync(paymentTerm);
                 await _db.SaveChangesAsync();
 
+                _log.LogInfo($"Created Payment Term: {paymentTerm.Payment_term_name}", paymentTerm);
+
                 return Ok(new
                 {
                     paymentTermName = paymentTerm.Payment_term_name,
@@ -628,7 +612,7 @@ namespace QouToPOWebApp.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed to save custom payment term. " + ex);
+                _log.LogError("Failed to save custom payment term", ex);
                 return Json(new
                 {
                     message = "Failed to save custom payment term. Please try again"
