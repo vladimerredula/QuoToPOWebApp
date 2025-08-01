@@ -25,5 +25,7 @@ namespace QouToPOWebApp
         public DbSet<Po_template> Po_templates { get; set; }
         public DbSet<File_group> File_groups { get; set; }
         public DbSet<Attachment> Attachments { get; set; }
+
+        public DbSet<Session> Sessions { get; set; }
     }
 }
