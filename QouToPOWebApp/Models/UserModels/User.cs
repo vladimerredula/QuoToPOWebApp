@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using QouToPOWebApp.Models.TemplateModels;
 
 namespace QouToPOWebApp.Models.UserModels
 {
@@ -41,7 +42,10 @@ namespace QouToPOWebApp.Models.UserModels
 
         public int Status { get; set; } = 0;
         public DateTime? Last_password_changed { get; set; }
+
+        [ForeignKey("Template")]
         public int? Qtp_template_ID { get; set; }
+        public virtual Template? Template { get; set; }
 
         [Display(Name = "Name")]
         public string? Full_name

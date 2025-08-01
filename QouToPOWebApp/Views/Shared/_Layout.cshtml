@@ -40,25 +40,42 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
+                        @foreach (var module in _template.GetUserTemplate())
+                        {
+                            if (module.Pages.Count > 1)
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="@(module.Module_name)DropdownMenu">
+                                        @module.Module_name
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="@(module.Module_name)DropdownMenu">
+                                        @foreach (var templatePage in module.Pages)
+                                        {
+                                            <li><a asp-controller="@templatePage.Controller_name" asp-action="@templatePage.Action_name" class="dropdown-item">@templatePage.Page_name</a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="@module.Pages.First().Controller_name" asp-action="@module.Pages.First().Action_name">@module.Pages.First().Page_name</a>
+                                </li>
+                            }
+                        }
+                    </ul>
+                    @* <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item dropdown">
                             <button class="nav-link dropdown-toggle" id="poDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 POs
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="poDropdown">
-                                <li class="submenu submenu-md dropend">
-                                    <a class="dropdown-item dropdown-toggle" role="button"
-                                       data-bs-toggle="dropdown" aria-expanded="false"
-                                       onclick="event.stopPropagation();">
-                                        Create PO
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-controller="Po" asp-action="New">New</a></li>
-                                        <li><a class="dropdown-item disabled" asp-controller="Po" asp-action="FromQuotation">From Quotation</a></li>
-                                    </ul>
-                                </li>
                                 <li>
                                     <a asp-controller="Po" asp-action="Index" asp-route-path="@DateTime.Now.ToString("yyyy")" class="dropdown-item">PO list</a>
                                 </li>
+                                <li><a class="dropdown-item" asp-controller="Po" asp-action="New">Create new</a></li>
+                                <li><a class="dropdown-item disabled" asp-controller="Po" asp-action="FromQuotation">Scan PDF</a></li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a asp-controller="Po" asp-action="Template" asp-route-id="" class="dropdown-item">Templates</a>
                                 </li>
@@ -83,7 +100,20 @@
                                 </li>
                             </ul>
                         </li>
-                    </ul>
+                        <li class="nav-item dropdown">
+                            <button class="nav-link dropdown-toggle" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Admin
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                <li>
+                                    <a asp-controller="Session" asp-action="Index" class="dropdown-item">Active Session</a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Template" asp-action="Index" class="dropdown-item">Templates</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul> *@
 
                     <ul class="navbar-nav navbar-right">
                         @if (User.Identity.IsAuthenticated)

@@ -2,6 +2,7 @@
 using QouToPOWebApp.Models.InfoModels;
 using QouToPOWebApp.Models.MiscModels;
 using QouToPOWebApp.Models.PoModels;
+using QouToPOWebApp.Models.TemplateModels;
 using QouToPOWebApp.Models.UserModels;
 
 namespace QouToPOWebApp
@@ -25,6 +26,15 @@ namespace QouToPOWebApp
         public DbSet<Po_template> Po_templates { get; set; }
         public DbSet<File_group> File_groups { get; set; }
         public DbSet<Attachment> Attachments { get; set; }
+
+        // Templates
+        public DbSet<Template> Templates { get; set; }
+        public DbSet<Module> Modules { get; set; }
+        public DbSet<Page> Pages { get; set; }
+        public DbSet<Component> Components { get; set; }
+        public DbSet<Template_module> Template_modules { get; set; }
+        public DbSet<Template_page> Template_pages { get; set; }
+        public DbSet<Template_component> Template_components { get; set; }
 
         public DbSet<Session> Sessions { get; set; }
     }

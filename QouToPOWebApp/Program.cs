@@ -25,6 +25,7 @@ builder.Services.AddScoped<TabulaService>();
 builder.Services.AddScoped<IBreadcrumbService, BreadcrumbService>();
 builder.Services.AddScoped<BreadcrumbActionFilter>();
 builder.Services.AddScoped(typeof(LogService<>));
+builder.Services.AddScoped<TemplateService>();
 builder.Services.AddSingleton<EncryptionHelper>();
 
 builder.Services.AddHttpContextAccessor();
