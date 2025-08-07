@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<object>
 
 @{
-    ViewData["Title"] = "PO";
+    ViewData["Title"] = "POs";
     string currentPath = ViewBag.CurrentPath as string ?? "";
     string parentPath = System.IO.Path.GetDirectoryName(currentPath) ?? "";
     // string _poPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "AppData/PO");

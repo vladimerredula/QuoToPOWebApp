@@ -124,7 +124,7 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdownMenu">
                                     @* <li><a class="dropdown-item" data-bs-toggle="popover" data-bs-offset="0,30" data-bs-trigger="hover focus" data-bs-content="In progress"><i class="bi bi-person-circle"></i> My Profile</a></li> *@
-                                    <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changePassModal"><i class="bi bi-person-fill-gear"></i> Change password</a></li>
+                                    <li><a class="dropdown-item @(User.FindFirstValue("ChangePassword") == "true" ? "" : "disabled")" data-bs-toggle="modal" data-bs-target="#changePassModal"><i class="bi bi-person-fill-gear"></i> Change password</a></li>
                                     <li><a asp-controller="Access" asp-action="Logout" class="dropdown-item"><i class="bi bi-box-arrow-left"></i> Logout</a></li>
                                 </ul>
                             </li>

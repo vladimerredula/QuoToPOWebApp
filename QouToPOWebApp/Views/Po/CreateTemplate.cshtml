@@ -8,7 +8,7 @@
 @model TemplateViewModel
 
 @{
-    ViewData["Title"] = "Template edit";
+    ViewData["Title"] = "PO template";
     var paymentTerms = ViewBag.paymentTerms as List<Payment_term>;
     var deliveryTerms = ViewBag.deliveryTerms as List<Delivery_term>;
 }
@@ -508,7 +508,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header border-0">
-                <h1 class="modal-title fs-5" id="pdfPreviewModalLabel">Preview</h1>
+                <h1 class="modal-title fs-5" id="pdfPreviewModalLabel">PO template preview</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
