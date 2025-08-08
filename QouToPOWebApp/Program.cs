@@ -8,6 +8,7 @@ using QouToPOWebApp.Filters;
 using QouToPOWebApp.Helpers;
 using QouToPOWebApp.Models.MiscModels;
 using QouToPOWebApp.Services;
+using StackExchange.Redis;
 using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,6 +45,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
     ));
 
+// Redis connection (shared for cache + DataProtection)
+var redis = ConnectionMultiplexer.Connect("redis:6379");
+
+// Caching (Redis)
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = "redis:6379"; // Use container name in Docker network
+});
+
 // Authentication + Cookie Config
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -69,7 +79,7 @@ builder.Services.AddSession(options =>
 
 // Data Protection
 builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo("/app/DataProtection-Keys"))
+    .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys")
     .SetApplicationName("QuoToPoWebApp");
 
 // Forwarded Headers (for reverse proxy)
