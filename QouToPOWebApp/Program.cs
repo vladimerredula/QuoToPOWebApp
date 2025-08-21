@@ -10,6 +10,7 @@ using QouToPOWebApp.Models.MiscModels;
 using QouToPOWebApp.Services;
 using StackExchange.Redis;
 using System.Net;
+using UAParser;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,8 +62,83 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.Name = "qtp.Auth";
         options.LoginPath = "/Access/Login";
         options.AccessDeniedPath = "/AccessDenied";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+        options.ExpireTimeSpan = TimeSpan.FromDays(30);
         options.SlidingExpiration = true;
+
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnSignedIn = async ctx =>
+            {
+                var db = ctx.HttpContext.RequestServices.GetRequiredService<ApplicationDbContext>();
+                var userId = ctx.Principal.FindFirst("Personnelid")?.Value;
+
+                if (int.TryParse(userId, out var personnelId))
+                {
+                    var ip = ctx.Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                          ?? ctx.HttpContext.Connection.RemoteIpAddress?.ToString();
+                    if (ip == "::1") ip = "127.0.0.1";
+
+                    var userAgent = ctx.Request.Headers["User-Agent"].ToString(); var parser = Parser.GetDefault();
+                    var clientInfo = parser.Parse(userAgent);
+                    var browser = clientInfo.UA.Family;
+                    var browserVersion = clientInfo.UA.ToString();
+                    var os = clientInfo.OS.ToString();
+                    var device = clientInfo.Device.ToString();
+                    var userAgentString = $"{browser} ({browserVersion}) on {os} ({device})";
+
+                    db.Sessions.Add(new Session
+                    {
+                        Session_ID = Guid.NewGuid().ToString(),
+                        Personnel_ID = personnelId,
+                        Ip_address = ip,
+                        User_agent = userAgentString,
+                        App_name = "QTP",
+                        Signed_in_at = DateTime.Now,
+                        Last_activity = DateTime.Now
+                    });
+                    await db.SaveChangesAsync();
+                }
+            },
+            OnValidatePrincipal = async ctx =>
+            {
+                var db = ctx.HttpContext.RequestServices.GetRequiredService<ApplicationDbContext>();
+                var userId = ctx.Principal.FindFirst("Personnelid")?.Value;
+
+                if (int.TryParse(userId, out var personnelId))
+                {
+                    var session = await db.Sessions
+                        .Where(s => s.Personnel_ID == personnelId && s.Signed_out_at == null)
+                        .OrderByDescending(s => s.Signed_in_at)
+                        .FirstOrDefaultAsync();
+
+                    if (session != null)
+                    {
+                        session.Last_activity = DateTime.Now;
+                        await db.SaveChangesAsync();
+                    }
+                }
+            },
+            OnSigningOut = async ctx =>
+            {
+                var db = ctx.HttpContext.RequestServices.GetRequiredService<ApplicationDbContext>();
+                var userId = ctx.HttpContext.User.FindFirst("Personnelid")?.Value;
+
+                if (int.TryParse(userId, out var personnelId))
+                {
+                    var session = await db.Sessions
+                        .Where(s => s.Personnel_ID == personnelId && s.Signed_out_at == null)
+                        .OrderByDescending(s => s.Signed_in_at)
+                        .FirstOrDefaultAsync();
+
+                    if (session != null)
+                    {
+                        session.Signed_out_at = DateTime.Now;
+                        session.Last_activity = DateTime.Now;
+                        await db.SaveChangesAsync();
+                    }
+                }
+            }
+        };
     });
 
 builder.Services.AddAuthorization();
@@ -181,7 +257,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
-app.UseMiddleware<SessionTrackingMiddleware>();
 
 // Routing
 app.MapControllerRoute(

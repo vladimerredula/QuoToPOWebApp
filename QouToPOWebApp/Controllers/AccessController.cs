@@ -113,8 +113,6 @@ namespace QouToPOWebApp.Controllers
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), authProps);
 
-            // Ensure session is initialized
-            HttpContext.Session.SetString("SessionInitialized", HttpContext.Session.Id);
             _log.LogInfo("Logged in", usernameOverride: model.Username);
 
             return RedirectToAction("Index", "Access");
@@ -123,7 +121,6 @@ namespace QouToPOWebApp.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            HttpContext.Session.Clear();
             _log.LogInfo("Logged out");
 
             return RedirectToAction("Index", "Access");

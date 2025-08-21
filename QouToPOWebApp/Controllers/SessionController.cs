@@ -19,11 +19,9 @@ namespace QouToPOWebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetActiveUsers()
         {
-            var threshold = DateTime.UtcNow.AddMinutes(-30);
-
             var activeUsers = await _db.Sessions
                 .Include(s => s.User)
-                .Where(s => s.Last_activity >= threshold && s.App_name == "QTP")
+                .Where(s => s.App_name == "QTP" && s.Signed_out_at == null)
                 .OrderByDescending(s => s.Last_activity)
                 .Select(s => new
                 {
@@ -36,20 +34,6 @@ namespace QouToPOWebApp.Controllers
                 .ToListAsync();
 
             return Json(activeUsers);
-        }
-
-        [HttpGet("/test-session")]
-        public IActionResult TestSession()
-        {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("SessionTest")))
-            {
-                HttpContext.Session.SetString("SessionTest", "initialized");
-                return Content($"New Session ID: {HttpContext.Session.Id}");
-            }
-            else
-            {
-                return Content($"Same Session ID: {HttpContext.Session.Id}");
-            }
         }
     }
 }
