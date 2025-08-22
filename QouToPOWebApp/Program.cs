@@ -107,7 +107,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                 if (int.TryParse(userId, out var personnelId))
                 {
                     var session = await db.Sessions
-                        .Where(s => s.Personnel_ID == personnelId && s.Signed_out_at == null)
+                        .Where(s => s.Personnel_ID == personnelId && s.Signed_out_at == null && s.App_name == "QTP")
                         .OrderByDescending(s => s.Signed_in_at)
                         .FirstOrDefaultAsync();
 
@@ -126,7 +126,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                 if (int.TryParse(userId, out var personnelId))
                 {
                     var session = await db.Sessions
-                        .Where(s => s.Personnel_ID == personnelId && s.Signed_out_at == null)
+                        .Where(s => s.Personnel_ID == personnelId && s.Signed_out_at == null && s.App_name == "QTP")
                         .OrderByDescending(s => s.Signed_in_at)
                         .FirstOrDefaultAsync();
 
