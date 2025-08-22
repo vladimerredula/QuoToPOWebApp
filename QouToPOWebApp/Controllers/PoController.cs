@@ -91,7 +91,7 @@ namespace QouToPOWebApp.Controllers
 
             string fileName = Path.GetFileName(fullPath);
 
-            _log.LogInfo("Downloaded file", fileName);
+            _log.LogInfo($"Downloaded file {fileName}");
             return File(memory, "application/octet-stream", fileName);
         }
 
