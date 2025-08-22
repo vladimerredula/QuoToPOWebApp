@@ -162,7 +162,9 @@ builder.Services.AddDataProtection()
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    options.KnownProxies.Add(IPAddress.Parse("192.168.161.111")); // Nginx IP
+    options.KnownNetworks.Add(
+        new Microsoft.AspNetCore.HttpOverrides.IPNetwork(IPAddress.Parse("172.18.0.0"), 16) // default docker bridge network
+    );
 });
 
 // File Logging (General + Error)
